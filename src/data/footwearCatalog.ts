@@ -9,6 +9,11 @@ export const BRANDS = [
   'CONVERSE',
   'VANS',
   'SALOMON',
+  'SKECHERS',
+  'ASICS',
+  'REEBOK',
+  'UNDER ARMOUR',
+  'HOKA',
 ];
 
 export const CATEGORIES = [

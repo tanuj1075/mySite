@@ -1,6 +1,7 @@
 import React from 'react';
 import { X, Scale, ShoppingBag, Eye, Trash2 } from 'lucide-react';
 import { ShoeProduct, CartItem } from '../types';
+import { formatCurrency } from '../lib/currency';
 
 interface CompareModalProps {
   isOpen: boolean;
@@ -106,9 +107,9 @@ export const CompareModal: React.FC<CompareModalProps> = ({
                         {p.name}
                       </div>
                       <div className="text-[13px] font-bold text-[#1a1816] mb-3">
-                        ${p.price.toFixed(2)}{' '}
+                        {formatCurrency(p.price)}{' '}
                         <span className="line-through text-[#8e8474] text-xs font-normal">
-                          ${p.mrp.toFixed(2)}
+                          {formatCurrency(p.mrp)}
                         </span>
                       </div>
                       <div className="flex gap-2">
@@ -139,7 +140,7 @@ export const CompareModal: React.FC<CompareModalProps> = ({
                   <td className="p-3 font-bold text-[#59544c] bg-[#e4ddcf]/50">RATING</td>
                   {compareProducts.map((p) => (
                     <td key={p.id} className="p-3 text-[#1a1816]">
-                      ⭐ {p.rating} ({p.reviewsCount} reviews)
+                      {p.reviewsCount > 0 ? `⭐ ${p.rating} (${p.reviewsCount} reviews)` : 'Not rated'}
                     </td>
                   ))}
                 </tr>

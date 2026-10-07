@@ -6,7 +6,7 @@ interface ReturnsExchangeModalProps {
   isOpen: boolean;
   onClose: () => void;
   order: Order | null;
-  onSubmitRequest: (req: ExchangeReturnRequest) => void;
+  onSubmitRequest: (req: ExchangeReturnRequest) => void | Promise<void>;
 }
 
 const EXCHANGE_REASONS = [
@@ -32,12 +32,14 @@ export const ReturnsExchangeModal: React.FC<ReturnsExchangeModalProps> = ({
   const [requestedSize, setRequestedSize] = useState('9');
   const [notes, setNotes] = useState('');
   const [isSuccess, setIsSuccess] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [submissionError, setSubmissionError] = useState<string | null>(null);
 
   if (!isOpen || !order) return null;
 
   const targetItem: OrderItem = order.items[selectedItemIndex] || order.items[0];
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!targetItem) return;
 
@@ -56,12 +58,20 @@ export const ReturnsExchangeModal: React.FC<ReturnsExchangeModalProps> = ({
       adminNotes: 'Submitted by client. Awaiting atelier inspection authorization.',
     };
 
-    onSubmitRequest(newRequest);
-    setIsSuccess(true);
-    setTimeout(() => {
-      setIsSuccess(false);
-      onClose();
-    }, 2800);
+    setIsSubmitting(true);
+    setSubmissionError(null);
+    try {
+      await onSubmitRequest(newRequest);
+      setIsSuccess(true);
+      setTimeout(() => {
+        setIsSuccess(false);
+        onClose();
+      }, 2800);
+    } catch (error) {
+      setSubmissionError(error instanceof Error ? error.message : 'Request could not be saved');
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -107,6 +117,7 @@ export const ReturnsExchangeModal: React.FC<ReturnsExchangeModalProps> = ({
           </div>
         ) : (
           <form onSubmit={handleSubmit} className="space-y-5 text-xs">
+            {submissionError && <p role="alert" className="text-red-700">{submissionError}</p>}
             {/* Request Type Toggle */}
             <div className="grid grid-cols-2 gap-2">
               <button
@@ -238,9 +249,10 @@ export const ReturnsExchangeModal: React.FC<ReturnsExchangeModalProps> = ({
               </button>
               <button
                 type="submit"
+                disabled={isSubmitting}
                 className="w-1/2 py-2.5 bg-[#141312] text-[#f5efe6] font-bold uppercase tracking-wider hover:bg-[#35322e] transition-colors cursor-pointer"
               >
-                SUBMIT REQUEST
+                {isSubmitting ? 'SAVING REQUEST...' : 'SUBMIT REQUEST'}
               </button>
             </div>
           </form>

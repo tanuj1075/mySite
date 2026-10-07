@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Flame, Clock, Shield, ArrowRight, Check } from 'lucide-react';
 import { CartItem } from '../types';
+import { formatCurrency } from '../lib/currency';
 
 interface NewDropsViewProps {
   onClaimDrop: (item: CartItem) => void;
@@ -129,7 +130,7 @@ export const NewDropsView: React.FC<NewDropsViewProps> = ({
                     <h3 className="font-headline text-2xl font-bold uppercase text-[#1a1816] tracking-tight">
                       {drop.title}
                     </h3>
-                    <span className="text-sm font-bold text-[#1a1816]">${drop.price}</span>
+                    <span className="text-sm font-bold text-[#1a1816]">{formatCurrency(drop.price)}</span>
                   </div>
 
                   <p className="text-xs text-[#59544c] leading-relaxed mb-6 font-mono">

@@ -1,6 +1,7 @@
 import React from 'react';
 import { CheckCircle2, ShieldCheck, X, FileText, Download } from 'lucide-react';
 import { Address } from '../types';
+import { formatCurrency } from '../lib/currency';
 
 interface OrderConfirmationModalProps {
   isOpen: boolean;
@@ -93,7 +94,7 @@ export const OrderConfirmationModal: React.FC<OrderConfirmationModalProps> = ({
               TOTAL SETTLEMENT CHARGED
             </span>
             <span className="text-[#1a1816] text-[13px] font-bold">
-              ${totalAmount.toLocaleString('en-US', { minimumFractionDigits: 2 })} USD
+              {formatCurrency(totalAmount)}
             </span>
           </div>
         </div>

@@ -1,6 +1,7 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Search, UserCheck, ShieldCheck, ArrowRight, Download, Package, Mail, MapPin, Phone, Award } from 'lucide-react';
 import { CustomerItem, Order } from '../../types';
+import { adminApi } from '../../lib/api';
 
 interface AdminCustomersViewProps {
   orders?: Order[];
@@ -93,9 +94,32 @@ export const AdminCustomersView: React.FC<AdminCustomersViewProps> = ({
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedTier, setSelectedTier] = useState('ALL TIERS');
   const [inspectingCustomer, setInspectingCustomer] = useState<CustomerItem | null>(null);
+  const [customers, setCustomers] = useState<CustomerItem[]>([]);
+
+  useEffect(() => {
+    adminApi.customers().then((records) => {
+      setCustomers(records.map((record) => {
+        const customerOrders = Array.isArray(record.orders) ? record.orders as Array<{ total: string | number }> : [];
+        const customerAddresses = Array.isArray(record.addresses) ? record.addresses as Array<{ city: string; country: string }> : [];
+        const createdAt = new Date(String(record.createdAt));
+        return {
+          id: String(record.id),
+          name: String(record.name),
+          email: String(record.email),
+          phone: String(record.phone ?? ''),
+          location: customerAddresses[0] ? `${customerAddresses[0].city}, ${customerAddresses[0].country}` : 'Not provided',
+          tier: 'CUSTOMER',
+          lifetimeOrders: customerOrders.length,
+          totalSpent: customerOrders.reduce((sum, order) => sum + Number(order.total), 0),
+          status: 'VERIFIED',
+          memberSince: Number.isNaN(createdAt.getTime()) ? 'Unknown' : createdAt.toLocaleDateString(undefined, { month: 'short', year: 'numeric' }),
+        };
+      }));
+    }).catch(() => setCustomers([]));
+  }, []);
 
   // Filter customers
-  const filteredCustomers = DEFAULT_CUSTOMERS.filter((c) => {
+  const filteredCustomers = customers.filter((c) => {
     const matchesSearch =
       !searchQuery.trim() ||
       c.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -109,10 +133,11 @@ export const AdminCustomersView: React.FC<AdminCustomersViewProps> = ({
     return matchesSearch && matchesTier;
   });
 
-  const totalClientsCount = 1428;
-  const vipClientsCount = 142;
-  const avgOrderValue = 42500;
-  const retentionRate = 78.4;
+  const totalClientsCount = customers.length;
+  const vipClientsCount = customers.filter((customer) => customer.tier.includes('VIP')).length;
+  const totalOrderCount = customers.reduce((count, customer) => count + customer.lifetimeOrders, 0);
+  const avgOrderValue = totalOrderCount ? customers.reduce((sum, customer) => sum + customer.totalSpent, 0) / totalOrderCount : 0;
+  const retentionRate = totalClientsCount ? customers.filter((customer) => customer.lifetimeOrders > 1).length / totalClientsCount * 100 : 0;
 
   const handleExportClientsCSV = () => {
     const headers = ['ID', 'Name', 'Email', 'Phone', 'Location', 'Tier', 'Orders', 'TotalSpent', 'Status'];
@@ -181,7 +206,7 @@ export const AdminCustomersView: React.FC<AdminCustomersViewProps> = ({
             TOTAL VERIFIED CLIENTS
           </div>
           <div className="text-2xl font-bold text-[#1a1816] mt-1">{totalClientsCount.toLocaleString()}</div>
-          <div className="text-[9px] text-[#16a34a] font-bold mt-0.5">+48 this cycle</div>
+          <div className="text-[9px] text-[#16a34a] font-bold mt-0.5">Saved customer accounts</div>
         </div>
 
         <div className="bg-[#ede7dd] border border-[#d5cdc0] p-4">
@@ -189,7 +214,7 @@ export const AdminCustomersView: React.FC<AdminCustomersViewProps> = ({
             VIP PRIVILEGE TIER 01
           </div>
           <div className="text-2xl font-bold text-[#1a1816] mt-1">{vipClientsCount} Patrons</div>
-          <div className="text-[9px] text-[#59544c] mt-0.5">Private Concierge Gated</div>
+          <div className="text-[9px] text-[#59544c] mt-0.5">VIP tier not configured</div>
         </div>
 
         <div className="bg-[#ede7dd] border border-[#d5cdc0] p-4">
@@ -197,7 +222,7 @@ export const AdminCustomersView: React.FC<AdminCustomersViewProps> = ({
             AVERAGE ORDER VALUE
           </div>
           <div className="text-2xl font-bold text-[#1a1816] mt-1">₹{avgOrderValue.toLocaleString()}</div>
-          <div className="text-[9px] text-[#16a34a] font-bold mt-0.5">+12.2% vs last quarter</div>
+          <div className="text-[9px] text-[#16a34a] font-bold mt-0.5">From saved orders</div>
         </div>
 
         <div className="bg-[#ede7dd] border border-[#d5cdc0] p-4">
@@ -205,7 +230,7 @@ export const AdminCustomersView: React.FC<AdminCustomersViewProps> = ({
             REPEAT PROCUREMENT
           </div>
           <div className="text-2xl font-bold text-[#16a34a] mt-1">{retentionRate}%</div>
-          <div className="text-[9px] text-[#7b6e54] mt-0.5">Archival Member Loyalty</div>
+          <div className="text-[9px] text-[#7b6e54] mt-0.5">Customers with multiple orders</div>
         </div>
       </div>
 

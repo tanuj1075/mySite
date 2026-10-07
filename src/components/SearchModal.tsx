@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { X, Search, ArrowRight } from 'lucide-react';
 import { CartItem } from '../types';
+import { formatCurrency } from '../lib/currency';
 
 interface SearchModalProps {
   isOpen: boolean;
@@ -95,7 +96,7 @@ export const SearchModal: React.FC<SearchModalProps> = ({
                   </div>
                 </div>
                 <div className="flex items-center gap-3 font-mono text-[11px]">
-                  <span className="text-[#1a1816] font-bold">${item.price.toFixed(2)}</span>
+                  <span className="text-[#1a1816] font-bold">{formatCurrency(item.price)}</span>
                   <ArrowRight className="w-4 h-4 text-[#59544c] group-hover:text-[#1a1816] transition-colors" />
                 </div>
               </div>

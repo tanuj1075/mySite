@@ -30,6 +30,8 @@ import { AccountModal } from './components/AccountModal';
 import { LoginView } from './components/LoginView';
 import { AdminLoginView } from './components/AdminLoginView';
 import { Footer } from './components/Footer';
+import { adminApi, authApi, clearAdminSession, clearSession, customerApi } from './lib/api';
+import { loadRazorpayCheckout } from './lib/razorpay';
 
 import { INITIAL_CART_ITEMS, INITIAL_ADDRESSES } from './data/mockData';
 import {
@@ -50,7 +52,107 @@ import {
   ExchangeReturnRequest,
   SneakerDrop,
   Coupon,
+  PaymentMethod,
 } from './types';
+
+type AdminRoute = 'login' | 'panel' | null;
+
+function readAdminRoute(): AdminRoute {
+  const pathname = window.location.pathname.replace(/\/+$/, '') || '/';
+  if (pathname === '/admin') return 'panel';
+  if (pathname === '/admin/login') return 'login';
+  return null;
+}
+
+function toOrderRecord(record: Record<string, unknown>): Order {
+  const statusMap: Record<string, Order['orderStatus']> = {
+    ORDER_PLACED: 'Order Placed',
+    CONFIRMED: 'Confirmed',
+    PACKED: 'Packed',
+    SHIPPED: 'Shipped',
+    OUT_FOR_DELIVERY: 'Out for Delivery',
+    DELIVERED: 'Delivered',
+    CANCELLED: 'Order Placed',
+  };
+  const items = (record.items as Array<Record<string, unknown>> ?? []).map((item) => ({
+    productId: String(item.productId),
+    sku: String(item.sku),
+    name: String(item.name),
+    brand: String(item.brand),
+    color: String(item.color),
+    size: String(item.size),
+    price: Number(item.price),
+    quantity: Number(item.quantity),
+    image: String(item.image),
+  }));
+  return {
+    id: String(record.id),
+    date: new Date(String(record.createdAt ?? Date.now())).toLocaleDateString(),
+    items,
+    subtotal: Number(record.subtotal),
+    discount: Number(record.discount),
+    couponCode: typeof record.couponCode === 'string' ? record.couponCode : undefined,
+    total: Number(record.total),
+    paymentAmount: Number(record.paymentAmount ?? record.total),
+    shippingAddress: record.addressSnapshot as Address,
+    paymentMethod: String(record.paymentMethod),
+    currency: String(record.paymentCurrency ?? 'INR'),
+    exchangeRate: Number(record.exchangeRate ?? 1),
+    paymentStatus: String(record.paymentStatus) as Order['paymentStatus'],
+    orderStatus: statusMap[String(record.orderStatus)] ?? 'Order Placed',
+    expectedDelivery: '3-5 Business Days',
+    trackingNumber: String(record.trackingNumber ?? ''),
+    carrier: 'VANTA Logistics',
+    timeline: [],
+  };
+}
+
+function toExchangeRecord(record: Record<string, unknown>): ExchangeReturnRequest {
+  return {
+    id: String(record.id),
+    orderId: String(record.orderId),
+    type: String(record.type) as ExchangeReturnRequest['type'],
+    productId: String(record.productId),
+    productName: String(record.productName),
+    productImage: String(record.productImage),
+    currentSize: String(record.currentSize),
+    requestedSize: typeof record.requestedSize === 'string' ? record.requestedSize : undefined,
+    reason: String(record.reason),
+    date: new Date(String(record.createdAt ?? Date.now())).toISOString().slice(0, 10),
+    status: String(record.status) as ExchangeReturnRequest['status'],
+    adminNotes: typeof record.adminNotes === 'string' ? record.adminNotes : undefined,
+  };
+}
+
+function toDropRecord(record: Record<string, unknown>): SneakerDrop {
+  return {
+    id: String(record.id),
+    productId: String(record.productId),
+    productName: String(record.productName),
+    brand: String(record.brand),
+    edition: String(record.edition),
+    image: String(record.image),
+    price: Number(record.price),
+    mrp: Number(record.mrp),
+    launchDate: String(record.launchDate),
+    launchTime: String(record.launchTime),
+    stock: Number(record.stock),
+    status: String(record.status) as SneakerDrop['status'],
+    targetTimestamp: Number(record.targetTimestamp),
+    notifySubscribers: Array.isArray(record.notifySubscribers) ? record.notifySubscribers.map(String) : [],
+  };
+}
+
+function toCouponRecord(record: Record<string, unknown>): Coupon {
+  return {
+    code: String(record.code),
+    discountPercent: Number(record.discountPercent),
+    minOrderValue: Number(record.minOrderValue),
+    maxDiscount: record.maxDiscount == null ? undefined : Number(record.maxDiscount),
+    description: String(record.description),
+    isActive: Boolean(record.isActive),
+  };
+}
 
 export default function App() {
   // Product Catalog State
@@ -86,6 +188,10 @@ export default function App() {
 
   // Privileged Admin Authentication State
   const [isAdminAuthenticated, setIsAdminAuthenticated] = useState<boolean>(false);
+  const [adminRoute, setAdminRoute] = useState<AdminRoute>(() => readAdminRoute());
+  const [isAdminSessionLoading, setIsAdminSessionLoading] = useState(() => readAdminRoute() !== null);
+  const [adminSessionError, setAdminSessionError] = useState<string | null>(null);
+  const [adminSessionAttempt, setAdminSessionAttempt] = useState(0);
   const [adminIdentity, setAdminIdentity] = useState<{
     email: string;
     name: string;
@@ -127,6 +233,155 @@ export default function App() {
       setToastMessage(null);
     }, 3500);
   };
+
+  const navigateAdminRoute = (path: string, replace = false) => {
+    if (replace) window.history.replaceState({}, '', path);
+    else window.history.pushState({}, '', path);
+    setAdminRoute(readAdminRoute());
+  };
+
+  const restoreCustomerRecords = async (user: { name: string; email: string; memberId: string }) => {
+    setCurrentUser(user);
+    try {
+      const [cart, storedAddresses, storedOrders, storedExchanges, storedWishlist] = await Promise.all([
+        customerApi.cart(),
+        customerApi.addresses(),
+        customerApi.orders(),
+        customerApi.exchanges(),
+        customerApi.wishlist(),
+      ]);
+      const restoredCart = cart.items.flatMap((item): CartItem[] => {
+        const product = item.product.catalog as ShoeProduct;
+        if (!product?.id) return [];
+        const color = product.colors?.find((variant) => variant.name === item.color) ?? product.colors?.[0];
+        if (!color) return [];
+        return [{
+          id: item.id,
+          productId: item.productId,
+          code: product.code,
+          name: product.name,
+          edition: product.collections?.[0] ?? 'VANTA CATALOG',
+          price: product.price,
+          mrp: product.mrp,
+          brand: product.brand,
+          image: color.images.front,
+          colorway: item.color,
+          specification: item.size,
+          selectedColor: item.color,
+          selectedSize: item.size,
+          availableSizes: product.sizeInventory?.[item.color]?.map((size) => size.size) ?? [],
+          allocationStatus: 'Saved to your account',
+          quantity: item.quantity,
+        }];
+      });
+      const addresses = storedAddresses.map((address) => ({
+        ...address,
+        tag: address.tag ?? undefined,
+        line2: address.line2 ?? undefined,
+        state: address.state ?? undefined,
+        phone: address.phone ?? undefined,
+      }));
+      const orders = storedOrders.map(toOrderRecord);
+      setCartItems(restoredCart);
+      setAddresses(addresses);
+      setSelectedAddressId(addresses[0]?.id ?? '');
+      setOrders(orders);
+      setCurrentOrder(orders[0] ?? null);
+      setExchanges(storedExchanges.map(toExchangeRecord));
+      setWishlistItems(storedWishlist.flatMap((entry): WishlistItem[] => {
+        const product = (entry.product as { catalog?: ShoeProduct } | undefined)?.catalog;
+        if (!product?.id) return [];
+        const colorway = String(entry.colorway);
+        const color = product.colors?.find((variant) => variant.name === colorway) ?? product.colors?.[0];
+        return color ? [{
+          id: product.id,
+          productId: product.id,
+          code: product.code,
+          name: product.name,
+          brand: product.brand,
+          price: product.price,
+          mrp: product.mrp,
+          image: color.images.front,
+          colorway,
+          specification: String(entry.specification),
+          availableSizes: product.sizeInventory?.[colorway]?.map((size) => size.size) ?? [],
+        }] : [];
+      }));
+    } catch (error) {
+      showToast(error instanceof Error ? error.message : 'Could not load saved account records');
+    }
+  };
+
+  useEffect(() => {
+    const handlePopState = () => setAdminRoute(readAdminRoute());
+    window.addEventListener('popstate', handlePopState);
+    return () => window.removeEventListener('popstate', handlePopState);
+  }, []);
+
+  useEffect(() => {
+    customerApi.catalog().then((catalog) => {
+      if (!catalog.length) return;
+      const savedProducts = catalog as ShoeProduct[];
+      setProducts(savedProducts);
+      setSelectedProduct(savedProducts[0]);
+    }).catch(() => undefined);
+    customerApi.drops().then((storedDrops) => setDrops(storedDrops.map(toDropRecord))).catch(() => undefined);
+    if (authApi.hasSession()) {
+      authApi.session().then(restoreCustomerRecords).catch(() => clearSession());
+    }
+  }, []);
+
+  useEffect(() => {
+    if (!adminRoute) {
+      setIsAdminSessionLoading(false);
+      setAdminSessionError(null);
+      return;
+    }
+
+    if (adminRoute === 'login' && !adminApi.hasSession()) {
+      setIsAdminSessionLoading(false);
+      setAdminSessionError(null);
+      return;
+    }
+
+    let isCurrent = true;
+    setIsAdminSessionLoading(true);
+    setAdminSessionError(null);
+    adminApi.session().then((admin) => {
+      if (!isCurrent) return;
+      if (admin.role !== 'ADMIN') throw new Error('Admin role required');
+      setIsAdminAuthenticated(true);
+      setAdminIdentity({ email: admin.email, name: admin.name, role: admin.role });
+      setIsAdminPanelOpen(true);
+      Promise.all([adminApi.orders(), adminApi.products(), adminApi.coupons(), adminApi.drops(), adminApi.exchanges()])
+        .then(([storedOrders, storedProducts, storedCoupons, storedDrops, storedExchanges]) => {
+          setOrders(storedOrders.map(toOrderRecord));
+          setProducts(storedProducts.map((product) => product.catalog as ShoeProduct));
+          setCoupons(storedCoupons.map(toCouponRecord));
+          setDrops(storedDrops.map(toDropRecord));
+          setExchanges(storedExchanges.map(toExchangeRecord));
+        })
+        .catch((error: unknown) => showToast(error instanceof Error ? error.message : 'Could not load saved admin records'));
+      if (adminRoute === 'login') navigateAdminRoute('/admin', true);
+    }).catch((error: unknown) => {
+      if (!isCurrent) return;
+      const message = error instanceof Error ? error.message : 'Admin session validation failed';
+      const isInvalidSession = /session required|invalid or expired|admin role required|no longer valid/i.test(message);
+      if (isInvalidSession) {
+        clearAdminSession();
+        setIsAdminAuthenticated(false);
+        setAdminIdentity(null);
+        setIsAdminPanelOpen(false);
+        if (adminRoute === 'panel') navigateAdminRoute('/admin/login', true);
+      } else {
+        setAdminSessionError(message);
+      }
+    }).finally(() => {
+      if (isCurrent) setIsAdminSessionLoading(false);
+    });
+
+    return () => { isCurrent = false; };
+  }, [adminRoute, adminSessionAttempt]);
 
   // Stealth Admin Route & Keyboard Shortcut Detection (Hidden from standard users)
   useEffect(() => {
@@ -176,34 +431,68 @@ export default function App() {
   }, [isAdminAuthenticated]);
 
   // Cart operations
-  const handleUpdateQuantity = (id: string, delta: number) => {
+  const handleUpdateQuantity = async (id: string, delta: number) => {
+    const item = cartItems.find((cartItem) => cartItem.id === id);
+    if (!item) return;
+    const quantity = Math.max(1, item.quantity + delta);
+    if (currentUser) {
+      try {
+        await customerApi.updateCartItem(id, quantity);
+      } catch (error) {
+        showToast(error instanceof Error ? error.message : 'Could not save cart quantity');
+        return;
+      }
+    }
     setCartItems((prev) =>
       prev.map((item) => {
         if (item.id === id) {
-          const newQty = Math.max(1, item.quantity + delta);
-          return { ...item, quantity: newQty };
+          return { ...item, quantity };
         }
         return item;
       })
     );
   };
 
-  const handleRemoveItem = (id: string) => {
+  const handleRemoveItem = async (id: string) => {
     const itemToRemove = cartItems.find((i) => i.id === id);
+    if (currentUser) {
+      try {
+        await customerApi.removeCartItem(id);
+      } catch (error) {
+        showToast(error instanceof Error ? error.message : 'Could not remove saved cart item');
+        return;
+      }
+    }
     setCartItems((prev) => prev.filter((item) => item.id !== id));
     if (itemToRemove) {
       showToast(`REMOVED ${itemToRemove.name} FROM ARCHIVE QUEUE`);
     }
   };
 
-  const handleMoveToWishlist = (item: CartItem) => {
+  const handleMoveToWishlist = async (item: CartItem) => {
+    if (currentUser) {
+      const productId = item.productId ?? (products.some((product) => product.id === item.id) ? item.id : undefined);
+      if (!productId) {
+        showToast('THIS SPECIMEN CANNOT BE SAVED TO YOUR WISHLIST');
+        return;
+      }
+      try {
+        await customerApi.saveWishlistItem(productId, item.selectedColor ?? item.colorway, item.selectedSize ?? item.specification);
+        await customerApi.removeCartItem(item.id);
+      } catch (error) {
+        showToast(error instanceof Error ? error.message : 'Wishlist transfer could not be saved');
+        return;
+      }
+    }
     setCartItems((prev) => prev.filter((i) => i.id !== item.id));
     setWishlistItems((prev) => {
-      if (prev.some((w) => w.id === item.id)) return prev;
+      const productId = item.productId ?? item.id;
+      if (prev.some((w) => w.id === productId)) return prev;
       return [
         ...prev,
         {
-          id: item.id,
+          id: productId,
+          productId,
           code: item.code,
           name: item.name,
           price: item.price,
@@ -216,18 +505,31 @@ export default function App() {
     showToast(`TRANSFERRED ${item.name} TO ARCHIVED WISHLIST`);
   };
 
-  const handleMoveToBag = (item: WishlistItem) => {
+  const handleMoveToBag = async (item: WishlistItem) => {
+    let cartRecordId = item.id;
+    if (currentUser) {
+      const productId = item.productId ?? item.id;
+      try {
+        const savedItem = await customerApi.addCartItem(productId, item.colorway, item.specification, 1);
+        await customerApi.removeWishlistItem(productId);
+        cartRecordId = savedItem.id;
+      } catch (error) {
+        showToast(error instanceof Error ? error.message : 'Wishlist item could not be moved to your bag');
+        return;
+      }
+    }
     setWishlistItems((prev) => prev.filter((i) => i.id !== item.id));
     setCartItems((prev) => {
-      if (prev.some((c) => c.id === item.id)) {
+      if (prev.some((c) => c.productId === item.productId && c.colorway === item.colorway && c.specification === item.specification)) {
         return prev.map((c) =>
-          c.id === item.id ? { ...c, quantity: c.quantity + 1 } : c
+          c.productId === item.productId && c.colorway === item.colorway && c.specification === item.specification ? { ...c, id: cartRecordId, quantity: c.quantity + 1 } : c
         );
       }
       return [
         ...prev,
         {
-          id: item.id,
+          id: cartRecordId,
+          productId: item.productId ?? item.id,
           code: item.code,
           name: item.name,
           edition: 'PERMANENT TECH ARCHIVE',
@@ -244,28 +546,92 @@ export default function App() {
     showToast(`ALLOCATION RE-ESTABLISHED FOR ${item.name}`);
   };
 
-  const handleSelectSize = (itemId: string, newSize: string) => {
+  const handleSelectSize = async (itemId: string, newSize: string) => {
+    const item = cartItems.find((cartItem) => cartItem.id === itemId);
+    if (!item) return;
+    let cartRecordId = itemId;
+    let quantity = item.quantity;
+    if (currentUser && item.productId) {
+      try {
+        const savedItem = await customerApi.addCartItem(item.productId, item.selectedColor ?? item.colorway, newSize, item.quantity);
+        await customerApi.removeCartItem(itemId);
+        cartRecordId = savedItem.id;
+        quantity = savedItem.quantity;
+      } catch (error) {
+        showToast(error instanceof Error ? error.message : 'Size change could not be saved');
+        return;
+      }
+    }
     setCartItems((prev) =>
       prev.map((item) =>
-        item.id === itemId ? { ...item, specification: newSize } : item
+        item.id === itemId ? { ...item, id: cartRecordId, selectedSize: newSize, specification: newSize, quantity } : item
       )
     );
     showToast(`UPDATED SPECIFICATION TO ${newSize}`);
   };
 
-  const handleAddAddress = (newAddr: Address) => {
-    setAddresses((prev) => [...prev, newAddr]);
-    setSelectedAddressId(newAddr.id);
-    showToast(`DESTINATION REGISTERED: ${newAddr.name}`);
+  const handleAddAddress = async (newAddr: Address) => {
+    if (!currentUser) {
+      showToast('SIGN IN BEFORE SAVING A SHIPPING ADDRESS');
+      setActiveNav('LOGIN');
+      return;
+    }
+    try {
+      const savedAddress = await customerApi.addAddress(newAddr);
+      const address: Address = {
+        ...savedAddress,
+        tag: savedAddress.tag ?? undefined,
+        line2: savedAddress.line2 ?? undefined,
+        state: savedAddress.state ?? undefined,
+        phone: savedAddress.phone ?? undefined,
+      };
+      setAddresses((prev) => [...prev, address]);
+      setSelectedAddressId(address.id);
+      showToast(`DESTINATION SAVED: ${address.name}`);
+    } catch (error) {
+      showToast(error instanceof Error ? error.message : 'Could not save shipping address');
+    }
   };
 
   const handleRestoreDefaultItems = () => {
+    if (currentUser) {
+      showToast('DEFAULT DEMO ITEMS CANNOT REPLACE YOUR SAVED ACCOUNT BAG');
+      return;
+    }
     setCartItems(INITIAL_CART_ITEMS);
     showToast('ARCHIVE BAG RESTORED TO SPECIFICATION DEFAULTS');
   };
 
   // Add item to bag
-  const handleAddToCart = (item: CartItem) => {
+  const handleAddToCart = async (item: CartItem) => {
+    if (currentUser) {
+      const productId = item.productId ?? (products.some((product) => product.id === item.id) ? item.id : undefined);
+      if (!productId) {
+        showToast('THIS SPECIMEN IS NOT AVAILABLE IN THE SAVED CATALOG');
+        return;
+      }
+      try {
+        const savedItem = await customerApi.addCartItem(
+          productId,
+          item.selectedColor ?? item.colorway,
+          item.selectedSize ?? item.specification,
+          item.quantity,
+        );
+        const persistedItem = { ...item, id: savedItem.id, productId, quantity: savedItem.quantity };
+        setCartItems((prev) => {
+          const existing = prev.find((cartItem) => cartItem.productId === productId
+            && (cartItem.selectedColor ?? cartItem.colorway) === (item.selectedColor ?? item.colorway)
+            && (cartItem.selectedSize ?? cartItem.specification) === (item.selectedSize ?? item.specification));
+          if (existing) return prev.map((cartItem) => cartItem.id === existing.id ? persistedItem : cartItem);
+          return [...prev, persistedItem];
+        });
+        showToast(`SAVED ${item.name} TO YOUR ACCOUNT BAG`);
+        return;
+      } catch (error) {
+        showToast(error instanceof Error ? error.message : 'Could not save item to your account bag');
+        return;
+      }
+    }
     setCartItems((prev) => {
       const existing = prev.find((i) => i.id === item.id);
       if (existing) {
@@ -286,8 +652,17 @@ export default function App() {
   };
 
   // Wishlist toggle for products
-  const handleToggleWishlistProduct = (shoe: ShoeProduct) => {
+  const handleToggleWishlistProduct = async (shoe: ShoeProduct) => {
     const isAlreadyWish = wishlistItems.some((w) => w.id === shoe.id);
+    if (currentUser) {
+      try {
+        if (isAlreadyWish) await customerApi.removeWishlistItem(shoe.id);
+        else await customerApi.saveWishlistItem(shoe.id, shoe.colors[0]?.name ?? 'Standard', 'Universal Last');
+      } catch (error) {
+        showToast(error instanceof Error ? error.message : 'Wishlist change could not be saved');
+        return;
+      }
+    }
     if (isAlreadyWish) {
       setWishlistItems((prev) => prev.filter((w) => w.id !== shoe.id));
       showToast(`REMOVED ${shoe.name} FROM WISHLIST`);
@@ -345,98 +720,94 @@ export default function App() {
   };
 
   // Order Placement & Creation
-  const handlePlaceOrder = () => {
+  const handlePlaceOrder = async (paymentMethod: PaymentMethod) => {
     if (cartItems.length === 0) {
       showToast('ALLOCATION QUEUE IS CURRENTLY EMPTY');
       return;
     }
-
+    if (!currentUser || !authApi.hasSession()) {
+      showToast('SIGN IN BEFORE PLACING AN ORDER');
+      setActiveNav('LOGIN');
+      return;
+    }
+    if (!addresses.some((address) => address.id === selectedAddressId)) {
+      showToast('ADD A SAVED SHIPPING ADDRESS BEFORE CHECKOUT');
+      setIsNewAddressModalOpen(true);
+      return;
+    }
     setIsOrderSubmitting(true);
-    setTimeout(() => {
-      setIsOrderSubmitting(false);
+    try {
+      const savedOrder = await customerApi.createOrder(selectedAddressId, paymentMethod === 'COD' ? 'COD' : 'CARD');
+      let orderRecord = savedOrder;
 
-      const targetAddr =
-        addresses.find((a) => a.id === selectedAddressId) || addresses[0];
+      if (paymentMethod !== 'COD') {
+        const razorpayOrder = await customerApi.createRazorpayOrder(String(savedOrder.id));
+        const RazorpayCheckout = await loadRazorpayCheckout();
+        const address = addresses.find((item) => item.id === selectedAddressId);
+        const verifiedOrder = await new Promise<Record<string, unknown> | null>((resolve, reject) => {
+          let settled = false;
+          const finish = (result: Record<string, unknown> | null) => {
+            if (settled) return;
+            settled = true;
+            resolve(result);
+          };
+          try {
+            const checkout = new RazorpayCheckout({
+              key: razorpayOrder.keyId,
+              amount: razorpayOrder.amount,
+              currency: razorpayOrder.currency,
+              name: 'VANTA ARCHIVE',
+              description: `Order ${String(savedOrder.displayId ?? savedOrder.id)}`,
+              order_id: razorpayOrder.orderId,
+              prefill: {
+                name: currentUser.name,
+                email: currentUser.email,
+                contact: address?.phone,
+              },
+              theme: { color: '#1a1816' },
+              handler: async (payment) => {
+                try {
+                  const result = await customerApi.verifyRazorpayPayment({
+                    orderId: String(savedOrder.id),
+                    razorpayOrderId: payment.razorpay_order_id,
+                    razorpayPaymentId: payment.razorpay_payment_id,
+                    razorpaySignature: payment.razorpay_signature,
+                  });
+                  finish(result.order);
+                } catch (error) {
+                  if (!settled) {
+                    settled = true;
+                    reject(error);
+                  }
+                }
+              },
+              modal: { ondismiss: () => finish(null) },
+            });
+            checkout.open();
+          } catch (error) {
+            reject(error);
+          }
+        });
 
-      const newOrder: Order = {
-        id: `SH${Date.now().toString().slice(-5)}`,
-        date: new Date().toLocaleDateString('en-US', {
-          day: 'numeric',
-          month: 'long',
-          year: 'numeric',
-        }),
-        items: cartItems.map((c) => ({
-          id: c.id,
-          productId: c.productId || c.id,
-          name: c.name,
-          brand: c.brand || 'VANTA ATELIER',
-          color: c.colorway,
-          size: c.selectedSize || '9',
-          price: c.price,
-          quantity: c.quantity,
-          image: c.image,
-        })),
-        total: subtotal,
-        orderStatus: 'Confirmed',
-        paymentStatus: 'Paid',
-        paymentMethod: 'CRYPTOGRAPHIC CARD // VISA VERIFIED',
-        shippingAddress: targetAddr,
-        trackingNumber: `VNT-${Math.floor(10000000 + Math.random() * 90000000)}`,
-        carrier: 'Armored Vault Express',
-        expectedDelivery: '3–5 Business Days',
-        timeline: [
-          {
-            status: 'Order Placed',
-            date: 'Today',
-            time: 'Just now',
-            completed: true,
-            description: 'Order cryptographically authorized and logged into the vault.',
-          },
-          {
-            status: 'Confirmed',
-            date: 'Today',
-            time: 'Just now',
-            completed: true,
-            description: 'Inventory allocation confirmed and authenticated by atelier.',
-          },
-          {
-            status: 'Packed',
-            date: 'Pending',
-            time: 'Estimated tomorrow',
-            completed: false,
-            description: 'Protective archival box sealed with tamper-evident seal.',
-          },
-          {
-            status: 'Shipped',
-            date: 'Pending',
-            time: 'TBD',
-            completed: false,
-            description: 'Courier collection and air transit dispatch.',
-          },
-          {
-            status: 'Out for Delivery',
-            date: 'Pending',
-            time: 'TBD',
-            completed: false,
-            description: 'Local ground courier delivery route active.',
-          },
-          {
-            status: 'Delivered',
-            date: 'Pending',
-            time: 'TBD',
-            completed: false,
-            description: 'Signature delivered to client destination.',
-          },
-        ],
-      };
+        if (!verifiedOrder) {
+          showToast('PAYMENT CANCELLED // YOUR CART IS PRESERVED');
+          return;
+        }
+        orderRecord = verifiedOrder;
+      }
 
-      setOrders((prev) => [newOrder, ...prev]);
-      setCurrentOrder(newOrder);
+      const order = toOrderRecord(orderRecord);
+      setOrders((prev) => [order, ...prev]);
+      setCurrentOrder(order);
       setCartItems([]);
       setActiveNav('ORDER_SUCCESS');
       window.scrollTo({ top: 0, behavior: 'smooth' });
-      showToast(`ORDER CONFIRMED: #${newOrder.id}`);
-    }, 1200);
+      showToast(`ORDER SAVED: #${order.id} // PAYMENT ${order.paymentStatus}`);
+    } catch (error) {
+      showToast(error instanceof Error ? error.message : 'Order could not be saved');
+    } finally {
+      setIsOrderSubmitting(false);
+    }
   };
 
   // Subtotal calculation
@@ -461,46 +832,62 @@ export default function App() {
     size: string,
     newStock: number
   ) => {
-    setProducts((prev) =>
-      prev.map((prod) => {
-        if (prod.id !== productId) return prod;
-        const colorSizes = prod.sizeInventory[colorName] || [];
-        const updatedSizes = colorSizes.map((s) =>
-          s.size === size ? { ...s, stock: newStock } : s
-        );
-        return {
-          ...prod,
-          sizeInventory: {
-            ...prod.sizeInventory,
-            [colorName]: updatedSizes,
-          },
-        };
-      })
-    );
-    showToast(`INVENTORY UPDATED: SIZE US ${size} SET TO ${newStock} UNITS`);
+    const product = products.find((entry) => entry.id === productId);
+    if (!product) return;
+    const updatedProduct = {
+      ...product,
+      sizeInventory: {
+        ...product.sizeInventory,
+        [colorName]: (product.sizeInventory[colorName] ?? []).map((entry) => entry.size === size ? { ...entry, stock: newStock } : entry),
+      },
+    };
+    void adminApi.saveProduct(updatedProduct).then(() => {
+      setProducts((prev) => prev.map((entry) => entry.id === productId ? updatedProduct : entry));
+      showToast(`INVENTORY UPDATED: SIZE US ${size} SET TO ${newStock} UNITS`);
+    }).catch((error: unknown) => showToast(error instanceof Error ? error.message : 'Inventory update could not be saved'));
   };
 
   // Add New Product
-  const handleAddNewProduct = (newProd: ShoeProduct) => {
-    setProducts((prev) => [newProd, ...prev]);
+  const handleAddNewProduct = async (newProd: ShoeProduct) => {
+    try {
+      await adminApi.saveProduct(newProd);
+      setProducts((prev) => [newProd, ...prev.filter((product) => product.id !== newProd.id)]);
+    } catch (error) {
+      showToast(error instanceof Error ? error.message : 'Product could not be saved');
+    }
   };
 
   // Delete Product
-  const handleDeleteProduct = (productId: string) => {
-    setProducts((prev) => prev.filter((p) => p.id !== productId));
-    showToast(`SPECIMEN ${productId} REMOVED FROM ARCHIVE`);
+  const handleDeleteProduct = async (productId: string) => {
+    try {
+      await adminApi.deleteProduct(productId);
+      setProducts((prev) => prev.filter((product) => product.id !== productId));
+      showToast(`SPECIMEN ${productId} REMOVED FROM ARCHIVE`);
+    } catch (error) {
+      showToast(error instanceof Error ? error.message : 'Product could not be removed');
+    }
   };
 
   // Update Product
-  const handleUpdateProduct = (updatedProduct: ShoeProduct) => {
-    setProducts((prev) =>
-      prev.map((p) => (p.id === updatedProduct.id ? updatedProduct : p))
-    );
-    showToast(`SPECIMEN ${updatedProduct.name} DOSSIER SYNCHRONIZED`);
+  const handleUpdateProduct = async (updatedProduct: ShoeProduct) => {
+    try {
+      await adminApi.saveProduct(updatedProduct);
+      setProducts((prev) => prev.map((product) => product.id === updatedProduct.id ? updatedProduct : product));
+      showToast(`SPECIMEN ${updatedProduct.name} DOSSIER SYNCHRONIZED`);
+    } catch (error) {
+      showToast(error instanceof Error ? error.message : 'Product update could not be saved');
+    }
   };
 
   // Update Order Status
-  const handleUpdateOrderStatus = (orderId: string, newStatus: any) => {
+  const handleUpdateOrderStatus = async (orderId: string, newStatus: any) => {
+    const status = ({ 'Order Placed': 'ORDER_PLACED', Confirmed: 'CONFIRMED', Packed: 'PACKED', Shipped: 'SHIPPED', 'Out for Delivery': 'OUT_FOR_DELIVERY', Delivered: 'DELIVERED', Cancelled: 'CANCELLED' } as Record<string, string>)[String(newStatus)] ?? String(newStatus).toUpperCase().replaceAll(' ', '_');
+    try {
+      await adminApi.updateOrderStatus(orderId, status);
+    } catch (error) {
+      showToast(error instanceof Error ? error.message : 'Order status could not be saved');
+      return;
+    }
     setOrders((prev) =>
       prev.map((o) => {
         if (o.id !== orderId) return o;
@@ -515,10 +902,16 @@ export default function App() {
   };
 
   // Update Exchange Status
-  const handleUpdateExchangeStatus = (
+  const handleUpdateExchangeStatus = async (
     exchangeId: string,
     status: 'Approved' | 'Rejected'
   ) => {
+    try {
+      await adminApi.updateExchangeStatus(exchangeId, status);
+    } catch (error) {
+      showToast(error instanceof Error ? error.message : 'Exchange status could not be saved');
+      return;
+    }
     setExchanges((prev) =>
       prev.map((ex) => (ex.id === exchangeId ? { ...ex, status } : ex))
     );
@@ -526,12 +919,23 @@ export default function App() {
   };
 
   // Add New Drop
-  const handleAddNewDrop = (newDrop: SneakerDrop) => {
-    setDrops((prev) => [newDrop, ...prev]);
+  const handleAddNewDrop = async (newDrop: SneakerDrop) => {
+    try {
+      await adminApi.saveDrop(newDrop as unknown as Record<string, unknown> & { id: string });
+      setDrops((prev) => [newDrop, ...prev.filter((drop) => drop.id !== newDrop.id)]);
+    } catch (error) {
+      showToast(error instanceof Error ? error.message : 'Drop could not be saved');
+    }
   };
 
   // Update Drop Status
-  const handleUpdateDropStatus = (dropId: string, status: any) => {
+  const handleUpdateDropStatus = async (dropId: string, status: any) => {
+    try {
+      await adminApi.updateDropStatus(dropId, status);
+    } catch (error) {
+      showToast(error instanceof Error ? error.message : 'Drop status could not be saved');
+      return;
+    }
     setDrops((prev) =>
       prev.map((d) => (d.id === dropId ? { ...d, status } : d))
     );
@@ -539,8 +943,13 @@ export default function App() {
   };
 
   // Add New Coupon
-  const handleAddNewCoupon = (newCoupon: Coupon) => {
-    setCoupons((prev) => [newCoupon, ...prev]);
+  const handleAddNewCoupon = async (newCoupon: Coupon) => {
+    try {
+      await adminApi.saveCoupon(newCoupon);
+      setCoupons((prev) => [newCoupon, ...prev.filter((coupon) => coupon.code !== newCoupon.code)]);
+    } catch (error) {
+      showToast(error instanceof Error ? error.message : 'Coupon could not be saved');
+    }
   };
 
   // Render dedicated Login Page matching user design
@@ -554,10 +963,16 @@ export default function App() {
           }}
           currentUser={currentUser}
           onLoginSuccess={(user) => {
-            setCurrentUser(user);
+            void restoreCustomerRecords(user);
           }}
           onLogout={() => {
+            authApi.logout();
             setCurrentUser(null);
+            setCartItems([]);
+            setWishlistItems([]);
+            setAddresses([]);
+            setOrders([]);
+            setCurrentOrder(null);
           }}
           onShowToast={showToast}
         />
@@ -574,8 +989,25 @@ export default function App() {
     );
   }
 
+  if (adminRoute === 'panel' && (!isAdminAuthenticated || isAdminSessionLoading)) {
+    return (
+      <main className="min-h-screen bg-[#ede7dd] text-[#1a1816] flex items-center justify-center p-6 font-mono text-xs">
+        {adminSessionError ? (
+          <div className="max-w-md text-center">
+            <p className="uppercase tracking-widest">Admin service unavailable</p>
+            <p className="mt-3 text-[#59544c]">{adminSessionError}</p>
+            <button className="mt-6 border border-[#1a1816] px-4 py-3 uppercase tracking-widest" onClick={() => setAdminSessionAttempt((attempt) => attempt + 1)}>Retry</button>
+            <button className="ml-3 underline" onClick={() => navigateAdminRoute('/admin/login', true)}>Admin login</button>
+          </div>
+        ) : (
+          <p className="uppercase tracking-widest">Validating admin session...</p>
+        )}
+      </main>
+    );
+  }
+
   // Render dedicated Admin Login Page (Restricted Admin Gate)
-  if (activeNav === 'ADMIN_LOGIN' || (activeNav === 'ADMIN' && !isAdminAuthenticated)) {
+  if (adminRoute === 'login' || activeNav === 'ADMIN_LOGIN' || (activeNav === 'ADMIN' && !isAdminAuthenticated)) {
     return (
       <>
         <AdminLoginView
@@ -584,10 +1016,12 @@ export default function App() {
             setAdminIdentity(admin);
             setIsAdminPanelOpen(true);
             setActiveNav('COLLECTIONS');
+            navigateAdminRoute('/admin');
             showToast(`ACCESS GRANTED // ATELIER MASTER: ${admin.name}`);
           }}
           onNavigateStore={() => {
             setActiveNav('COLLECTIONS');
+            if (adminRoute) navigateAdminRoute('/', false);
             window.scrollTo({ top: 0, behavior: 'smooth' });
           }}
           onShowToast={showToast}
@@ -877,20 +1311,38 @@ export default function App() {
         isOpen={isReturnsModalOpen}
         onClose={() => setIsReturnsModalOpen(false)}
         order={exchangeTargetOrder}
-        onSubmitRequest={(req) => {
-          setExchanges((prev) => [req, ...prev]);
-          showToast(`EXCHANGE REQUEST REGISTERED: ${req.id}`);
+        onSubmitRequest={async (req) => {
+          if (!currentUser) throw new Error('Sign in before submitting a return or exchange');
+          const saved = await customerApi.createExchange({
+            orderId: req.orderId,
+            type: req.type,
+            productId: req.productId,
+            productName: req.productName,
+            productImage: req.productImage,
+            currentSize: req.currentSize,
+            requestedSize: req.requestedSize,
+            reason: req.reason,
+            adminNotes: req.adminNotes,
+          });
+          const persistedRequest = toExchangeRecord(saved);
+          setExchanges((prev) => [persistedRequest, ...prev]);
+          showToast(`EXCHANGE REQUEST SAVED: ${persistedRequest.id}`);
         }}
       />
 
       {/* Admin Panel Console (Sections 29-35) - Strictly gated to authenticated admins */}
       <AdminPanelView
         isOpen={isAdminPanelOpen && isAdminAuthenticated}
-        onClose={() => setIsAdminPanelOpen(false)}
+        onClose={() => {
+          setIsAdminPanelOpen(false);
+          if (adminRoute === 'panel') navigateAdminRoute('/', false);
+        }}
         onLogoutAdmin={() => {
+          void adminApi.logout().catch(() => undefined);
           setIsAdminAuthenticated(false);
           setAdminIdentity(null);
           setIsAdminPanelOpen(false);
+          navigateAdminRoute('/admin/login', true);
           showToast('ADMIN SESSION TERMINATED // CONSOLE LOCKED');
         }}
         products={products}

@@ -19,6 +19,7 @@ import {
 } from 'lucide-react';
 import { ShoeProduct, CartItem, ReviewItem } from '../types';
 import { INITIAL_REVIEWS } from '../data/footwearCatalog';
+import { formatCurrency } from '../lib/currency';
 
 interface ProductDetailsViewProps {
   product: ShoeProduct;
@@ -66,7 +67,7 @@ export const ProductDetailsView: React.FC<ProductDetailsViewProps> = ({
 
   // Customer Reviews state
   const [reviews, setReviews] = useState<ReviewItem[]>(
-    INITIAL_REVIEWS.filter((r) => r.productId === product.id || r.productId === 'vn-shoe-01')
+    INITIAL_REVIEWS.filter((r) => r.productId === product.id)
   );
   const [showReviewForm, setShowReviewForm] = useState(false);
   const [newReviewAuthor, setNewReviewAuthor] = useState('');
@@ -301,11 +302,17 @@ export const ProductDetailsView: React.FC<ProductDetailsViewProps> = ({
                   {product.brand} // {product.code}
                 </span>
                 <div className="flex items-center gap-1 text-[11px] font-bold text-[#1a1816]">
-                  <Star className="w-3.5 h-3.5 fill-[#1a1816] text-[#1a1816]" />
-                  <span>{product.rating}</span>
-                  <span className="text-[#7b6e54] font-normal">
-                    ({product.reviewsCount} reviews)
-                  </span>
+                  {product.reviewsCount > 0 ? (
+                    <>
+                      <Star className="w-3.5 h-3.5 fill-[#1a1816] text-[#1a1816]" />
+                      <span>{product.rating}</span>
+                      <span className="text-[#7b6e54] font-normal">
+                        ({product.reviewsCount} reviews)
+                      </span>
+                    </>
+                  ) : (
+                    <span className="text-[#7b6e54] font-normal">No ratings yet</span>
+                  )}
                 </div>
               </div>
 
@@ -315,10 +322,10 @@ export const ProductDetailsView: React.FC<ProductDetailsViewProps> = ({
 
               <div className="flex items-baseline gap-3 pt-2">
                 <span className="text-2xl sm:text-3xl font-bold text-[#1a1816]">
-                  ${product.price.toFixed(2)}
+                  {formatCurrency(product.price)}
                 </span>
                 <span className="text-sm text-[#8e8474] line-through font-normal">
-                  ${product.mrp.toFixed(2)}
+                  {formatCurrency(product.mrp)}
                 </span>
                 <span className="text-xs bg-[#141312] text-[#f5efe6] px-2 py-0.5 font-bold tracking-wider">
                   {product.discountPercent}% OFF
@@ -516,11 +523,18 @@ export const ProductDetailsView: React.FC<ProductDetailsViewProps> = ({
                 </div>
                 <div className="p-2 bg-[#f5efe6] border border-[#d5cdc0]">
                   <span className="text-[9px] text-[#7b6e54] block uppercase">COMFORT</span>
-                  <strong className="text-[#1a1816]">⭐ {product.comfortScore} / 5.0</strong>
+                  <strong className="text-[#1a1816]">
+                    {product.comfortScore === null ? 'Not rated' : `⭐ ${product.comfortScore} / 5.0`}
+                  </strong>
                 </div>
               </div>
 
               {/* Review-Based Fit Indicator Bar */}
+              {product.fitIndicator === 'Not specified' ? (
+                <div className="text-[10px] text-[#59544c] text-center pt-1">
+                  Fit information not available.
+                </div>
+              ) : (
               <div className="space-y-1.5 pt-1">
                 <div className="flex justify-between text-[10px] text-[#59544c] uppercase font-bold">
                   <span>Runs Small</span>
@@ -542,6 +556,7 @@ export const ProductDetailsView: React.FC<ProductDetailsViewProps> = ({
                   Recommendation: <strong className="text-[#1a1816]">{product.recommended}</strong>
                 </div>
               </div>
+              )}
             </div>
           </div>
         </div>

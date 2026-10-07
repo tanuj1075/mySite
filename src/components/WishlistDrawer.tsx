@@ -1,6 +1,7 @@
 import React from 'react';
 import { X, Heart, ShoppingBag, Trash2 } from 'lucide-react';
 import { WishlistItem } from '../types';
+import { formatCurrency } from '../lib/currency';
 
 interface WishlistDrawerProps {
   isOpen: boolean;
@@ -75,7 +76,7 @@ export const WishlistDrawer: React.FC<WishlistDrawerProps> = ({
                       {item.specification}
                     </span>
                     <span className="text-[#1a1816] font-bold mt-1">
-                      ${item.price.toFixed(2)} USD
+                      {formatCurrency(item.price)}
                     </span>
                   </div>
                   <div className="flex flex-col gap-2 shrink-0">

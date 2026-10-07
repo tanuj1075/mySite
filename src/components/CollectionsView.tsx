@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { ArrowRight, ChevronLeft, ChevronRight, Lock, Check, Shield, Layers, Compass, Sparkles } from 'lucide-react';
 import { CartItem } from '../types';
+import { formatCurrency } from '../lib/currency';
 
 interface CollectionsViewProps {
   onClaimVoidRunner: () => void;
@@ -138,6 +139,37 @@ export const CollectionsView: React.FC<CollectionsViewProps> = ({
       tag: 'UNLINED ARCHITECTURAL FORM',
       detail: 'Supple 1.8mm unlined full-grain calfskin paired with raw natural Hevea tree latex cushioning at high-impact heel strikes. Hand-stitched with bonded nylon thread.',
       specs: '1.8mm Full-Grain // Dual Saddle Stitch // 100% Biodegradable Latex Infill',
+    },
+  ];
+
+  const featuredBrandCards = [
+    {
+      name: 'NIKE',
+      tag: 'High-performance running',
+      image:
+        'https://static.nike.com/a/images/t_PDP_1728_v1/f_auto,q_auto:eco/3b3f51b7-1d7d-4718-a5bc-7ec8d3dc9869/air-force-1-07-mens-shoes-DZejrQoC.png',
+      accent: '#d8c8af',
+    },
+    {
+      name: 'ADIDAS',
+      tag: 'Streetwear essentials',
+      image:
+        'https://assets.adidas.com/images/h_840,f_auto,q_auto,fl_lossy,c_fill,g_auto/1d9a02f0be704fafbe3d6b8158afb9f6_9366/Samba_OG_Shoes_White_B75806_HM52.jpg',
+      accent: '#bfb7a8',
+    },
+    {
+      name: 'SKECHERS',
+      tag: 'Comfort-first movement',
+      image:
+        'https://images.skechers.com/images/400/118885_MBLK_01.jpg',
+      accent: '#d0c0a4',
+    },
+    {
+      name: 'ASICS',
+      tag: 'Cushioned everyday speed',
+      image:
+        'https://www.asics.com/dw/image/v2/BBTN_PRD/on/demandware.static/-/Sites-ASICS-US-Library/default/dw9fb2d5a7/2024/ASICS-Running/JPL/Express/ASICS_Gel-Kayano_30_Storm_White_Silver.jpg?sw=600&sh=600',
+      accent: '#c7c5be',
     },
   ];
 
@@ -291,6 +323,58 @@ export const CollectionsView: React.FC<CollectionsViewProps> = ({
                 </button>
               </div>
             </div>
+          </div>
+        </section>
+
+        {/* Brand Featured Collection Banner */}
+        <section id="featured-collection-section" className="border border-[#d5cdc0] bg-[#f5efe6] p-6 sm:p-8 space-y-6">
+          <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 border-b border-[#d5cdc0] pb-4">
+            <div>
+              <span className="font-mono text-[10px] uppercase tracking-[0.2em] text-[#7b6e54] font-bold block mb-2">
+                [ FEATURED COLLECTION ]
+              </span>
+              <h2 className="font-headline text-3xl sm:text-4xl lg:text-5xl text-[#1a1816] font-bold">
+                PREMIUM BRAND EDITIONS
+              </h2>
+            </div>
+            <button
+              onClick={() => onNavigate('SHOP')}
+              className="font-mono text-[10px] font-bold text-[#1a1816] hover:opacity-75 flex items-center gap-2 cursor-pointer"
+            >
+              <span>[ VIEW ALL BRAND SPECIMENS → ]</span>
+            </button>
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4">
+            {featuredBrandCards.map((brand) => (
+              <div
+                key={brand.name}
+                className="group border border-[#d5cdc0] bg-[#f5efe6] hover:border-[#1a1816] transition-colors"
+              >
+                <div className="aspect-[4/5] overflow-hidden bg-[#e4ddcf]">
+                  <img
+                    src={brand.image}
+                    alt={`${brand.name} sneaker product detail`}
+                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                  />
+                </div>
+                <div className="p-4 space-y-3">
+                  <div className="flex items-center justify-between gap-2">
+                    <span className="font-mono text-[10px] uppercase tracking-[0.18em] text-[#7b6e54]">
+                      {brand.name}
+                    </span>
+                    <span className="w-2 h-2 rounded-full" style={{ backgroundColor: brand.accent }}></span>
+                  </div>
+                  <p className="font-mono text-[11px] text-[#59544c] leading-relaxed">{brand.tag}</p>
+                  <button
+                    onClick={() => onNavigate('SHOP')}
+                    className="font-mono text-[10px] font-bold text-[#1a1816] hover:underline cursor-pointer"
+                  >
+                    VIEW COLLECTION →
+                  </button>
+                </div>
+              </div>
+            ))}
           </div>
         </section>
 
@@ -470,7 +554,7 @@ export const CollectionsView: React.FC<CollectionsViewProps> = ({
             <div className="border border-[#d5cdc0] bg-[#f5efe6] flex flex-col group hover:border-[#1a1816] transition-colors">
               <div className="p-3 border-b border-[#d5cdc0] flex justify-between items-center font-mono text-[10px] text-[#59544c]">
                 <span>[ FOOTWEAR // 12 RESTOCK ]</span>
-                <span className="text-[#1a1816] font-bold">[ 480 USD ]</span>
+                <span className="text-[#1a1816] font-bold">[ {formatCurrency(480)} ]</span>
               </div>
               <div className="aspect-[3/4] overflow-hidden relative bg-[#e4ddcf]">
                 <img
@@ -642,7 +726,7 @@ export const CollectionsView: React.FC<CollectionsViewProps> = ({
             <div className="border border-[#d5cdc0] bg-[#f5efe6] p-6 space-y-4 group hover:border-[#1a1816] transition-colors">
               <div className="flex justify-between items-center font-mono text-[10px] text-[#59544c] border-b border-[#d5cdc0] pb-2">
                 <span>SPECIMEN SPECIFICATION // 01 TRAVERTINE CREAM</span>
-                <span className="font-bold text-[#1a1816] text-xs">480 USD</span>
+                <span className="font-bold text-[#1a1816] text-xs">{formatCurrency(480)}</span>
               </div>
               <div className="aspect-[4/3] bg-[#ede7dd] border border-[#d5cdc0] overflow-hidden relative">
                 <img
@@ -679,7 +763,7 @@ export const CollectionsView: React.FC<CollectionsViewProps> = ({
             <div className="border border-[#d5cdc0] bg-[#f5efe6] p-6 space-y-4 group hover:border-[#1a1816] transition-colors">
               <div className="flex justify-between items-center font-mono text-[10px] text-[#59544c] border-b border-[#d5cdc0] pb-2">
                 <span>SPECIMEN // 02 MINERAL TAUPE</span>
-                <span className="font-bold text-[#1a1816] text-xs">520 USD</span>
+                <span className="font-bold text-[#1a1816] text-xs">{formatCurrency(520)}</span>
               </div>
               <div className="aspect-[4/3] bg-[#ede7dd] border border-[#d5cdc0] overflow-hidden relative">
                 <img

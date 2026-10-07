@@ -1,6 +1,7 @@
 import React from 'react';
 import { X, Shield, Cpu, Activity, ArrowRight, Layers } from 'lucide-react';
 import { ArchiveSpecimen, CartItem } from '../types';
+import { formatCurrency } from '../lib/currency';
 
 interface SpecimenInspectModalProps {
   isOpen: boolean;
@@ -130,7 +131,7 @@ export const SpecimenInspectModal: React.FC<SpecimenInspectModalProps> = ({
           <div className="text-xs font-mono">
             <span className="text-[#59544c] mr-2">ESTIMATED VALUATION:</span>
             <span className="text-[#1a1816] font-bold text-sm">
-              {specimen.price ? `$${specimen.price.toFixed(2)}` : 'RESERVED ARCHIVE'}
+              {specimen.price ? formatCurrency(specimen.price) : 'RESERVED ARCHIVE'}
             </span>
           </div>
 

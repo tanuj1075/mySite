@@ -1,6 +1,7 @@
 import React from 'react';
 import { CheckCircle, Truck, ArrowRight, ShoppingBag, Shield, Clock } from 'lucide-react';
 import { Order } from '../types';
+import { formatCurrency } from '../lib/currency';
 
 interface OrderSuccessViewProps {
   order: Order;
@@ -82,7 +83,7 @@ export const OrderSuccessView: React.FC<OrderSuccessViewProps> = ({
                   </div>
                   <div className="text-right">
                     <div className="font-bold text-sm text-[#1a1816]">
-                      ${(item.price * item.quantity).toFixed(2)}
+                      {formatCurrency(item.price * item.quantity * (order.exchangeRate ?? 1), order.currency ?? 'INR')}
                     </div>
                   </div>
                 </div>
@@ -109,7 +110,7 @@ export const OrderSuccessView: React.FC<OrderSuccessViewProps> = ({
               <div className="font-bold text-[#1a1816]">{order.paymentMethod}</div>
               <div className="text-[#7b6e54] font-bold">STATUS: {order.paymentStatus}</div>
               <div className="text-sm font-bold text-[#1a1816] pt-1">
-                TOTAL PAID: ${order.total.toFixed(2)}
+                TOTAL PAID: {formatCurrency(order.paymentAmount ?? order.total, order.currency ?? 'INR')}
               </div>
             </div>
           </div>

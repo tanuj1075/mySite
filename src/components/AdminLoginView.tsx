@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { ArrowRight, Eye, EyeOff, ExternalLink, ShieldCheck, Key } from 'lucide-react';
+import { authApi } from '../lib/api';
 
 interface AdminLoginViewProps {
   onAdminLoginSuccess: (admin: { email: string; name: string; role: string }) => void;
@@ -12,15 +13,14 @@ export const AdminLoginView: React.FC<AdminLoginViewProps> = ({
   onNavigateStore,
   onShowToast,
 }) => {
-  const [email, setEmail] = useState('a.vance@vanta.com');
-  const [password, setPassword] = useState('••••••••••••');
-  const [realPassword, setRealPassword] = useState('vanta-admin-2025');
+  const [email, setEmail] = useState('admin@vanta.com');
+  const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [rememberDevice, setRememberDevice] = useState(true);
   const [isAuthenticating, setIsAuthenticating] = useState(false);
   const [showForgotModal, setShowForgotModal] = useState(false);
 
-  const handleAdminLogin = (e: React.FormEvent) => {
+  const handleAdminLogin = async (e: React.FormEvent) => {
     e.preventDefault();
 
     if (!email || !email.includes('@')) {
@@ -28,18 +28,18 @@ export const AdminLoginView: React.FC<AdminLoginViewProps> = ({
       return;
     }
 
+    if (password.length < 8) {
+      onShowToast('ADMIN CREDENTIAL MUST BE AT LEAST 8 CHARACTERS');
+      return;
+    }
     setIsAuthenticating(true);
-
-    setTimeout(() => {
-      setIsAuthenticating(false);
-      const adminIdentity = {
-        email: email,
-        name: email.split('@')[0].toUpperCase(),
-        role: 'SUPERADMIN // VAULT MASTER',
-      };
-      onAdminLoginSuccess(adminIdentity);
-      onShowToast(`ADMIN SESSION INITIALIZED: ${adminIdentity.name} // PRIVILEGES UNLOCKED`);
-    }, 850);
+    try {
+      const authenticatedAdmin = await authApi.adminLogin(email, password, rememberDevice);
+      onAdminLoginSuccess({ email: authenticatedAdmin.email, name: authenticatedAdmin.name, role: authenticatedAdmin.role });
+      onShowToast(`ADMIN SESSION INITIALIZED: ${authenticatedAdmin.name} // PRIVILEGES UNLOCKED`);
+    } catch (error) {
+      onShowToast(error instanceof Error ? error.message.toUpperCase() : 'ADMIN AUTHENTICATION FAILED');
+    } finally { setIsAuthenticating(false); }
   };
 
   const handleForgotPassword = () => {
@@ -180,7 +180,7 @@ export const AdminLoginView: React.FC<AdminLoginViewProps> = ({
                     required
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
-                    placeholder="a.vance@vanta.com"
+                    placeholder="admin@vanta.com"
                     className="w-full bg-white border border-[#d5cdc0] px-4 py-3.5 text-[13px] text-[#1a1816] font-mono tracking-wide focus:outline-none focus:border-[#1a1816] rounded-xs shadow-2xs transition-colors"
                   />
                 </div>
@@ -198,11 +198,8 @@ export const AdminLoginView: React.FC<AdminLoginViewProps> = ({
                       id="admin-password"
                       type={showPassword ? 'text' : 'password'}
                       required
-                      value={showPassword ? realPassword : password}
-                      onChange={(e) => {
-                        setRealPassword(e.target.value);
-                        setPassword(e.target.value);
-                      }}
+                      value={password}
+                      onChange={(e) => setPassword(e.target.value)}
                       className="w-full bg-white border border-[#d5cdc0] px-4 py-3.5 pr-11 text-[13px] text-[#1a1816] font-mono tracking-wide focus:outline-none focus:border-[#1a1816] rounded-xs shadow-2xs transition-colors"
                     />
                     <button
@@ -253,21 +250,6 @@ export const AdminLoginView: React.FC<AdminLoginViewProps> = ({
                   <ArrowRight className="w-3.5 h-3.5" />
                 </button>
 
-                {/* Demo Quick-Fill Pill for seamless testing */}
-                <div className="mt-4 flex items-center justify-center">
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setEmail('a.vance@vanta.com');
-                      setRealPassword('vanta-admin-2025');
-                      setPassword('••••••••••••');
-                      onShowToast('ADMIN CREDENTIALS POPULATED: a.vance@vanta.com');
-                    }}
-                    className="font-mono text-[9px] text-[#7b6e54] hover:text-[#1a1816] border border-[#d5cdc0] px-2.5 py-1 bg-[#ede7dd]/60 hover:bg-[#ede7dd] cursor-pointer transition-colors uppercase tracking-wider"
-                  >
-                    PRE-SET: A. VANCE // ATELIER SUPERADMIN
-                  </button>
-                </div>
               </div>
 
               {/* Bottom Security Telemetry Footer Grid */}
@@ -324,16 +306,12 @@ export const AdminLoginView: React.FC<AdminLoginViewProps> = ({
               </span>
             </div>
             <p className="text-[#59544c] mb-6 leading-relaxed">
-              Administrative credentials require hardware key signing or enterprise direct reset. For testing access, please use the primary administrator profile:
+              Administrative credentials require hardware key signing or enterprise direct reset. Contact your system owner to restore access.
             </p>
             <div className="bg-[#ede7dd] border border-[#d5cdc0] p-4 mb-6 space-y-1">
               <div>
                 <span className="text-[#7b6e54]">ADMIN: </span>
-                <span className="font-bold text-[#1a1816]">a.vance@vanta.com</span>
-              </div>
-              <div>
-                <span className="text-[#7b6e54]">KEY: </span>
-                <span className="font-bold text-[#1a1816]">vanta-admin-2025</span>
+                <span className="font-bold text-[#1a1816]">admin@vanta.com</span>
               </div>
               <div>
                 <span className="text-[#7b6e54]">ROLE: </span>
@@ -343,13 +321,10 @@ export const AdminLoginView: React.FC<AdminLoginViewProps> = ({
             <button
               onClick={() => {
                 setShowForgotModal(false);
-                setEmail('a.vance@vanta.com');
-                setRealPassword('vanta-admin-2025');
-                setPassword('••••••••••••');
               }}
               className="w-full py-3 bg-[#141312] text-[#f5efe6] uppercase font-bold tracking-widest hover:bg-[#35322e] transition-colors cursor-pointer"
             >
-              DISMISS &amp; LOAD CREDENTIALS
+              DISMISS
             </button>
           </div>
         </div>

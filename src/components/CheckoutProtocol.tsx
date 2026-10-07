@@ -1,10 +1,8 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   ShieldCheck,
   CreditCard,
-  Smartphone,
-  Landmark,
-  ConciergeBell,
+  Banknote,
   Lock,
   ArrowRight,
   Plus,
@@ -13,6 +11,15 @@ import {
 } from 'lucide-react';
 import { Address, PaymentMethod } from '../types';
 import { CHECKOUT_STEPS } from '../data/mockData';
+import { formatCurrency } from '../lib/currency';
+import { authApi, customerApi } from '../lib/api';
+
+interface PaymentQuote {
+  currency: string;
+  exchangeRate: number;
+  amount: number;
+  baseAmount: number;
+}
 
 interface CheckoutProtocolProps {
   addresses: Address[];
@@ -20,7 +27,7 @@ interface CheckoutProtocolProps {
   onSelectAddress: (id: string) => void;
   onOpenNewAddressModal: () => void;
   subtotal: number;
-  onPlaceOrder: () => void;
+  onPlaceOrder: (paymentMethod: PaymentMethod) => void;
   isOrderSubmitting: boolean;
 }
 
@@ -35,15 +42,47 @@ export const CheckoutProtocol: React.FC<CheckoutProtocolProps> = ({
 }) => {
   const [currentStep, setCurrentStep] = useState<number>(2);
   const [paymentMethod, setPaymentMethod] = useState<PaymentMethod>('CARD');
-  const [cardNumber, setCardNumber] = useState('•••• •••• •••• 4099');
-  const [expiry, setExpiry] = useState('11 / 28');
-  const [cvc, setCvc] = useState('•••');
-  const [isEditingCard, setIsEditingCard] = useState(false);
+  const [paymentQuote, setPaymentQuote] = useState<PaymentQuote | null>(null);
+  const [quoteError, setQuoteError] = useState<string | null>(null);
+  const [isQuoteLoading, setIsQuoteLoading] = useState(false);
+
+  useEffect(() => {
+    let active = true;
+    if (!selectedAddressId || subtotal <= 0 || !authApi.hasSession()) {
+      setPaymentQuote(null);
+      setQuoteError(null);
+      setIsQuoteLoading(false);
+      return () => { active = false; };
+    }
+
+    setPaymentQuote(null);
+    setQuoteError(null);
+    setIsQuoteLoading(true);
+    customerApi.paymentQuote(selectedAddressId)
+      .then((quote) => {
+        if (active) setPaymentQuote(quote);
+      })
+      .catch((error: unknown) => {
+        if (active) setQuoteError(error instanceof Error ? error.message : 'Could not quote the local currency');
+      })
+      .finally(() => {
+        if (active) setIsQuoteLoading(false);
+      });
+
+    return () => { active = false; };
+  }, [selectedAddressId, subtotal]);
+
+  useEffect(() => {
+    if (paymentQuote && paymentQuote.currency !== 'INR' && paymentMethod === 'COD') {
+      setPaymentMethod('CARD');
+    }
+  }, [paymentQuote, paymentMethod]);
 
   // Financial calculations
-  const shippingCost = 0; // Complimentary Armored Freight
-  const estimatedDuties = 0;
-  const totalSettlement = subtotal + shippingCost + estimatedDuties;
+  const currency = paymentQuote?.currency ?? 'INR';
+  const exchangeRate = paymentQuote?.exchangeRate ?? 1;
+  const displayedSubtotal = (paymentQuote?.baseAmount ?? subtotal) * exchangeRate;
+  const totalSettlement = paymentQuote?.amount ?? displayedSubtotal;
 
   const currentStepObj =
     CHECKOUT_STEPS.find((s) => s.id === currentStep) || CHECKOUT_STEPS[1];
@@ -231,18 +270,18 @@ export const CheckoutProtocol: React.FC<CheckoutProtocolProps> = ({
           </span>
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
             {[
-              { id: 'CARD', label: 'CARD', icon: CreditCard },
-              { id: 'APPLE_PAY', label: 'APPLE PAY', icon: Smartphone },
-              { id: 'WIRE', label: 'WIRE', icon: Landmark },
-              { id: 'CONCIERGE', label: 'CONCIERGE', icon: ConciergeBell },
+              { id: 'CARD' as const, label: 'RAZORPAY', detail: currency === 'INR' ? 'CARD, UPI, NET BANKING' : 'INTERNATIONAL METHODS', icon: CreditCard },
+              { id: 'COD' as const, label: 'CASH ON DELIVERY', detail: 'INDIA ONLY', icon: Banknote },
             ].map((method) => {
               const isActive = paymentMethod === method.id;
+              const isUnavailable = method.id === 'COD' && currency !== 'INR';
               const Icon = method.icon;
               return (
                 <button
                   key={method.id}
                   type="button"
-                  onClick={() => setPaymentMethod(method.id as PaymentMethod)}
+                  disabled={isUnavailable}
+                  onClick={() => setPaymentMethod(method.id)}
                   className={`p-3 border flex flex-col items-center justify-center gap-2 transition-all cursor-pointer ${
                     isActive
                       ? 'bg-[#1a1816] border-[#1a1816] text-[#ede7dd]'
@@ -261,120 +300,29 @@ export const CheckoutProtocol: React.FC<CheckoutProtocolProps> = ({
                   >
                     {method.label}
                   </span>
+                  <span className={`font-mono text-[8px] tracking-wide ${
+                    isActive ? 'text-[#ede7dd]' : 'text-[#59544c]'
+                  }`}>
+                    {method.detail}
+                  </span>
                 </button>
               );
             })}
           </div>
         </div>
 
-        {/* ENCRYPTED VAULT CHANNEL / CARD INPUT */}
-        {paymentMethod === 'CARD' ? (
-          <div className="bg-[#ede7dd] border border-[#d5cdc0] p-4 flex flex-col gap-4">
-            <div className="flex justify-between items-center border-b border-[#d5cdc0] pb-2">
-              <span className="font-mono text-[10px] font-bold text-[#7b6e54] uppercase tracking-widest">
-                ENCRYPTED VAULT CHANNEL
-              </span>
-              <span className="font-mono text-[10px] text-[#1a1816] font-bold tracking-wider">
-                AES-256 GCM
-              </span>
-            </div>
-
-            {/* Card Number Input */}
-            <div className="flex flex-col gap-1">
-              <div className="flex items-center justify-between">
-                <span className="font-mono text-[10px] text-[#59544c] uppercase tracking-wider">
-                  Card Number
-                </span>
-                <button
-                  type="button"
-                  onClick={() => setIsEditingCard(!isEditingCard)}
-                  className="font-mono text-[9px] text-[#7b6e54] underline cursor-pointer font-bold"
-                >
-                  {isEditingCard ? 'LOCK' : 'CHANGE'}
-                </button>
-              </div>
-              <div className="bg-[#f5efe6] border border-[#d5cdc0] p-2.5 font-mono text-[11px] text-[#1a1816] flex justify-between items-center">
-                {isEditingCard ? (
-                  <input
-                    type="text"
-                    value={cardNumber}
-                    onChange={(e) => setCardNumber(e.target.value)}
-                    className="bg-transparent text-[#1a1816] w-full focus:outline-none font-mono text-[11px]"
-                    placeholder="4000 0000 0000 4099"
-                  />
-                ) : (
-                  <span>{cardNumber}</span>
-                )}
-                <span className="text-[#7b6e54] text-[10px] font-bold shrink-0 ml-2">
-                  VISA / MC
-                </span>
-              </div>
-            </div>
-
-            {/* Expiry & CVC Inputs */}
-            <div className="grid grid-cols-2 gap-3">
-              <div className="flex flex-col gap-1">
-                <span className="font-mono text-[10px] text-[#59544c] uppercase tracking-wider">
-                  Expiry
-                </span>
-                <div className="bg-[#f5efe6] border border-[#d5cdc0] p-2.5 font-mono text-[11px] text-[#1a1816]">
-                  {isEditingCard ? (
-                    <input
-                      type="text"
-                      value={expiry}
-                      onChange={(e) => setExpiry(e.target.value)}
-                      className="bg-transparent text-[#1a1816] w-full focus:outline-none font-mono text-[11px]"
-                      placeholder="MM / YY"
-                    />
-                  ) : (
-                    <span>{expiry}</span>
-                  )}
-                </div>
-              </div>
-
-              <div className="flex flex-col gap-1">
-                <span className="font-mono text-[10px] text-[#59544c] uppercase tracking-wider">
-                  Security CVC
-                </span>
-                <div className="bg-[#f5efe6] border border-[#d5cdc0] p-2.5 font-mono text-[11px] text-[#1a1816]">
-                  {isEditingCard ? (
-                    <input
-                      type="password"
-                      maxLength={4}
-                      value={cvc}
-                      onChange={(e) => setCvc(e.target.value)}
-                      className="bg-transparent text-[#1a1816] w-full focus:outline-none font-mono text-[11px]"
-                      placeholder="•••"
-                    />
-                  ) : (
-                    <span>{cvc}</span>
-                  )}
-                </div>
-              </div>
-            </div>
-          </div>
-        ) : paymentMethod === 'APPLE_PAY' ? (
-          <div className="bg-[#ede7dd] border border-[#d5cdc0] p-4 flex flex-col gap-2 font-mono text-xs">
-            <span className="text-[#7b6e54] text-[10px] uppercase font-bold">APPLE PAY BIOMETRIC</span>
-            <p className="text-[#1a1816] text-[11px]">
-              Ready for Face ID / Touch ID validation upon placing order.
-            </p>
-          </div>
-        ) : paymentMethod === 'WIRE' ? (
-          <div className="bg-[#ede7dd] border border-[#d5cdc0] p-4 flex flex-col gap-2 font-mono text-xs">
-            <span className="text-[#7b6e54] text-[10px] uppercase font-bold">DIRECT VAULT WIRE (SWIFT/IBAN)</span>
-            <p className="text-[#1a1816] text-[11px]">
-              Archival escrow coordinates will be generated upon authorization.
-            </p>
-          </div>
-        ) : (
-          <div className="bg-[#ede7dd] border border-[#d5cdc0] p-4 flex flex-col gap-2 font-mono text-xs">
-            <span className="text-[#7b6e54] text-[10px] uppercase font-bold">PRIVATE CLIENT CONCIERGE</span>
-            <p className="text-[#1a1816] text-[11px]">
-              Your dedicated curator will contact you via encrypted phone line.
-            </p>
-          </div>
-        )}
+        <div className="bg-[#ede7dd] border border-[#d5cdc0] p-4 flex flex-col gap-2 font-mono text-xs">
+          <span className="text-[#7b6e54] text-[10px] uppercase font-bold">
+            {paymentMethod === 'CARD' ? 'SECURE RAZORPAY CHECKOUT' : 'CASH ON DELIVERY'}
+          </span>
+          <p className="text-[#1a1816] text-[11px]">
+            {paymentMethod === 'CARD'
+              ? currency === 'INR'
+                ? 'Choose card, UPI, net banking, or supported wallets in Razorpay Checkout. Your card details are never entered or stored on this site.'
+                : 'Razorpay Checkout will show international payment methods enabled for your account and currency. Your card details are never entered or stored on this site.'
+              : 'Pay the delivery agent when your order arrives.'}
+          </p>
+        </div>
 
         {/* FINANCIAL LEDGER / COST BREAKDOWN */}
         <div
@@ -384,20 +332,20 @@ export const CheckoutProtocol: React.FC<CheckoutProtocolProps> = ({
           <div className="flex justify-between text-[#59544c]">
             <span className="tracking-wider">MERCHANDISE SUB-TOTAL</span>
             <span className="text-[#1a1816] font-bold">
-              ${subtotal.toLocaleString('en-US', { minimumFractionDigits: 2 })}
+              {formatCurrency(displayedSubtotal, currency)}
             </span>
           </div>
           <div className="flex justify-between text-[#59544c]">
             <span className="tracking-wider">PRIORITY ARMORED FREIGHT</span>
-            <span className="text-[#7b6e54] font-bold">COMPLIMENTARY ($0.00)</span>
+            <span className="text-[#7b6e54] font-bold">COMPLIMENTARY ({formatCurrency(0, currency)})</span>
           </div>
           <div className="flex justify-between text-[#59544c]">
-            <span className="tracking-wider">CARBON VOLUNTARY OFFSET</span>
-            <span className="text-[#1a1816]">INCLUDED</span>
+            <span className="tracking-wider">PRODUCT TAX</span>
+            <span className="text-[#1a1816]">INCLUDED IN LISTED PRICES</span>
           </div>
           <div className="flex justify-between text-[#59544c]">
-            <span className="tracking-wider">ESTIMATED LOCAL DUTIES</span>
-            <span className="text-[#1a1816]">$0.00</span>
+            <span className="tracking-wider">IMPORT DUTIES</span>
+            <span className="text-[#1a1816]">MAY BE DUE AT DESTINATION</span>
           </div>
 
           {/* Total Settlement Box */}
@@ -407,16 +355,30 @@ export const CheckoutProtocol: React.FC<CheckoutProtocolProps> = ({
                 TOTAL SETTLEMENT
               </span>
               <span className="font-mono text-[9px] text-[#59544c] tracking-wider">
-                ALL DUTIES &amp; FEES ASSUMED
+                TAX INCLUDED // IMPORT DUTIES MAY APPLY
               </span>
             </div>
             <span
               id="total-settlement-price"
               className="font-headline text-[24px] md:text-[28px] text-[#1a1816] font-bold tracking-tight"
             >
-              ${totalSettlement.toLocaleString('en-US', { minimumFractionDigits: 2 })} USD
+              {formatCurrency(totalSettlement, currency)}
             </span>
           </div>
+          {isQuoteLoading && (
+            <p className="text-[10px] text-[#59544c]" role="status">LOADING COUNTRY CURRENCY QUOTE...</p>
+          )}
+          {quoteError && (
+            <p className="text-[10px] text-red-800" role="alert">{quoteError}</p>
+          )}
+          {paymentQuote && currency !== 'INR' && (
+            <p className="text-[10px] text-[#59544c]">
+              Indicative exchange rate: 1 INR = {exchangeRate.toPrecision(5)} {currency}. Final amount is fixed when the order is created.
+            </p>
+          )}
+          {paymentQuote && currency === 'INR' && (
+            <p className="text-[10px] text-[#59544c]">India shipping address // tax included in listed product prices.</p>
+          )}
         </div>
 
         {/* Primary High-Contrast Call to Action */}
@@ -424,8 +386,8 @@ export const CheckoutProtocol: React.FC<CheckoutProtocolProps> = ({
           <button
             type="button"
             id="submit-order-btn"
-            disabled={isOrderSubmitting || subtotal <= 0}
-            onClick={onPlaceOrder}
+            disabled={isOrderSubmitting || subtotal <= 0 || (authApi.hasSession() && (!paymentQuote || isQuoteLoading || Boolean(quoteError)))}
+            onClick={() => onPlaceOrder(paymentMethod)}
             className="w-full py-5 bg-[#141312] text-[#f5efe6] font-mono text-[12px] font-bold uppercase tracking-[0.2em] hover:bg-[#35322e] transition-all flex items-center justify-center gap-3 shadow-md active:scale-[0.99] cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed"
           >
             {isOrderSubmitting ? (

@@ -14,6 +14,7 @@ import {
 } from 'lucide-react';
 import { ShoeProduct, CartItem, SizeStock } from '../types';
 import { BRANDS, CATEGORIES, GENDERS, ALL_SIZES } from '../data/footwearCatalog';
+import { formatCurrency } from '../lib/currency';
 
 interface ProductListingViewProps {
   products: ShoeProduct[];
@@ -415,8 +416,8 @@ export const ProductListingView: React.FC<ProductListingViewProps> = ({
                 className="w-full accent-[#1a1816] cursor-pointer"
               />
               <div className="flex justify-between text-[9px] text-[#7b6e54]">
-                <span>$80</span>
-                <span>$700</span>
+                <span>{formatCurrency(80)}</span>
+                <span>{formatCurrency(700)}</span>
               </div>
             </div>
 
@@ -557,8 +558,14 @@ export const ProductListingView: React.FC<ProductListingViewProps> = ({
                               {shoe.category} • {shoe.gender}
                             </span>
                             <div className="flex items-center gap-1 text-[10px] font-bold text-[#1a1816]">
-                              <Star className="w-3 h-3 fill-[#1a1816]" />
-                              <span>{shoe.rating}</span>
+                              {shoe.reviewsCount > 0 ? (
+                                <>
+                                  <Star className="w-3 h-3 fill-[#1a1816]" />
+                                  <span>{shoe.rating}</span>
+                                </>
+                              ) : (
+                                <span className="text-[#7b6e54]">Not rated</span>
+                              )}
                             </div>
                           </div>
 
@@ -573,10 +580,10 @@ export const ProductListingView: React.FC<ProductListingViewProps> = ({
                         {/* Price & MRP */}
                         <div className="flex items-baseline gap-2 mb-3">
                           <span className="text-base font-bold text-[#1a1816]">
-                            ${shoe.price.toFixed(2)}
+                            {formatCurrency(shoe.price)}
                           </span>
                           <span className="text-xs text-[#8e8474] line-through">
-                            ${shoe.mrp.toFixed(2)}
+                            {formatCurrency(shoe.mrp)}
                           </span>
                         </div>
 

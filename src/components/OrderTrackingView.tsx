@@ -1,6 +1,7 @@
 import React from 'react';
 import { Check, Clock, Package, Truck, MapPin, ChevronLeft, ArrowRight, ShieldCheck, RotateCcw } from 'lucide-react';
 import { Order } from '../types';
+import { formatCurrency } from '../lib/currency';
 
 interface OrderTrackingViewProps {
   order: Order;
@@ -201,7 +202,7 @@ export const OrderTrackingView: React.FC<OrderTrackingViewProps> = ({
                     </div>
                   </div>
                   <div className="font-bold text-xs text-[#1a1816]">
-                    ${(item.price * item.quantity).toFixed(2)}
+                    {formatCurrency(item.price * item.quantity * (order.exchangeRate ?? 1), order.currency ?? 'INR')}
                   </div>
                 </div>
               ))}

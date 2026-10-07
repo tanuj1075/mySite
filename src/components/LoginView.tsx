@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { ArrowRight, Eye, EyeOff, ShieldCheck, Check, ArrowLeft } from 'lucide-react';
+import { authApi } from '../lib/api';
 
 interface LoginViewProps {
   onNavigate: (nav: string) => void;
@@ -24,7 +25,7 @@ export const LoginView: React.FC<LoginViewProps> = ({
   const [showPassword, setShowPassword] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const handleLogin = (e: React.FormEvent) => {
+  const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!email || !email.includes('@')) {
       onShowToast('PLEASE ENTER A VALID CLIENT EMAIL PROTOCOL');
@@ -41,20 +42,17 @@ export const LoginView: React.FC<LoginViewProps> = ({
     }
 
     setIsSubmitting(true);
-    setTimeout(() => {
-      setIsSubmitting(false);
-      const authenticatedUser = {
-        name: email.split('@')[0].toUpperCase(),
-        email: email,
-        memberId: `CLIENT_${Math.floor(1000 + Math.random() * 9000)}`,
-      };
+    try {
+      const authenticatedUser = await authApi.login(email, password);
       onLoginSuccess(authenticatedUser);
       onShowToast(`WELCOME BACK, ${authenticatedUser.name}. SESSION SECURED.`);
       onNavigate('COLLECTIONS');
-    }, 800);
+    } catch (error) {
+      onShowToast(error instanceof Error ? error.message.toUpperCase() : 'AUTHENTICATION FAILED');
+    } finally { setIsSubmitting(false); }
   };
 
-  const handleRegister = (e: React.FormEvent) => {
+  const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!name.trim()) {
       onShowToast('PLEASE ENTER YOUR FULL CLIENT NAME');
@@ -70,17 +68,14 @@ export const LoginView: React.FC<LoginViewProps> = ({
     }
 
     setIsSubmitting(true);
-    setTimeout(() => {
-      setIsSubmitting(false);
-      const newUser = {
-        name: name.toUpperCase(),
-        email: email,
-        memberId: `CLIENT_${Math.floor(1000 + Math.random() * 9000)}`,
-      };
+    try {
+      const newUser = await authApi.register(name, email, password);
       onLoginSuccess(newUser);
       onShowToast(`VAULT REGISTRY INITIALIZED: ${newUser.name}`);
       onNavigate('COLLECTIONS');
-    }, 800);
+    } catch (error) {
+      onShowToast(error instanceof Error ? error.message.toUpperCase() : 'REGISTRATION FAILED');
+    } finally { setIsSubmitting(false); }
   };
 
   const handleForgotPassword = (e: React.FormEvent) => {

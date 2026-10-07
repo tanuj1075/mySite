@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { ShoppingBag, Eye, Filter, ArrowRight, Shield } from 'lucide-react';
 import { CartItem } from '../types';
+import { formatCurrency } from '../lib/currency';
 
 interface ShopViewProps {
   onAddToCart: (item: CartItem) => void;
@@ -182,7 +183,7 @@ export const ShopView: React.FC<ShopViewProps> = ({
               <div>
                 <div className="flex items-center justify-between mb-4 text-[10px]">
                   <span className="text-[#59544c] tracking-widest font-bold">{item.code}</span>
-                  <span className="text-[#1a1816] font-bold">${item.price.toFixed(2)}</span>
+                  <span className="text-[#1a1816] font-bold">{formatCurrency(item.price)}</span>
                 </div>
 
                 <div className="relative aspect-[4/3] bg-[#ede7dd] border border-[#d5cdc0] overflow-hidden mb-6">

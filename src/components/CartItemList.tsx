@@ -1,6 +1,7 @@
 import React from 'react';
 import { CheckCircle2, ShieldAlert, ShieldCheck, ChevronRight, RotateCcw } from 'lucide-react';
 import { CartItem } from '../types';
+import { formatCurrency } from '../lib/currency';
 
 interface CartItemListProps {
   items: CartItem[];
@@ -95,7 +96,7 @@ export const CartItemList: React.FC<CartItemListProps> = ({
                     </div>
                     <div className="text-right shrink-0">
                       <span className="font-mono text-[18px] font-bold text-[#1a1816] tracking-tight">
-                        ${(item.price * item.quantity).toFixed(2)}
+                        {formatCurrency(item.price * item.quantity)}
                       </span>
                       <span className="block font-mono text-[10px] text-[#7b6e54] tracking-wider">
                         TAX INCL.

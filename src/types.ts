@@ -33,16 +33,12 @@ export interface Address {
   phone?: string;
 }
 
-export type PaymentMethod = 'CARD' | 'UPI' | 'NET_BANKING' | 'WALLET' | 'COD' | 'EMI' | 'APPLE_PAY' | 'WIRE';
+export type PaymentMethod = 'CARD' | 'COD';
 
 export interface CheckoutState {
   currentStep: number; // 1 to 5
   selectedAddressId: string;
   paymentMethod: PaymentMethod;
-  cardNumber: string;
-  expiry: string;
-  cvc: string;
-  upiId?: string;
   selectedBank?: string;
   selectedWallet?: string;
   couponCode?: string;
@@ -169,19 +165,19 @@ export interface ShoeProduct {
   upper: string;
   sole: string;
   closure: string;
-  fitType: 'Regular Fit' | 'Narrow Fit' | 'Wide Fit';
+  fitType: 'Regular Fit' | 'Narrow Fit' | 'Wide Fit' | 'Not specified';
   occasion: string;
   use: string;
   weight: string;
-  waterResistance: 'Yes' | 'No' | 'Water Repellent';
+  waterResistance: 'Yes' | 'No' | 'Water Repellent' | 'Not specified';
   countryOfOrigin: string;
   warranty: string;
   description: string;
   
   // Review-based indicators
-  fitIndicator: 'Runs Small' | 'True to Size' | 'Runs Large';
-  comfortScore: number; // out of 5
-  width: 'Narrow' | 'Medium' | 'Wide';
+  fitIndicator: 'Runs Small' | 'True to Size' | 'Runs Large' | 'Not specified';
+  comfortScore: number | null; // out of 5
+  width: 'Narrow' | 'Medium' | 'Wide' | 'Not specified';
   recommended: string;
   
   isNewArrival?: boolean;
@@ -220,10 +216,13 @@ export interface Order {
   couponCode?: string;
   shipping?: number;
   total: number;
+  paymentAmount?: number;
   shippingAddress: Address;
   paymentMethod: string;
-  paymentStatus: 'PAID' | 'COD' | 'PENDING' | 'Paid' | 'Pending';
-  orderStatus: 'Order Placed' | 'Confirmed' | 'Packed' | 'Shipped' | 'Out for Delivery' | 'Delivered';
+  currency?: string;
+  exchangeRate?: number;
+  paymentStatus: 'PAID' | 'COD' | 'PENDING' | 'FAILED' | 'REFUNDED' | 'Paid' | 'Pending';
+  orderStatus: 'Order Placed' | 'Confirmed' | 'Packed' | 'Shipped' | 'Out for Delivery' | 'Delivered' | 'Cancelled';
   expectedDelivery: string;
   trackingNumber: string;
   carrier: string;
