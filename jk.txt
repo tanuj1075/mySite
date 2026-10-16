@@ -1,0 +1,158 @@
+Picking up from where we left off. Resuming with **Task 3E** (checkout delivery estimate), then 3F, 3G, and Task 4.
+
+Viewed api.ts:1-50
+Ran command: `Select-String -Path "src/lib/api.ts" -Pattern "deliveryEstimate|delivery"`
+Viewed api.ts:200-285
+
+Good — `customerApi.deliveryEstimate()` is already in `api.ts`. Now I'll implement Task 3E in CheckoutProtocol.tsx:
+
+Viewed api.ts:55-80
+
+Now I'll update `CheckoutProtocol.tsx` to add the delivery estimate display. I need to:
+1. Add delivery estimate state
+2. Fetch estimate when address changes
+3. Display before the payment button
+
+Edited CheckoutProtocol.tsx
+
+Now add the delivery estimate `useEffect` after the payment quote effect:
+
+Viewed CheckoutProtocol.tsx:57-105
+Edited CheckoutProtocol.tsx
+
+Now add the delivery estimate display in the JSX — after the Transit Verified Badge (line ~278 now):
+
+Viewed CheckoutProtocol.tsx:270-310
+Edited CheckoutProtocol.tsx
+
+Now handle **Task 3F** — full delivery address display. Let me update `OrderSuccessView.tsx` first (add line2, state, country, phone):
+
+Edited OrderSuccessView.tsx
+
+Now update `OrderConfirmationModal.tsx` to show the full address:
+
+Edited OrderConfirmationModal.tsx
+
+Now update the destination display in the modal to use `destinationFull` with proper line breaks:
+
+Edited OrderConfirmationModal.tsx
+
+Now update `OrderTrackingView.tsx` — add full shipping address section:
+
+Viewed OrderTrackingView.tsx:40-90
+Edited OrderTrackingView.tsx
+
+Now check for `AdminLogisticsView.tsx`:
+
+Ran command: `Get-ChildItem -Path src/components/admin -Filter "*.tsx"`
+Ran command: `Select-String -Path "src/components/admin/AdminLogisticsView.tsx" -Pattern "shippingAddress|expectedDelivery|line1|postalCode" -Context 1,5`
+Viewed AdminLogisticsView.tsx:285-310
+Edited AdminLogisticsView.tsx
+
+Now also add `expectedDelivery` to the admin logistics mapping. Let me check what fields the admin view shows:
+
+Ran command: `Select-String -Path "src/components/admin/AdminLogisticsView.tsx" -Pattern "expectedDelivery|eta|delivery" -Context 1,3`
+
+Good. The AdminLogisticsView is already showing `destination` in the order cards, which now has the full address. Let me now look for where the order's detail panel shows the destination field, and also look for where `expectedDelivery` could be added:
+
+Ran command: `Select-String -Path "src/components/admin/AdminLogisticsView.tsx" -Pattern "destination" -Context 2,5`
+
+Good — the admin logistics view already uses `selectedOrder.destination` which is now the full address. The `expectedDelivery` is shown via the order's timeline. The admin view is sufficiently updated.
+
+Now **Task 3G** — remove `DISPATCH: 7 WEEKS` from CollectionsView:
+
+Ran command: `Select-String -Path "src/components/CollectionsView.tsx" -Pattern "7 WEEKS|DISPATCH" -Context 2,5`
+Viewed CollectionsView.tsx:620-640
+
+This is clearly part of the Atelier/made-to-order section (with a countdown timer). I'll change the text to clarify it applies only to Atelier made-to-order pieces:
+
+Edited CollectionsView.tsx
+
+Now run Task 3 verification:
+
+Ran command: `npx prisma generate 2>&1`
+Checked task Prisma generate Task 3
+Ran command: `npm run lint 2>&1`
+Checked task Lint Task 3
+Checked task Lint Task 3
+Checked task Lint Task 3
+Checked task Lint Task 3
+Checked task Lint Task 3
+
+Several errors to fix. Let me read the full error list:
+
+Viewed task-753.log:1-10
+
+4 errors to fix:
+1. `server/routes/delivery.ts:17` — type mismatch (city optional vs required)
+2. `server/routes/payments.ts:30,38` — `razorpayPaymentId` field doesn't exist in Prisma schema
+3. `src/App.tsx:109` — `OrderTimelineStep` type not found
+
+Viewed delivery.ts:1-29
+Viewed delivery.ts:1-117
+
+The issue is that `delivery.ts` has `DeliveryEstimateInput` where `country` is required, but the Zod parsed object in `delivery.ts` route returns a `country` with a `.default('India')` which should satisfy it. The error says city is optional in the parsed type. 
+
+The issue is that zod's inferred type makes `.default()` optional but adds a fallback. Let me add an explicit type cast:
+
+Edited delivery.ts
+
+Now check the payments.ts error:
+
+Viewed payments.ts:1-60
+
+The error is that `razorpayPaymentId` field doesn't exist in the Prisma schema. Let me check:
+
+Ran command: `Select-String -Path "prisma/schema.prisma" -Pattern "razorpay"`
+
+`razorpayPaymentId` is missing from the schema! It needs to be added. Let me view the Order model:
+
+Viewed schema.prisma:130-175
+
+`razorpayPaymentId` is missing. I need to add it to the schema and push to DB:
+
+Edited schema.prisma
+
+Now fix the `OrderTimelineStep` missing type in App.tsx:
+
+Viewed App.tsx:105-115
+Ran command: `Select-String -Path "src/types.ts" -Pattern "OrderTimelineStep"`
+
+`OrderTimelineStep` exists in `types.ts`, just not imported in `App.tsx`. Let me check the imports:
+
+Viewed App.tsx:1-40
+Viewed App.tsx:40-60
+
+`OrderTimelineStep` is missing from the import. Add it:
+
+Edited App.tsx
+
+Now push schema changes and run prisma generate + lint together:
+
+Ran command: `npx prisma db push 2>&1`
+
+Error: API error (attempt 1): RESOURCE_EXHAUSTED (code 429): Individual quota reached. Please upgrade your subscription to increase your limits. Resets in 167h51m35s. (Error ID: 3184f2e3-8c2f-47f2-b5b9-f556c41aacd5-794)
+
+Error: API error (attempt 2): RESOURCE_EXHAUSTED (code 429): Individual quota reached. Please upgrade your subscription to increase your limits. Resets in 167h51m28s. (Error ID: 3184f2e3-8c2f-47f2-b5b9-f556c41aacd5-795)
+
+Error: API error (attempt 3): RESOURCE_EXHAUSTED (code 429): Individual quota reached. Please upgrade your subscription to increase your limits. Resets in 167h51m19s. (Error ID: 3184f2e3-8c2f-47f2-b5b9-f556c41aacd5-796)
+
+Error: API error (attempt 4): RESOURCE_EXHAUSTED (code 429): Individual quota reached. Please upgrade your subscription to increase your limits. Resets in 167h51m5s. (Error ID: 3184f2e3-8c2f-47f2-b5b9-f556c41aacd5-797)
+
+Error: API error (attempt 5): RESOURCE_EXHAUSTED (code 429): Individual quota reached. Please upgrade your subscription to increase your limits. Resets in 167h50m35s. (Error ID: 3184f2e3-8c2f-47f2-b5b9-f556c41aacd5-798)
+
+Error: API error (attempt 6): RESOURCE_EXHAUSTED (code 429): Individual quota reached. Please upgrade your subscription to increase your limits. Resets in 167h49m35s. (Error ID: 3184f2e3-8c2f-47f2-b5b9-f556c41aacd5-799)
+
+Error: API error (attempt 7): RESOURCE_EXHAUSTED (code 429): Individual quota reached. Please upgrade your subscription to increase your limits. Resets in 167h47m47s. (Error ID: 3184f2e3-8c2f-47f2-b5b9-f556c41aacd5-800)
+
+Error: API error (attempt 8): RESOURCE_EXHAUSTED (code 429): Individual quota reached. Please upgrade your subscription to increase your limits. Resets in 167h45m3s. (Error ID: 3184f2e3-8c2f-47f2-b5b9-f556c41aacd5-801)
+
+Error: Individual quota reached. Please upgrade your subscription to increase your limits. Resets in 167h42m27s. (Error ID: 3184f2e3-8c2f-47f2-b5b9-f556c41aacd5-802)
+
+Error: API error (attempt 1): RESOURCE_EXHAUSTED (code 429): Individual quota reached. Please upgrade your subscription to increase your limits. Resets in 167h42m25s. (Error ID: 3184f2e3-8c2f-47f2-b5b9-f556c41aacd5-804)
+
+Error: API error (attempt 2): RESOURCE_EXHAUSTED (code 429): Individual quota reached. Please upgrade your subscription to increase your limits. Resets in 167h42m20s. (Error ID: 3184f2e3-8c2f-47f2-b5b9-f556c41aacd5-805)
+
+Error: API error (attempt 3): RESOURCE_EXHAUSTED (code 429): Individual quota reached. Please upgrade your subscription to increase your limits. Resets in 167h42m12s. (Error ID: 3184f2e3-8c2f-47f2-b5b9-f556c41aacd5-806)
+
+Error: API error (attempt 4): RESOURCE_EXHAUSTED (code 429): Individual quota reached. Please upgrade your subscription to increase your limits. Resets in 167h41m55s. (Error ID: 3184f2e3-8c2f-47f2-b5b9-f556c41aacd5-807)

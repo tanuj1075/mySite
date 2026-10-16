@@ -153,6 +153,11 @@ model Order {
   razorpayOrderId   String?       @unique
   razorpayPaymentId String?
   trackingNumber    String?
+  estimatedDeliveryMin DateTime?
+  estimatedDeliveryMax DateTime?
+  deliveryDaysMin   Int?
+  deliveryDaysMax   Int?
+  carrier           String        @default("VANTA Logistics")
   items             OrderItem[]
   exchanges         ExchangeReturnRequest[]
   user              User          @relation(fields: [userId], references: [id])

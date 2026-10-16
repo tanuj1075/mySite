@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   Shield,
   ShieldCheck,
@@ -16,6 +16,7 @@ import {
   Eye,
   Sliders,
 } from 'lucide-react';
+import { adminApi } from '../../lib/api';
 
 interface AdminSecurityViewProps {
   onShowToast: (msg: string) => void;
@@ -53,13 +54,47 @@ export const AdminSecurityView: React.FC<AdminSecurityViewProps> = ({ onShowToas
     },
   ]);
 
-  const handleRevokeOtherSessions = () => {
-    setSessions(sessions.filter((s) => s.isCurrent));
-    onShowToast('REVOKED 3 REMOTE ADMINISTRATOR SESSIONS // TOKENS INVALIDATED');
+  useEffect(() => {
+    adminApi.sessions()
+      .then((realSessions) => {
+        if (realSessions && realSessions.length > 0) {
+          setSessions(realSessions.map((s) => ({
+            id: s.id,
+            isCurrent: s.isCurrent,
+            ip: 'Verified Token Node',
+            location: 'Authenticated Origin',
+            environment: s.environment,
+          })));
+        }
+      })
+      .catch(() => {
+        // Retain initial reference demonstration records when backend is unavailable
+      });
+  }, []);
+
+  const handleRevokeOtherSessions = async () => {
+    try {
+      const res = await adminApi.revokeAllSessions();
+      setSessions((prev) => prev.filter((s) => s.isCurrent));
+      onShowToast(`REVOKED REMOTE SESSIONS // ${res.revokedCount} DATABASE REFRESH TOKENS INVALIDATED`);
+    } catch {
+      setSessions((prev) => prev.filter((s) => s.isCurrent));
+      onShowToast('REVOKED SESSIONS (OFFLINE SIMULATION // BACKEND REFRESH TOKENS NOT REACHED)');
+    }
   };
 
   return (
     <div className="p-4 sm:p-8 font-sans space-y-10 bg-[#faf7f2] min-h-full">
+      {/* Explicit Architecture & Demonstration Disclaimer */}
+      <div className="bg-[#ede7dd] border border-[#d5cdc0] p-3 text-[11px] font-mono flex items-start gap-2.5">
+        <AlertTriangle className="w-4 h-4 text-[#7b6e54] shrink-0 mt-0.5" />
+        <div>
+          <span className="font-bold text-[#1a1816] uppercase">SYSTEM INTEGRITY AUDIT NOTE: </span>
+          <span className="text-[#59544c]">
+            Active session revocation connects directly to the PostgreSQL refresh token database. Physical hardware enclaves (Milan/London), biometric terminal gates, and cryptographic Merkle root displays represent target architectural specifications in demo mode.
+          </span>
+        </div>
+      </div>
       {/* Top Header Section matching Image 4 */}
       <div>
         <div className="font-mono text-[10px] text-[#7b6e54] tracking-[0.2em] uppercase mb-1">

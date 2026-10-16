@@ -49,6 +49,7 @@ import {
   NavSection,
   ShoeProduct,
   Order,
+  OrderTimelineStep,
   ExchangeReturnRequest,
   SneakerDrop,
   Coupon,
@@ -72,40 +73,116 @@ function toOrderRecord(record: Record<string, unknown>): Order {
     SHIPPED: 'Shipped',
     OUT_FOR_DELIVERY: 'Out for Delivery',
     DELIVERED: 'Delivered',
-    CANCELLED: 'Order Placed',
+    CANCELLED: 'Cancelled',
   };
-  const items = (record.items as Array<Record<string, unknown>> ?? []).map((item) => ({
-    productId: String(item.productId),
-    sku: String(item.sku),
-    name: String(item.name),
-    brand: String(item.brand),
-    color: String(item.color),
-    size: String(item.size),
-    price: Number(item.price),
-    quantity: Number(item.quantity),
-    image: String(item.image),
-  }));
-  return {
-    id: String(record.id),
-    date: new Date(String(record.createdAt ?? Date.now())).toLocaleDateString(),
-    items,
-    subtotal: Number(record.subtotal),
-    discount: Number(record.discount),
-    couponCode: typeof record.couponCode === 'string' ? record.couponCode : undefined,
-    total: Number(record.total),
-    paymentAmount: Number(record.paymentAmount ?? record.total),
-    shippingAddress: record.addressSnapshot as Address,
-    paymentMethod: String(record.paymentMethod),
-    currency: String(record.paymentCurrency ?? 'INR'),
-    exchangeRate: Number(record.exchangeRate ?? 1),
-    paymentStatus: String(record.paymentStatus) as Order['paymentStatus'],
-    orderStatus: statusMap[String(record.orderStatus)] ?? 'Order Placed',
-    expectedDelivery: '3-5 Business Days',
-    trackingNumber: String(record.trackingNumber ?? ''),
-    carrier: 'VANTA Logistics',
-    timeline: [],
-  };
-}
+  const items = (record.items as Array<Record<string, unknown>> ?? []).map((item) => {
+    const catalog = (item.product as { catalog?: { sizeSystem?: string } } | undefined)?.catalog;
+    return {
+      productId: String(item.productId),
+      sku: String(item.sku),
+      name: String(item.name),
+      brand: String(item.brand),
+      color: String(item.color),
+      size: String(item.size),
+      sizeSystem: catalog?.sizeSystem ?? 'US',
+      price: Number(item.price),
+      quantity: Number(item.quantity),
+      image: String(item.image),
+    };
+  });
+    const createdDate = new Date(String(record.createdAt ?? Date.now()));
+    const estMin = record.estimatedDeliveryMin ? new Date(String(record.estimatedDeliveryMin)) : null;
+    const estMax = record.estimatedDeliveryMax ? new Date(String(record.estimatedDeliveryMax)) : null;
+    const daysMin = record.deliveryDaysMin ? Number(record.deliveryDaysMin) : null;
+    const daysMax = record.deliveryDaysMax ? Number(record.deliveryDaysMax) : null;
+
+    let expectedDelivery = '3–5 business days';
+    if (estMin && estMax) {
+      const minStr = estMin.toLocaleDateString('en-GB', { weekday: 'short', day: 'numeric', month: 'short' });
+      const maxStr = estMax.toLocaleDateString('en-GB', { weekday: 'short', day: 'numeric', month: 'short', year: 'numeric' });
+      expectedDelivery = `${minStr} – ${maxStr}${daysMin && daysMax ? ` (${daysMin}–${daysMax} business days)` : ''}`;
+    }
+
+    const orderStatus = statusMap[String(record.orderStatus)] ?? 'Order Placed';
+    const statusOrder: Order['orderStatus'][] = ['Order Placed', 'Confirmed', 'Packed', 'Shipped', 'Out for Delivery', 'Delivered'];
+    const currentIdx = statusOrder.indexOf(orderStatus);
+
+    const timeline: OrderTimelineStep[] = [
+      {
+        status: 'Order Placed',
+        date: createdDate.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' }),
+        time: createdDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+        description: 'Order placed cryptographically on vault ledger.',
+        completed: currentIdx >= 0,
+        current: currentIdx === 0,
+      },
+      {
+        status: 'Confirmed',
+        date: currentIdx >= 1 ? createdDate.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' }) : 'Expected',
+        time: currentIdx >= 1 ? createdDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : '--:--',
+        description: 'Allocation verified & inventory locked.',
+        completed: currentIdx >= 1,
+        current: currentIdx === 1,
+      },
+      {
+        status: 'Packed',
+        date: currentIdx >= 2 ? createdDate.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' }) : 'Expected',
+        time: currentIdx >= 2 ? '--:--' : '--:--',
+        description: 'Hand-inspected, serialized in stasis archive crate.',
+        completed: currentIdx >= 2,
+        current: currentIdx === 2,
+      },
+      {
+        status: 'Shipped',
+        date: currentIdx >= 3 ? createdDate.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' }) : (estMin ? estMin.toLocaleDateString('en-GB', { day: '2-digit', month: 'short' }) : 'Expected'),
+        time: currentIdx >= 3 ? '--:--' : '--:--',
+        description: `En route with ${String(record.carrier ?? 'VANTA Logistics')} dispatch.`,
+        completed: currentIdx >= 3,
+        current: currentIdx === 3,
+      },
+      {
+        status: 'Out for Delivery',
+        date: currentIdx >= 4 ? createdDate.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' }) : (estMax ? estMax.toLocaleDateString('en-GB', { day: '2-digit', month: 'short' }) : 'Expected'),
+        time: '--:--',
+        description: 'Local courier dispatch to destination address.',
+        completed: currentIdx >= 4,
+        current: currentIdx === 4,
+      },
+      {
+        status: 'Delivered',
+        date: currentIdx >= 5 ? createdDate.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' }) : (estMax ? estMax.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' }) : 'Pending'),
+        time: '--:--',
+        description: 'Signature verified and sealed at delivery.',
+        completed: currentIdx >= 5,
+        current: currentIdx === 5,
+      },
+    ];
+
+    return {
+      id: String(record.displayId ?? record.id),
+      date: createdDate.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' }),
+      items,
+      subtotal: Number(record.subtotal),
+      discount: Number(record.discount),
+      couponCode: typeof record.couponCode === 'string' ? record.couponCode : undefined,
+      total: Number(record.total),
+      paymentAmount: Number(record.paymentAmount ?? record.total),
+      shippingAddress: record.addressSnapshot as Address,
+      paymentMethod: String(record.paymentMethod),
+      currency: String(record.paymentCurrency ?? 'INR'),
+      exchangeRate: Number(record.exchangeRate ?? 1),
+      paymentStatus: String(record.paymentStatus) as Order['paymentStatus'],
+      orderStatus,
+      expectedDelivery,
+      estimatedDeliveryMin: estMin ? estMin.toISOString() : undefined,
+      estimatedDeliveryMax: estMax ? estMax.toISOString() : undefined,
+      deliveryDaysMin: daysMin ?? undefined,
+      deliveryDaysMax: daysMax ?? undefined,
+      trackingNumber: String(record.trackingNumber ?? ''),
+      carrier: String(record.carrier ?? 'VANTA Logistics'),
+      timeline,
+    };
+  }
 
 function toExchangeRecord(record: Record<string, unknown>): ExchangeReturnRequest {
   return {
@@ -843,7 +920,7 @@ export default function App() {
     };
     void adminApi.saveProduct(updatedProduct).then(() => {
       setProducts((prev) => prev.map((entry) => entry.id === productId ? updatedProduct : entry));
-      showToast(`INVENTORY UPDATED: SIZE US ${size} SET TO ${newStock} UNITS`);
+      showToast(`INVENTORY UPDATED: ${product.sizeSystem === 'Size' ? 'SIZE' : `SIZE ${product.sizeSystem ?? 'US'}`} ${size} SET TO ${newStock} UNITS`);
     }).catch((error: unknown) => showToast(error instanceof Error ? error.message : 'Inventory update could not be saved'));
   };
 
@@ -1273,8 +1350,10 @@ export default function App() {
       <SizeGuideModal
         isOpen={isSizeGuideOpen}
         onClose={() => setIsSizeGuideOpen(false)}
+        sizeSystem={selectedProduct.sizeSystem}
+        sizes={Object.values(selectedProduct.sizeInventory).flat()}
         onSelectSize={(sz) => {
-          showToast(`CALIBRATED SIZE SELECTION: US ${sz}`);
+          showToast(`CALIBRATED SIZE SELECTION: ${selectedProduct.sizeSystem === 'Size' ? 'SIZE' : selectedProduct.sizeSystem ?? 'US'} ${sz}`);
         }}
       />
 
@@ -1400,9 +1479,9 @@ export default function App() {
       <SearchModal
         isOpen={isSearchOpen}
         onClose={() => setIsSearchOpen(false)}
-        availableItems={cartItems.length > 0 ? cartItems : INITIAL_CART_ITEMS}
-        onSelectItem={(item) => {
-          handleAddToCart(item);
+        products={products}
+        onSelectProduct={(product) => {
+          handleSelectProduct(product);
         }}
       />
 

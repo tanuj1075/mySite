@@ -41,8 +41,16 @@ export const authApi = {
   session() {
     return requestCustomer<AuthResponse['user']>('/auth/session');
   },
-  logout() {
+  async logout() {
+    const refreshToken = localStorage.getItem(CUSTOMER_REFRESH_KEY);
     clearSession();
+    if (refreshToken) {
+      try {
+        await request('/auth/logout', { method: 'POST', body: JSON.stringify({ refreshToken }) });
+      } catch {
+        // Network/server errors ignored on client-side cleanup
+      }
+    }
   },
   async adminLogin(email: string, password: string, rememberDevice = true) {
     const result = await request<AuthResponse>('/auth/admin/login', { method: 'POST', body: JSON.stringify({ email, password }) });
@@ -58,6 +66,12 @@ export const customerApi = {
   },
   drops() {
     return request<Array<Record<string, unknown>>>('/drops');
+  },
+  deliveryEstimate(address: { city: string; state?: string; postalCode: string; country?: string }) {
+    return request<{ minDays: number; maxDays: number; minDate: string; maxDate: string; zone: string }>('/delivery/estimate', {
+      method: 'POST',
+      body: JSON.stringify(address),
+    });
   },
   cart() {
     return requestCustomer<{ items: Array<{ id: string; productId: string; color: string; size: string; quantity: number; product: { catalog: unknown } }> }>('/cart');
@@ -168,6 +182,12 @@ export const adminApi = {
   },
   updateExchangeStatus(id: string, status: string) {
     return requestAdmin(`/admin/exchanges/${encodeURIComponent(id)}/status`, { method: 'PATCH', body: JSON.stringify({ status }) });
+  },
+  sessions() {
+    return requestAdmin<Array<{ id: string; createdAt: string; expiresAt: string; isCurrent: boolean; environment: string }>>('/admin/security/sessions');
+  },
+  revokeAllSessions() {
+    return requestAdmin<{ revokedCount: number; message: string }>('/admin/security/sessions/revoke-all', { method: 'POST' });
   },
   async logout() {
     const refreshToken = getAdminRefreshToken();

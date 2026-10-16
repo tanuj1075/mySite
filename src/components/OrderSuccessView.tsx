@@ -76,7 +76,7 @@ export const OrderSuccessView: React.FC<OrderSuccessViewProps> = ({
                     <div>
                       <h4 className="font-bold text-xs uppercase text-[#1a1816]">{item.name}</h4>
                       <p className="text-[10px] text-[#59544c]">
-                        {item.brand} • {item.color} • <strong className="text-[#1a1816]">Size US {item.size}</strong>
+                        {item.brand} • {item.color} • <strong className="text-[#1a1816]">Size {item.sizeSystem && item.sizeSystem !== 'Size' ? `${item.sizeSystem} ` : item.sizeSystem ? '' : 'US '}{item.size}</strong>
                       </p>
                       <span className="text-[10px] text-[#7b6e54]">QTY: {item.quantity}</span>
                     </div>
@@ -99,9 +99,19 @@ export const OrderSuccessView: React.FC<OrderSuccessViewProps> = ({
               </span>
               <div className="font-bold text-[#1a1816]">{order.shippingAddress.name}</div>
               <div className="text-[#59544c]">{order.shippingAddress.line1}</div>
-              <div className="text-[#59544c]">
-                {order.shippingAddress.city}, {order.shippingAddress.postalCode}
+              {order.shippingAddress.line2 && (
+                <div className="text-[#59544c]">{order.shippingAddress.line2}</div>
+              )}
+              <div className="text-[#59504c]">
+                {order.shippingAddress.city}{order.shippingAddress.state ? `, ${order.shippingAddress.state}` : ''} {order.shippingAddress.postalCode}
               </div>
+              <div className="text-[#59544c]">{order.shippingAddress.country}</div>
+              {order.shippingAddress.phone && (
+                <div className="text-[#7b6e54]">📞 {order.shippingAddress.phone}</div>
+              )}
+              {order.expectedDelivery && (
+                <div className="mt-2 text-[10px] font-bold text-[#1a1816]">ETA: {order.expectedDelivery}</div>
+              )}
             </div>
             <div className="space-y-1">
               <span className="text-[10px] text-[#7b6e54] uppercase font-bold block">

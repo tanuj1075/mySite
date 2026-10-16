@@ -22,7 +22,15 @@ export const OrderConfirmationModal: React.FC<OrderConfirmationModalProps> = ({
   const sealNumber = '#8892014';
   const destinationText = destinationAddress
     ? `${destinationAddress.line1}, ${destinationAddress.city}`
-    : '450 West 14th St, New York';
+    : '—';
+  const destinationFull = destinationAddress ? [
+    destinationAddress.name,
+    destinationAddress.line1,
+    destinationAddress.line2,
+    `${destinationAddress.city}${destinationAddress.state ? `, ${destinationAddress.state}` : ''} ${destinationAddress.postalCode}`,
+    destinationAddress.country,
+    destinationAddress.phone ? `📞 ${destinationAddress.phone}` : null,
+  ].filter(Boolean).join('\n') : destinationText;
 
   return (
     <div
@@ -73,10 +81,10 @@ export const OrderConfirmationModal: React.FC<OrderConfirmationModalProps> = ({
             </span>
             <span className="text-[#1a1816] font-bold">#{transactionHash}</span>
           </div>
-          <div className="flex justify-between items-center border-b border-[#d5cdc0] pb-2">
+          <div className="flex justify-between items-start border-b border-[#d5cdc0] pb-2">
             <span className="text-[#59544c] uppercase tracking-wider">DESTINATION</span>
-            <span className="text-[#1a1816] text-right font-medium truncate max-w-[220px]">
-              {destinationText}
+            <span className="text-[#1a1816] text-right font-medium max-w-[220px] whitespace-pre-line text-[10px] leading-relaxed">
+              {destinationFull}
             </span>
           </div>
           <div className="flex justify-between items-center border-b border-[#d5cdc0] pb-2">

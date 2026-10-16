@@ -51,6 +51,7 @@ export const ProductDetailsView: React.FC<ProductDetailsViewProps> = ({
   // Active color variant (default to first)
   const [selectedColorIndex, setSelectedColorIndex] = useState(0);
   const activeColor = product.colors[selectedColorIndex] || product.colors[0];
+  const sizeLabel = product.sizeSystem && product.sizeSystem !== 'Size' ? product.sizeSystem : 'Size';
 
   // Active angle in gallery
   const [activeAngle, setActiveAngle] = useState<'front' | 'side' | 'back' | 'top' | 'sole' | 'lifestyle'>('front');
@@ -133,9 +134,9 @@ export const ProductDetailsView: React.FC<ProductDetailsViewProps> = ({
       brand: product.brand,
       image: activeColor.images[activeAngle] || activeColor.images.front,
       colorway: activeColor.name,
-      specification: `Size US ${selectedSize}`,
-      availableSizes: sizeStockList.map((s) => `US ${s.size}`),
-      allocationStatus: `Allocated // US ${selectedSize}`,
+      specification: `Size ${sizeLabel} ${selectedSize}`,
+      availableSizes: sizeStockList.map((s) => `${sizeLabel} ${s.size}`),
+      allocationStatus: `Allocated // ${sizeLabel} ${selectedSize}`,
       quantity: 1,
       productId: product.id,
       selectedColor: activeColor.name,
@@ -147,7 +148,7 @@ export const ProductDetailsView: React.FC<ProductDetailsViewProps> = ({
     const item = prepareCartItem();
     if (item) {
       onAddToCart(item);
-      onShowToast(`ADDED TO BAG: ${product.name} (US ${selectedSize})`);
+      onShowToast(`ADDED TO BAG: ${product.name} (${sizeLabel} ${selectedSize})`);
     }
   };
 
@@ -406,9 +407,11 @@ export const ProductDetailsView: React.FC<ProductDetailsViewProps> = ({
                           : 'bg-[#ede7dd] text-[#8e8474] border-[#d5cdc0]/50 opacity-60'
                       }`}
                     >
-                      <span>US {s.size}</span>
+                      <span>{sizeLabel} {s.size}</span>
                       <span className="text-[8px] tracking-tighter">
-                        {isAvailable ? `${s.stock} left` : 'Out of Stock'}
+                        {isAvailable
+                          ? product.inventoryCountsAreExact === false ? 'Available' : `${s.stock} left`
+                          : 'Out of Stock'}
                       </span>
                     </button>
                   );
@@ -428,7 +431,7 @@ export const ProductDetailsView: React.FC<ProductDetailsViewProps> = ({
                 <div className="p-3 bg-[#ede7dd] border border-[#b8ad9c] text-xs space-y-2">
                   <div className="text-[#b83b3b] font-bold flex items-center gap-1.5">
                     <AlertCircle className="w-4 h-4" />
-                    <span>Size US {selectedSize} is currently out of stock.</span>
+                    <span>Size {sizeLabel} {selectedSize} is currently out of stock.</span>
                   </div>
                   <button
                     onClick={() => onOpenNotifyMe(product.name, selectedSize, activeColor.name)}

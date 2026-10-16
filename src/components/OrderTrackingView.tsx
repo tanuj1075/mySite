@@ -71,7 +71,7 @@ export const OrderTrackingView: React.FC<OrderTrackingViewProps> = ({
               <Truck className="w-6 h-6 text-[#1a1816]" />
               <div>
                 <span className="text-[10px] text-[#7b6e54] uppercase font-bold block">
-                  ESTIMATED ATELIER ARRIVAL
+                  ESTIMATED ARRIVAL
                 </span>
                 <span className="text-lg font-bold text-[#1a1816]">
                   {order.expectedDelivery}
@@ -81,6 +81,21 @@ export const OrderTrackingView: React.FC<OrderTrackingViewProps> = ({
             <div className="text-xs bg-[#141312] text-[#f5efe6] px-3 py-1.5 font-bold uppercase tracking-wider">
               CURRENT STATUS: {order.orderStatus.toUpperCase()}
             </div>
+          </div>
+
+          {/* Full Shipping Address */}
+          <div className="bg-[#ede7dd] border border-[#d5cdc0] p-4 font-mono text-xs">
+            <span className="text-[10px] text-[#7b6e54] uppercase font-bold block mb-2">DISPATCH DESTINATION</span>
+            <div className="text-[#1a1816] font-bold">{order.shippingAddress.name}</div>
+            <div className="text-[#59544c]">{order.shippingAddress.line1}</div>
+            {order.shippingAddress.line2 && <div className="text-[#59544c]">{order.shippingAddress.line2}</div>}
+            <div className="text-[#59544c]">
+              {order.shippingAddress.city}{order.shippingAddress.state ? `, ${order.shippingAddress.state}` : ''} {order.shippingAddress.postalCode}
+            </div>
+            <div className="text-[#59544c]">{order.shippingAddress.country}</div>
+            {order.shippingAddress.phone && (
+              <div className="text-[#7b6e54] mt-1">📞 {order.shippingAddress.phone}</div>
+            )}
           </div>
 
           {/* STEP-BY-STEP PROGRESS BAR (DESKTOP & MOBILE) */}
@@ -197,7 +212,7 @@ export const OrderTrackingView: React.FC<OrderTrackingViewProps> = ({
                     <div>
                       <div className="font-bold text-xs uppercase text-[#1a1816]">{item.name}</div>
                       <div className="text-[10px] text-[#59544c]">
-                        {item.color} • <strong className="text-[#1a1816]">Size US {item.size}</strong> • Qty: {item.quantity}
+                        {item.color} • <strong className="text-[#1a1816]">Size {item.sizeSystem && item.sizeSystem !== 'Size' ? `${item.sizeSystem} ` : item.sizeSystem ? '' : 'US '}{item.size}</strong> • Qty: {item.quantity}
                       </div>
                     </div>
                   </div>

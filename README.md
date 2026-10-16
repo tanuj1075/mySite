@@ -16,6 +16,8 @@ The `.env.example` also retains `GEMINI_API_KEY` and `APP_URL` for existing AI S
 
 The API health check is `http://localhost:4000/api/health`. The seeded admin uses `ADMIN_EMAIL` and `ADMIN_PASSWORD`; change both before any shared deployment.
 
+To discover and append products from the authorized Superkicks and Campus public catalogs, start PostgreSQL and apply the migrations first, then run `npm run catalog:import` (default: up to 60 new products; `npm run catalog:import -- --limit=100` imports up to 100). The importer keeps the existing Prisma `Product` table and catalog JSON, skips duplicate brands/models/SKUs/source URLs, validates and downloads product images into `public/catalog-images`, and records source URLs and product metadata. It only imports products with available sizes, a consistent listed price, a description, and at least three valid images. Existing catalog products are not replaced. Product feeds report size availability rather than unit counts; imported stock is therefore an availability snapshot, not an exact quantity.
+
 ### Persisted records
 
 PostgreSQL stores registered accounts (passwords are hashed), products, coupons, drops, saved addresses, carts, wishlists, orders and order items, refresh-token hashes, and return/exchange requests. Customer cart, address, wishlist, order, and return/exchange actions require sign-in. Card details are not stored. After pulling schema changes, apply migrations with `npx prisma migrate deploy`, then run `npm run db:seed` to add or synchronize the configured admin and initial catalog data.

@@ -58,6 +58,14 @@ router.get('/admin/session', requireAuth, requireAdmin, async (req, res, next) =
   } catch (error) { next(error); }
 });
 
+router.post('/logout', async (req, res, next) => {
+  try {
+    const refreshToken = z.string().min(1).parse(req.body.refreshToken);
+    await revokeRefreshToken(refreshToken);
+    res.status(204).end();
+  } catch (error) { next(error); }
+});
+
 router.post('/admin/logout', async (req, res, next) => {
   try {
     const refreshToken = z.string().min(1).parse(req.body.refreshToken);

@@ -101,10 +101,10 @@ export interface MaterialDossierItem {
 
 export interface ProductImagesByAngle {
   front: string;
-  side: string;
-  back: string;
-  top: string;
-  sole: string;
+  side?: string;
+  back?: string;
+  top?: string;
+  sole?: string;
   lifestyle?: string;
   onFeet?: string;
 }
@@ -144,6 +144,34 @@ export interface ShoeProduct {
   id: string;
   sku: string;
   code: string;
+  sourceProductId?: string;
+  sourceProductUrl?: string;
+  sourceUrl?: string;
+  sourceStore?: string;
+  sourceCategory?: string;
+  sourceTags?: string[];
+  sourceSku?: string;
+  shortDescription?: string;
+  productImages?: string[];
+  color?: string;
+  features?: string[];
+  sizeSystem?: string;
+  inventoryCountsAreExact?: boolean;
+  tags?: string[];
+  model?: string;
+  source?: string;
+  currency?: string;
+  sourceMrp?: number;
+  sourcePrice?: number;
+  sourceSizes?: string[];
+  sourceCurrency?: string;
+  sourceImageUrl?: string;
+  verifiedAt?: string;
+  exchangeRateDate?: string;
+  sourceProductName?: string;
+  sourceAvailability?: string;
+  exchangeRateUSDToINR?: number;
+  retailerProductGroupId?: string;
   name: string;
   brand: string; // e.g. 'VANTA ATELIER', 'NIKE', 'ADIDAS', 'PUMA', 'NEW BALANCE', 'CONVERSE', 'VANS', 'SALOMON'
   category: 'Sneakers' | 'Running' | 'Walking' | 'Football' | 'Basketball' | 'Training' | 'Formal Shoes' | 'Casual Shoes' | 'Sandals' | 'Slippers' | 'Boots';
@@ -193,6 +221,7 @@ export interface OrderItem {
   brand: string;
   color: string;
   size: string;
+  sizeSystem?: string;
   price: number;
   quantity: number;
   image: string;
@@ -224,6 +253,10 @@ export interface Order {
   paymentStatus: 'PAID' | 'COD' | 'PENDING' | 'FAILED' | 'REFUNDED' | 'Paid' | 'Pending';
   orderStatus: 'Order Placed' | 'Confirmed' | 'Packed' | 'Shipped' | 'Out for Delivery' | 'Delivered' | 'Cancelled';
   expectedDelivery: string;
+  estimatedDeliveryMin?: string;
+  estimatedDeliveryMax?: string;
+  deliveryDaysMin?: number;
+  deliveryDaysMax?: number;
   trackingNumber: string;
   carrier: string;
   timeline: OrderTimelineStep[];
@@ -344,6 +377,7 @@ export type NavSection =
   | 'COMPARE'
   | 'MY_ORDERS'
   | 'ORDER_TRACKING'
+  | 'ORDER_SUCCESS'
   | 'RETURNS_EXCHANGES'
   | 'ADMIN'
   | 'ADMIN_LOGIN'

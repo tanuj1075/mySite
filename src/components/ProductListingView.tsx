@@ -41,6 +41,12 @@ export const ProductListingView: React.FC<ProductListingViewProps> = ({
   initialBrandFilter,
   onShowToast,
 }) => {
+  const PRICE_CEILING = useMemo(() => {
+    if (!products.length) return 50000;
+    const maxVal = Math.max(...products.map((p) => p.price));
+    return maxVal > 0 ? Math.ceil(maxVal / 500) * 500 : 50000;
+  }, [products]);
+
   // Filter States
   const [selectedCategory, setSelectedCategory] = useState<string>(initialCategoryFilter || 'ALL');
   const [selectedBrand, setSelectedBrand] = useState<string>(initialBrandFilter || 'ALL');
@@ -50,12 +56,46 @@ export const ProductListingView: React.FC<ProductListingViewProps> = ({
   const [selectedSport, setSelectedSport] = useState<string>('ALL');
   const [minRating, setMinRating] = useState<number>(0);
   const [onlyInStock, setOnlyInStock] = useState<boolean>(false);
-  const [maxPrice, setMaxPrice] = useState<number>(700);
+  const [maxPrice, setMaxPrice] = useState<number>(PRICE_CEILING);
+  const [visibleCount, setVisibleCount] = useState<number>(24);
 
-  // Sorting
+  // Preserve custom price filter unless ceiling is lower or initial load
+  const isCustomPriceRef = React.useRef(false);
+  React.useEffect(() => {
+    if (!isCustomPriceRef.current || maxPrice > PRICE_CEILING) {
+      setMaxPrice(PRICE_CEILING);
+    }
+  }, [PRICE_CEILING]);
+
+  const availableColors = useMemo(() => {
+    const colorSet = new Set<string>();
+    products.forEach((p) => {
+      p.colors?.forEach((c) => {
+        if (c.name) colorSet.add(c.name.trim());
+      });
+    });
+    return Array.from(colorSet).slice(0, 10);
+  }, [products]);
+
   const [sortBy, setSortBy] = useState<
     'POPULAR' | 'NEWEST' | 'PRICE_ASC' | 'PRICE_DESC' | 'RATING' | 'DISCOUNT' | 'TRENDING'
   >('POPULAR');
+
+  // Reset pagination when any filter changes
+  React.useEffect(() => {
+    setVisibleCount(24);
+  }, [
+    selectedCategory,
+    selectedBrand,
+    selectedGender,
+    selectedSizes,
+    selectedColors,
+    selectedSport,
+    minRating,
+    onlyInStock,
+    maxPrice,
+    sortBy,
+  ]);
 
   // Mobile filters drawer toggle
   const [mobileFiltersOpen, setMobileFiltersOpen] = useState(false);
@@ -67,8 +107,16 @@ export const ProductListingView: React.FC<ProductListingViewProps> = ({
     );
   };
 
+  // Toggle color filter
+  const toggleColor = (color: string) => {
+    setSelectedColors((prev) =>
+      prev.includes(color) ? prev.filter((c) => c !== color) : [...prev, color]
+    );
+  };
+
   // Reset all filters
   const resetFilters = () => {
+    isCustomPriceRef.current = false;
     setSelectedCategory('ALL');
     setSelectedBrand('ALL');
     setSelectedGender('ALL');
@@ -77,7 +125,8 @@ export const ProductListingView: React.FC<ProductListingViewProps> = ({
     setSelectedSport('ALL');
     setMinRating(0);
     setOnlyInStock(false);
-    setMaxPrice(700);
+    setMaxPrice(PRICE_CEILING);
+    setVisibleCount(24);
   };
 
   // Filtered and Sorted products
@@ -100,6 +149,18 @@ export const ProductListingView: React.FC<ProductListingViewProps> = ({
       // Gender filter
       if (selectedGender !== 'ALL' && p.gender !== selectedGender && p.gender !== 'Unisex') {
         return false;
+      }
+
+      // Color filter
+      if (selectedColors.length > 0) {
+        const hasMatchingColor = p.colors?.some((c) =>
+          selectedColors.some(
+            (sc) =>
+              c.name.toLowerCase().includes(sc.toLowerCase()) ||
+              sc.toLowerCase().includes(c.name.toLowerCase())
+          )
+        );
+        if (!hasMatchingColor) return false;
       }
 
       // Sport filter
@@ -146,6 +207,7 @@ export const ProductListingView: React.FC<ProductListingViewProps> = ({
     selectedCategory,
     selectedBrand,
     selectedGender,
+    selectedColors,
     selectedSport,
     minRating,
     maxPrice,
@@ -187,7 +249,7 @@ export const ProductListingView: React.FC<ProductListingViewProps> = ({
                   : `${selectedCategory.toUpperCase()} COLLECTION`}
               </h1>
               <p className="font-mono text-xs text-[#59544c] max-w-xl">
-                Showing {sortedProducts.length} certified specifications. Filtered by architectural
+                Showing {Math.min(visibleCount, sortedProducts.length)} of {sortedProducts.length} products ({products.length} in catalog). Filtered by architectural
                 material, size-level inventory, and brand canon.
               </p>
             </div>
@@ -239,7 +301,7 @@ export const ProductListingView: React.FC<ProductListingViewProps> = ({
             </button>
           ))}
           <div className="h-4 w-[1px] bg-[#d5cdc0] mx-2 hidden sm:block" />
-          {['VANTA ATELIER', 'NIKE', 'ADIDAS', 'NEW BALANCE'].map((br) => (
+          {['CAMPUS', 'NIKE', 'ADIDAS', 'PUMA', 'RED TAPE', 'NEW BALANCE'].map((br) => (
             <button
               key={br}
               onClick={() => setSelectedBrand(selectedBrand === br ? 'ALL' : br)}
@@ -400,24 +462,59 @@ export const ProductListingView: React.FC<ProductListingViewProps> = ({
               </div>
             </div>
 
-            {/* 5. PRICE RANGE SLIDER */}
+            {/* 5. COLORWAY FILTER */}
+            {availableColors.length > 0 && (
+              <div className="space-y-2 border-b border-[#d5cdc0] pb-4">
+                <div className="flex items-center justify-between">
+                  <span className="text-[11px] font-bold text-[#1a1816] uppercase">
+                    COLORWAY
+                  </span>
+                  <span className="text-[9px] text-[#7b6e54]">
+                    {selectedColors.length > 0 ? `${selectedColors.length} active` : 'All'}
+                  </span>
+                </div>
+                <div className="flex flex-wrap gap-1.5 pt-1">
+                  {availableColors.map((col) => {
+                    const isSelected = selectedColors.includes(col);
+                    return (
+                      <button
+                        key={col}
+                        onClick={() => toggleColor(col)}
+                        className={`py-1 px-2 text-[9px] uppercase font-bold border transition-colors cursor-pointer ${
+                          isSelected
+                            ? 'bg-[#141312] text-[#f5efe6] border-[#141312]'
+                            : 'bg-[#ede7dd] text-[#59544c] border-[#d5cdc0] hover:border-[#1a1816]'
+                        }`}
+                      >
+                        {col}
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+            )}
+
+            {/* 6. PRICE RANGE SLIDER */}
             <div className="space-y-2 border-b border-[#d5cdc0] pb-4">
               <div className="flex items-center justify-between text-[11px]">
                 <span className="font-bold text-[#1a1816] uppercase">MAX PRICE</span>
-                <span className="font-bold text-[#1a1816]">${maxPrice}</span>
+                <span className="font-bold text-[#1a1816]">{formatCurrency(maxPrice)}</span>
               </div>
               <input
                 type="range"
-                min="80"
-                max="700"
-                step="20"
+                min="0"
+                max={PRICE_CEILING}
+                step="500"
                 value={maxPrice}
-                onChange={(e) => setMaxPrice(Number(e.target.value))}
+                onChange={(e) => {
+                  isCustomPriceRef.current = true;
+                  setMaxPrice(Number(e.target.value));
+                }}
                 className="w-full accent-[#1a1816] cursor-pointer"
               />
               <div className="flex justify-between text-[9px] text-[#7b6e54]">
-                <span>{formatCurrency(80)}</span>
-                <span>{formatCurrency(700)}</span>
+                <span>{formatCurrency(0)}</span>
+                <span>{formatCurrency(PRICE_CEILING)}</span>
               </div>
             </div>
 
@@ -475,8 +572,9 @@ export const ProductListingView: React.FC<ProductListingViewProps> = ({
                 </button>
               </div>
             ) : (
-              <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
-                {sortedProducts.map((shoe) => {
+              <>
+                <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+                {sortedProducts.slice(0, visibleCount).map((shoe) => {
                   const isWish = wishlistIds.includes(shoe.id);
                   const isComp = compareIds.includes(shoe.id);
 
@@ -626,6 +724,22 @@ export const ProductListingView: React.FC<ProductListingViewProps> = ({
                   );
                 })}
               </div>
+
+                {/* Pagination / Load more */}
+                {visibleCount < sortedProducts.length && (
+                  <div className="mt-10 flex flex-col items-center justify-center gap-3">
+                    <p className="text-xs text-[#59544c] font-mono">
+                      Showing {Math.min(visibleCount, sortedProducts.length)} of {sortedProducts.length} products
+                    </p>
+                    <button
+                      onClick={() => setVisibleCount((prev) => prev + 24)}
+                      className="px-8 py-3 bg-[#1a1816] hover:bg-[#35322e] text-[#f5efe6] text-xs font-bold uppercase tracking-widest border border-[#1a1816] transition-colors cursor-pointer"
+                    >
+                      LOAD MORE (+24)
+                    </button>
+                  </div>
+                )}
+              </>
             )}
           </div>
         </div>

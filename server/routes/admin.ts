@@ -6,8 +6,15 @@ import { requireAdmin, requireAuth } from '../middleware/auth.js';
 const router = Router();
 router.use(requireAuth, requireAdmin);
 router.get('/customers', async (_req, res, next) => { try { res.json(await prisma.user.findMany({ where: { role: 'CUSTOMER' }, select: { id: true, email: true, name: true, phone: true, createdAt: true, orders: { select: { total: true } }, addresses: { select: { city: true, country: true } } } })); } catch (error) { next(error); } });
-router.get('/orders', async (_req, res, next) => { try { res.json(await prisma.order.findMany({ include: { items: true }, orderBy: { createdAt: 'desc' } })); } catch (error) { next(error); } });
-router.patch('/orders/:id/status', async (req, res, next) => { try { const status = z.enum(['ORDER_PLACED', 'CONFIRMED', 'PACKED', 'SHIPPED', 'OUT_FOR_DELIVERY', 'DELIVERED', 'CANCELLED']).parse(req.body.status); res.json(await prisma.order.update({ where: { id: req.params.id }, data: { orderStatus: status } })); } catch (error) { next(error); } });
+router.get('/orders', async (_req, res, next) => { try { res.json(await prisma.order.findMany({ include: { items: { include: { product: { select: { catalog: true } } } } }, orderBy: { createdAt: 'desc' } })); } catch (error) { next(error); } });
+router.patch('/orders/:id/status', async (req, res, next) => {
+  try {
+    const status = z.enum(['ORDER_PLACED', 'CONFIRMED', 'PACKED', 'SHIPPED', 'OUT_FOR_DELIVERY', 'DELIVERED', 'CANCELLED']).parse(req.body.status);
+    const existing = await prisma.order.findUnique({ where: { id: req.params.id } });
+    if (!existing) return res.status(404).json({ error: 'Order not found' });
+    res.json(await prisma.order.update({ where: { id: req.params.id }, data: { orderStatus: status } }));
+  } catch (error) { next(error); }
+});
 
 const productInput = z.object({ id: z.string(), sku: z.string(), name: z.string(), brand: z.string(), category: z.string(), price: z.number().nonnegative(), mrp: z.number().nonnegative(), catalog: z.record(z.string(), z.unknown()) });
 router.get('/products', async (_req, res, next) => { try { res.json(await prisma.product.findMany({ where: { isActive: true }, orderBy: { createdAt: 'desc' } })); } catch (error) { next(error); } });
@@ -32,5 +39,34 @@ router.patch('/drops/:id/status', async (req, res, next) => { try { const status
 
 router.get('/exchanges', async (_req, res, next) => { try { res.json(await prisma.exchangeReturnRequest.findMany({ include: { user: { select: { email: true, name: true } } }, orderBy: { createdAt: 'desc' } })); } catch (error) { next(error); } });
 router.patch('/exchanges/:id/status', async (req, res, next) => { try { const status = z.enum(['Approved', 'Rejected', 'Pickup Scheduled', 'Completed']).parse(req.body.status); res.json(await prisma.exchangeReturnRequest.update({ where: { id: req.params.id }, data: { status } })); } catch (error) { next(error); } });
+
+router.get('/security/sessions', async (req, res, next) => {
+  try {
+    const adminId = req.auth!.sub;
+    const tokens = await prisma.refreshToken.findMany({
+      where: { userId: adminId, revokedAt: null, expiresAt: { gt: new Date() } },
+      select: { id: true, createdAt: true, expiresAt: true },
+      orderBy: { createdAt: 'desc' },
+    });
+    res.json(tokens.map((t, idx) => ({
+      id: `vnt_sess_${t.id.slice(-6)}`,
+      createdAt: t.createdAt,
+      expiresAt: t.expiresAt,
+      isCurrent: idx === 0,
+      environment: 'Admin Session (Authenticated Token)',
+    })));
+  } catch (error) { next(error); }
+});
+
+router.post('/security/sessions/revoke-all', async (req, res, next) => {
+  try {
+    const adminId = req.auth!.sub;
+    const result = await prisma.refreshToken.updateMany({
+      where: { userId: adminId, revokedAt: null },
+      data: { revokedAt: new Date() },
+    });
+    res.json({ revokedCount: result.count, message: 'All remote administrator sessions revoked' });
+  } catch (error) { next(error); }
+});
 
 export default router;

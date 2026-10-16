@@ -627,7 +627,7 @@ export const CollectionsView: React.FC<CollectionsViewProps> = ({
                   <span className="w-2 h-2 rounded-full bg-[#1a1816] animate-pulse"></span>
                   PRE-ALLOCATION // SYNCHRONIZING UTC
                 </span>
-                <span className="font-bold text-[#1a1816]">DISPATCH: 7 WEEKS</span>
+                <span className="font-bold text-[#1a1816]">ATELIER MADE-TO-ORDER: 7 WEEKS</span>
               </div>
 
               {/* 4 Metric Boxes */}

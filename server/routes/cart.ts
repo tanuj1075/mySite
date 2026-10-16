@@ -18,7 +18,15 @@ router.post('/items', async (req, res, next) => {
     const cart = await getOrCreateCart(req.auth!.sub);
     const product = await prisma.product.findUnique({ where: { id: input.productId } });
     if (!product || !product.isActive) return res.status(404).json({ error: 'Product not found' });
-    const item = await prisma.cartItem.upsert({ where: { cartId_productId_color_size: { cartId: cart.id, productId: input.productId, color: input.color, size: input.size } }, update: { quantity: { increment: input.quantity } }, create: { cartId: cart.id, productId: input.productId, color: input.color, size: input.size, quantity: input.quantity } });
+    const item = await prisma.cartItem.upsert({
+      where: { cartId_productId_color_size: { cartId: cart.id, productId: input.productId, color: input.color, size: input.size } },
+      update: { quantity: { increment: input.quantity } },
+      create: { cartId: cart.id, productId: input.productId, color: input.color, size: input.size, quantity: input.quantity },
+    });
+    if (item.quantity > 20) {
+      await prisma.cartItem.update({ where: { id: item.id }, data: { quantity: 20 } });
+      return res.status(400).json({ error: 'Maximum quantity of 20 per item reached' });
+    }
     res.status(201).json(item);
   } catch (error) { next(error); }
 });

@@ -243,7 +243,7 @@ export const AdminProductsView: React.FC<AdminProductsViewProps> = ({
           else if (s.stock <= 4) label = 'LOW STOCK';
           else if (s.stock >= 10) label = 'OPTIMAL';
           return {
-            size: s.size.startsWith('US') ? s.size : `US ${s.size}`,
+            size: s.size.startsWith('US') ? s.size : `${prod.sizeSystem ?? 'US'} ${s.size}`,
             stock: s.stock,
             label,
           };

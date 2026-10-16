@@ -1,17 +1,22 @@
 import React, { useState } from 'react';
 import { X, Ruler, CheckCircle2, HelpCircle, ArrowRight } from 'lucide-react';
 import { SIZE_CHART } from '../data/footwearCatalog';
+import { SizeStock } from '../types';
 
 interface SizeGuideModalProps {
   isOpen: boolean;
   onClose: () => void;
   onSelectSize?: (size: string) => void;
+  sizeSystem?: string;
+  sizes?: SizeStock[];
 }
 
 export const SizeGuideModal: React.FC<SizeGuideModalProps> = ({
   isOpen,
   onClose,
   onSelectSize,
+  sizeSystem = 'US',
+  sizes = [],
 }) => {
   const [footLengthCm, setFootLengthCm] = useState<string>('26.0');
   const [activeTab, setActiveTab] = useState<'CHART' | 'MEASURE'>('CHART');
@@ -22,6 +27,7 @@ export const SizeGuideModal: React.FC<SizeGuideModalProps> = ({
   const lengthNum = parseFloat(footLengthCm) || 26;
   const recommendedRow =
     SIZE_CHART.find((row) => parseFloat(row.cm) >= lengthNum) || SIZE_CHART[SIZE_CHART.length - 1];
+  const hasSourceSizes = sizeSystem !== 'US';
 
   return (
     <div
@@ -54,7 +60,7 @@ export const SizeGuideModal: React.FC<SizeGuideModalProps> = ({
         </div>
 
         {/* Tab switcher */}
-        <div className="flex border-b border-[#d5cdc0] text-[11px]">
+        {!hasSourceSizes && <div className="flex border-b border-[#d5cdc0] text-[11px]">
           <button
             onClick={() => setActiveTab('CHART')}
             className={`pb-2.5 px-4 font-bold uppercase tracking-wider cursor-pointer border-b-2 transition-colors ${
@@ -75,17 +81,50 @@ export const SizeGuideModal: React.FC<SizeGuideModalProps> = ({
           >
             MEASURE YOUR FOOT (CALCULATOR)
           </button>
-        </div>
+        </div>}
 
         {/* Tab 1: Conversion Table */}
-        {activeTab === 'CHART' && (
+        {(hasSourceSizes || activeTab === 'CHART') && (
           <div className="space-y-4">
             <p className="text-xs text-[#59544c] leading-relaxed">
-              VANTA footwear is engineered to universal ISO shoe metrics. If you fall between sizes,
-              order the nearest larger size for dynamic stride expansion.
+              {hasSourceSizes
+                ? `Sizes and availability shown below use the ${sizeSystem} labels provided by the product source. No size conversion or fit guidance was supplied.`
+                : 'VANTA footwear is engineered to universal ISO shoe metrics. If you fall between sizes, order the nearest larger size for dynamic stride expansion.'}
             </p>
 
             <div className="overflow-x-auto border border-[#d5cdc0] bg-[#ede7dd]">
+              {hasSourceSizes ? (
+                <table className="w-full text-[11px] text-left border-collapse">
+                  <thead>
+                    <tr className="border-b border-[#d5cdc0] bg-[#e4ddcf] text-[#1a1816] font-bold">
+                      <th className="py-2.5 px-3">{sizeSystem === 'Size' ? 'LISTED SIZE' : `${sizeSystem.toUpperCase()} SIZE`}</th>
+                      <th className="py-2.5 px-3">AVAILABILITY</th>
+                      <th className="py-2.5 px-3 text-right">ACTION</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-[#d5cdc0]">
+                    {sizes.map((row) => (
+                      <tr key={row.size} className="hover:bg-[#f5efe6] transition-colors">
+                        <td className="py-2 px-3 font-bold text-[#1a1816]">{row.size}</td>
+                        <td className="py-2 px-3 text-[#59544c]">{row.stock > 0 ? 'Available' : 'Out of stock'}</td>
+                        <td className="py-2 px-3 text-right">
+                          {onSelectSize && row.stock > 0 && (
+                            <button
+                              onClick={() => {
+                                onSelectSize(row.size);
+                                onClose();
+                              }}
+                              className="bg-[#141312] text-[#f5efe6] px-2.5 py-1 text-[9px] font-bold hover:bg-[#35322e] transition-colors uppercase cursor-pointer"
+                            >
+                              SELECT {row.size}
+                            </button>
+                          )}
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              ) : (
               <table className="w-full text-[11px] text-left border-collapse">
                 <thead>
                   <tr className="border-b border-[#d5cdc0] bg-[#e4ddcf] text-[#1a1816] font-bold">
@@ -122,12 +161,13 @@ export const SizeGuideModal: React.FC<SizeGuideModalProps> = ({
                   ))}
                 </tbody>
               </table>
+              )}
             </div>
           </div>
         )}
 
         {/* Tab 2: Measure Your Foot Step-by-Step */}
-        {activeTab === 'MEASURE' && (
+        {!hasSourceSizes && activeTab === 'MEASURE' && (
           <div className="space-y-6">
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-[11px]">
               <div className="bg-[#ede7dd] border border-[#d5cdc0] p-4 space-y-2">

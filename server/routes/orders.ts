@@ -1,14 +1,29 @@
 import { Router } from 'express';
 import { z } from 'zod';
+import crypto from 'crypto';
 import { prisma } from '../lib/prisma.js';
 import { requireAuth } from '../middleware/auth.js';
 import { CurrencyQuoteError, currencyForCountry, quoteInrAmount } from '../lib/currency.js';
+import { estimateDelivery } from '../lib/delivery.js';
 
 const router = Router();
 const orderInput = z.object({ addressId: z.string(), paymentMethod: z.enum(['CARD', 'UPI', 'NET_BANKING', 'WALLET', 'COD']), couponCode: z.string().optional() });
+
+function generateOrderDisplayId(): string {
+  const now = new Date();
+  const year = now.getFullYear();
+  const month = String(now.getMonth() + 1).padStart(2, '0');
+  const day = String(now.getDate()).padStart(2, '0');
+  const hours = String(now.getHours()).padStart(2, '0');
+  const minutes = String(now.getMinutes()).padStart(2, '0');
+  const seconds = String(now.getSeconds()).padStart(2, '0');
+  const randomChars = crypto.randomBytes(3).toString('hex').slice(0, 4).toUpperCase();
+  return `VN-${year}${month}${day}${hours}${minutes}${seconds}-${randomChars}`;
+}
+
 router.use(requireAuth);
-router.get('/', async (req, res, next) => { try { res.json(await prisma.order.findMany({ where: { userId: req.auth!.sub }, include: { items: true }, orderBy: { createdAt: 'desc' } })); } catch (error) { next(error); } });
-router.get('/:id', async (req, res, next) => { try { const order = await prisma.order.findFirst({ where: { id: req.params.id, userId: req.auth!.sub }, include: { items: true } }); if (!order) return res.status(404).json({ error: 'Order not found' }); res.json(order); } catch (error) { next(error); } });
+router.get('/', async (req, res, next) => { try { res.json(await prisma.order.findMany({ where: { userId: req.auth!.sub }, include: { items: { include: { product: { select: { catalog: true } } } } }, orderBy: { createdAt: 'desc' } })); } catch (error) { next(error); } });
+router.get('/:id', async (req, res, next) => { try { const order = await prisma.order.findFirst({ where: { id: req.params.id, userId: req.auth!.sub }, include: { items: { include: { product: { select: { catalog: true } } } } } }); if (!order) return res.status(404).json({ error: 'Order not found' }); res.json(order); } catch (error) { next(error); } });
 router.post('/', async (req, res, next) => {
   try {
     const input = orderInput.parse(req.body);
@@ -33,14 +48,83 @@ router.post('/', async (req, res, next) => {
       }
       return res.status(422).json({ error: error instanceof Error ? error.message : 'Could not quote the payment currency' });
     }
-    const order = await prisma.$transaction(async (tx) => {
-      const createdOrder = await tx.order.create({ data: { displayId: `VN-${Date.now().toString().slice(-8)}`, userId, addressSnapshot: address, subtotal, discount, total: subtotal - discount, paymentCurrency: paymentQuote.currency, paymentAmount: paymentQuote.amount, exchangeRate: paymentQuote.exchangeRate, couponCode: coupon?.code, paymentMethod: input.paymentMethod, paymentStatus: input.paymentMethod === 'COD' ? 'COD' : 'PENDING', orderStatus: 'ORDER_PLACED', trackingNumber: `VNT-${Math.floor(10000000 + Math.random() * 90000000)}`, items: { create: cart.items.map((item) => ({ productId: item.productId, sku: item.product.sku, name: item.product.name, brand: item.product.brand, color: item.color, size: item.size, price: item.product.price, quantity: item.quantity, image: String((item.product.catalog as { colors?: { images?: { front?: string } }[] }).colors?.[0]?.images?.front ?? '') })) } }, include: { items: true } });
-      if (input.paymentMethod === 'COD') {
-        await tx.cartItem.deleteMany({ where: { cartId: cart.id } });
+
+    let deliveryEst = null;
+    try {
+      deliveryEst = estimateDelivery({
+        city: address.city,
+        state: address.state ?? undefined,
+        postalCode: address.postalCode,
+        country: address.country,
+      });
+    } catch {
+      // Fallback if address lacks postalCode
+    }
+
+    let createdOrder = null;
+    let attempts = 0;
+    while (!createdOrder && attempts < 5) {
+      attempts++;
+      const displayId = generateOrderDisplayId();
+      try {
+        createdOrder = await prisma.$transaction(async (tx) => {
+          const newOrder = await tx.order.create({
+            data: {
+              displayId,
+              userId,
+              addressSnapshot: address,
+              subtotal,
+              discount,
+              total: subtotal - discount,
+              paymentCurrency: paymentQuote.currency,
+              paymentAmount: paymentQuote.amount,
+              exchangeRate: paymentQuote.exchangeRate,
+              couponCode: coupon?.code,
+              paymentMethod: input.paymentMethod,
+              paymentStatus: input.paymentMethod === 'COD' ? 'COD' : 'PENDING',
+              orderStatus: 'ORDER_PLACED',
+              trackingNumber: `VNT-${Math.floor(10000000 + Math.random() * 90000000)}`,
+              estimatedDeliveryMin: deliveryEst ? new Date(deliveryEst.minDate) : null,
+              estimatedDeliveryMax: deliveryEst ? new Date(deliveryEst.maxDate) : null,
+              deliveryDaysMin: deliveryEst ? deliveryEst.minDays : null,
+              deliveryDaysMax: deliveryEst ? deliveryEst.maxDays : null,
+              carrier: 'VANTA Logistics',
+              items: {
+                create: cart.items.map((item) => ({
+                  productId: item.productId,
+                  sku: item.product.sku,
+                  name: item.product.name,
+                  brand: item.product.brand,
+                  color: item.color,
+                  size: item.size,
+                  price: item.product.price,
+                  quantity: item.quantity,
+                  image: String((item.product.catalog as { colors?: { images?: { front?: string } }[] }).colors?.[0]?.images?.front ?? ''),
+                })),
+              },
+            },
+            include: { items: { include: { product: { select: { catalog: true } } } } },
+          });
+
+          if (input.paymentMethod === 'COD') {
+            await tx.cartItem.deleteMany({ where: { cartId: cart.id } });
+          }
+          return newOrder;
+        });
+      } catch (err: unknown) {
+        if (typeof err === 'object' && err !== null && 'code' in err && (err as { code: string }).code === 'P2002') {
+          // Collision on displayId, loop and retry
+          continue;
+        }
+        throw err;
       }
-      return createdOrder;
-    });
-    res.status(201).json(order);
+    }
+
+    if (!createdOrder) {
+      throw new Error('Could not generate unique order identifier after multiple attempts');
+    }
+
+    res.status(201).json(createdOrder);
   } catch (error) { next(error); }
 });
 export default router;

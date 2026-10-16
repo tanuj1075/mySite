@@ -8,6 +8,7 @@ import {
   Plus,
   Phone,
   RefreshCw,
+  Truck,
 } from 'lucide-react';
 import { Address, PaymentMethod } from '../types';
 import { CHECKOUT_STEPS } from '../data/mockData';
@@ -19,6 +20,14 @@ interface PaymentQuote {
   exchangeRate: number;
   amount: number;
   baseAmount: number;
+}
+
+interface DeliveryEstimate {
+  minDays: number;
+  maxDays: number;
+  minDate: string;
+  maxDate: string;
+  zone: string;
 }
 
 interface CheckoutProtocolProps {
@@ -45,6 +54,9 @@ export const CheckoutProtocol: React.FC<CheckoutProtocolProps> = ({
   const [paymentQuote, setPaymentQuote] = useState<PaymentQuote | null>(null);
   const [quoteError, setQuoteError] = useState<string | null>(null);
   const [isQuoteLoading, setIsQuoteLoading] = useState(false);
+  const [deliveryEstimate, setDeliveryEstimate] = useState<DeliveryEstimate | null>(null);
+  const [isDeliveryLoading, setIsDeliveryLoading] = useState(false);
+  const [deliveryError, setDeliveryError] = useState<string | null>(null);
 
   useEffect(() => {
     let active = true;
@@ -77,6 +89,30 @@ export const CheckoutProtocol: React.FC<CheckoutProtocolProps> = ({
       setPaymentMethod('CARD');
     }
   }, [paymentQuote, paymentMethod]);
+
+  // Fetch delivery estimate whenever address changes
+  useEffect(() => {
+    let active = true;
+    const addr = addresses.find((a) => a.id === selectedAddressId);
+    if (!addr) {
+      setDeliveryEstimate(null);
+      setDeliveryError(null);
+      return () => { active = false; };
+    }
+    setDeliveryEstimate(null);
+    setDeliveryError(null);
+    setIsDeliveryLoading(true);
+    customerApi.deliveryEstimate({
+      city: addr.city,
+      state: addr.state,
+      postalCode: addr.postalCode,
+      country: addr.country,
+    })
+      .then((est) => { if (active) setDeliveryEstimate(est); })
+      .catch((err: unknown) => { if (active) setDeliveryError(err instanceof Error ? err.message : 'Could not estimate delivery'); })
+      .finally(() => { if (active) setIsDeliveryLoading(false); });
+    return () => { active = false; };
+  }, [selectedAddressId, addresses]);
 
   // Financial calculations
   const currency = paymentQuote?.currency ?? 'INR';
@@ -254,13 +290,49 @@ export const CheckoutProtocol: React.FC<CheckoutProtocolProps> = ({
             ENTER NEW DISPATCH DESTINATION
           </button>
 
-          {/* Transit Verified Badge */}
-          <div className="bg-[#ede7dd] border border-[#d5cdc0] p-3 flex items-center gap-3">
-            <ShieldCheck className="w-4 h-4 text-[#7b6e54] shrink-0" />
-            <span className="font-mono text-[10px] leading-tight text-[#1a1816]">
-              ✓ Verified Transit: Guaranteed 2-Day Express via DHL Carbon-Neutral Priority
-            </span>
-          </div>
+          {/* Delivery Estimate Banner */}
+          {isDeliveryLoading && (
+            <div className="bg-[#ede7dd] border border-[#d5cdc0] p-3 flex items-center gap-3 font-mono text-[10px] text-[#59544c]">
+              <Truck className="w-4 h-4 text-[#7b6e54] shrink-0 animate-pulse" />
+              <span>ESTIMATING DELIVERY...</span>
+            </div>
+          )}
+          {deliveryError && (
+            <div className="bg-[#ede7dd] border border-[#d5cdc0] p-3 font-mono text-[10px] text-red-800" role="alert">
+              ⚠ {deliveryError}
+            </div>
+          )}
+          {deliveryEstimate && !isDeliveryLoading && (
+            <div className="bg-[#ede7dd] border border-[#1a1816] p-3 flex items-start gap-3">
+              <Truck className="w-4 h-4 text-[#1a1816] shrink-0 mt-0.5" />
+              <div className="flex flex-col gap-0.5">
+                <span className="font-mono text-[9px] font-bold text-[#7b6e54] uppercase tracking-widest">ESTIMATED ARRIVAL</span>
+                <span className="font-mono text-[12px] font-bold text-[#1a1816]">
+                  {new Date(deliveryEstimate.minDate).toLocaleDateString('en-GB', { weekday: 'short', day: 'numeric', month: 'short' })}
+                  {' – '}
+                  {new Date(deliveryEstimate.maxDate).toLocaleDateString('en-GB', { weekday: 'short', day: 'numeric', month: 'short', year: 'numeric' })}
+                  {' '}
+                  <span className="font-normal text-[#59544c]">({deliveryEstimate.minDays}–{deliveryEstimate.maxDays} business days)</span>
+                </span>
+                {addresses.find((a) => a.id === selectedAddressId) && (() => {
+                  const addr = addresses.find((a) => a.id === selectedAddressId)!;
+                  return (
+                    <span className="font-mono text-[10px] text-[#59544c]">
+                      Delivering to {addr.city}{addr.state ? `, ${addr.state}` : ''} {addr.postalCode}
+                    </span>
+                  );
+                })()}
+              </div>
+            </div>
+          )}
+          {!deliveryEstimate && !isDeliveryLoading && !deliveryError && (
+            <div className="bg-[#ede7dd] border border-[#d5cdc0] p-3 flex items-center gap-3">
+              <ShieldCheck className="w-4 h-4 text-[#7b6e54] shrink-0" />
+              <span className="font-mono text-[10px] leading-tight text-[#1a1816]">
+                Select a delivery address to see estimated arrival.
+              </span>
+            </div>
+          )}
         </div>
 
         {/* STEP 3 & 4: SETTLEMENT METHOD SELECTOR */}
