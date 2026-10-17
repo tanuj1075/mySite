@@ -6,6 +6,7 @@ import { AdminProductsView } from './admin/AdminProductsView';
 import { AdminLogisticsView } from './admin/AdminLogisticsView';
 import { AdminSecurityView } from './admin/AdminSecurityView';
 import { AdminOverviewView } from './admin/AdminOverviewView';
+import { AdminReviewsView } from './admin/AdminReviewsView';
 
 interface AdminPanelViewProps {
   isOpen: boolean;
@@ -14,6 +15,8 @@ interface AdminPanelViewProps {
   products: ShoeProduct[];
   onUpdateProductStock: (productId: string, colorName: string, size: string, newStock: number) => void;
   onAddNewProduct: (product: ShoeProduct) => void;
+  onDeleteProduct?: (productId: string) => void;
+  onUpdateProduct?: (product: ShoeProduct) => void;
   orders: Order[];
   onUpdateOrderStatus: (orderId: string, newStatus: any) => void;
   exchanges: ExchangeReturnRequest[];
@@ -33,6 +36,8 @@ export const AdminPanelView: React.FC<AdminPanelViewProps> = ({
   products,
   onUpdateProductStock,
   onAddNewProduct,
+  onDeleteProduct,
+  onUpdateProduct,
   orders,
   onUpdateOrderStatus,
   exchanges,
@@ -123,7 +128,11 @@ export const AdminPanelView: React.FC<AdminPanelViewProps> = ({
               products={products}
               onAddNewProduct={onAddNewProduct}
               onUpdateProductStock={onUpdateProductStock}
+              onDeleteProduct={onDeleteProduct}
+              onUpdateProduct={onUpdateProduct}
               onShowToast={onShowToast}
+              activeSection={activeSection}
+              onSelectSection={(sec) => setActiveSection(sec as AdminSection)}
             />
           )}
 
@@ -135,11 +144,13 @@ export const AdminPanelView: React.FC<AdminPanelViewProps> = ({
               exchanges={exchanges}
               onUpdateExchangeStatus={onUpdateExchangeStatus}
               onShowToast={onShowToast}
+              activeSection={activeSection}
+              onSelectSection={(sec) => setActiveSection(sec as AdminSection)}
             />
           )}
 
           {/* CUSTOMER EXPERIENCE -> RETURNS & EXCHANGES (IMAGE 3 - BOTTOM) */}
-          {(activeSection === 'RETURNS_EXCHANGES' || activeSection === 'REVIEWS') && (
+          {activeSection === 'RETURNS_EXCHANGES' && (
             <AdminLogisticsView
               orders={orders}
               onUpdateOrderStatus={onUpdateOrderStatus}
@@ -147,6 +158,17 @@ export const AdminPanelView: React.FC<AdminPanelViewProps> = ({
               onUpdateExchangeStatus={onUpdateExchangeStatus}
               focusWorkbench={true}
               onShowToast={onShowToast}
+              activeSection={activeSection}
+              onSelectSection={(sec) => setActiveSection(sec as AdminSection)}
+            />
+          )}
+
+          {/* CUSTOMER EXPERIENCE -> REVIEWS & APPRAISALS */}
+          {activeSection === 'REVIEWS' && (
+            <AdminReviewsView
+              products={products}
+              onShowToast={onShowToast}
+              onSelectSection={(sec) => setActiveSection(sec as AdminSection)}
             />
           )}
 
@@ -169,8 +191,11 @@ export const AdminPanelView: React.FC<AdminPanelViewProps> = ({
               onUpdateDropStatus={onUpdateDropStatus}
               coupons={coupons}
               onAddNewCoupon={onAddNewCoupon}
-              onSelectSection={(sec) => setActiveSection(sec)}
+              onSelectSection={(sec) => setActiveSection(sec as AdminSection)}
               onShowToast={onShowToast}
+              products={products}
+              orders={orders}
+              activeSection={activeSection}
             />
           )}
         </main>

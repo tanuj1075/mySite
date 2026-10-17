@@ -21,6 +21,9 @@ import {
   Search,
   Filter,
   BarChart3,
+  Boxes,
+  Radar,
+  Truck,
 } from 'lucide-react';
 import { SneakerDrop, Coupon, ShoeProduct, Order, BannerItem, AdminNotification } from '../../types';
 
@@ -495,8 +498,143 @@ export const AdminOverviewView: React.FC<AdminOverviewViewProps> = ({
     );
   }
 
-  // SUBVIEW: LOW STOCK RADAR / STOCK LOGISTICS
-  if (activeSection === 'LOW_STOCK_RADAR' || activeSection === 'STOCK_LOGISTICS') {
+  // SUBVIEW: STOCK LOGISTICS
+  if (activeSection === 'STOCK_LOGISTICS') {
+    const totalStockCount = products.reduce((acc, p) => {
+      let count = 0;
+      const inv = p.sizeInventory || {};
+      Object.keys(inv).forEach((col) => {
+        (inv[col] || []).forEach((s) => {
+          count += (s.stock || 0);
+        });
+      });
+      return acc + count;
+    }, 0) || 342;
+
+    const fulfillmentHubs = [
+      { name: 'MILAN CENTRAL ATELIER (MXP)', code: 'HUB-01', allocation: Math.round(totalStockCount * 0.52), status: 'OPTIMAL CAPACITY', speed: 'Priority 10:30 Air' },
+      { name: 'PARIS ARCHIVAL VAULT (CDG)', code: 'HUB-02', allocation: Math.round(totalStockCount * 0.25), status: 'NORMAL FLOW', speed: 'EU Express Overnight' },
+      { name: 'TOKYO KINETIC NODE (NRT)', code: 'HUB-03', allocation: Math.round(totalStockCount * 0.15), status: 'EXPEDITE ACTIVE', speed: 'APAC Transit Hub' },
+      { name: 'NEW YORK METRO TERMINAL (JFK)', code: 'HUB-04', allocation: Math.round(totalStockCount * 0.08), status: 'ALLOCATION RESTOCKING', speed: 'Americas Courier' },
+    ];
+
+    return (
+      <div className="p-4 sm:p-8 font-sans space-y-8 bg-[#faf7f2] min-h-full">
+        <div className="flex items-center justify-between font-mono text-[10px] text-[#7b6e54] tracking-[0.2em] uppercase mb-1">
+          <span>SUPPLY CHAIN // FULFILLMENT &amp; STOCK TELEMETRY</span>
+          <button
+            onClick={() => onSelectSection('OVERVIEW')}
+            className="text-[#1a1816] font-bold hover:underline cursor-pointer"
+          >
+            ← BACK TO OVERVIEW
+          </button>
+        </div>
+
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          <div>
+            <h1 className="font-headline text-3xl sm:text-4xl text-[#1a1816] tracking-tight">
+              Stock Logistics &amp; Fulfillment Nodes
+            </h1>
+            <p className="font-sans text-[13px] text-[#59544c] mt-1">
+              Global inventory distribution across 4 metropolitan air courier hubs and dimensional warehouse vaults.
+            </p>
+          </div>
+
+          <div className="flex items-center gap-2 font-mono text-[11px]">
+            <button
+              onClick={() => onSelectSection('LOW_STOCK_RADAR')}
+              className="px-3.5 py-2 bg-[#ede7dd] border border-[#d5cdc0] text-[#1a1816] hover:bg-[#e4ddcf] font-bold uppercase tracking-wider cursor-pointer shadow-2xs flex items-center gap-1.5"
+            >
+              <Radar className="w-3.5 h-3.5 text-[#991b1b]" />
+              <span>LOW-STOCK RADAR ({lowStockItems.length}) →</span>
+            </button>
+            <button
+              onClick={() => onSelectSection('SKU_MATRIX')}
+              className="px-3.5 py-2 bg-[#141312] text-[#f5efe6] hover:bg-[#35322e] font-bold uppercase tracking-wider cursor-pointer shadow-xs flex items-center gap-1.5"
+            >
+              <Boxes className="w-3.5 h-3.5" />
+              <span>SKU MATRIX →</span>
+            </button>
+          </div>
+        </div>
+
+        {/* Top 4 Supply Chain Stats */}
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 font-mono">
+          <div className="bg-[#ede7dd] border border-[#d5cdc0] p-4 shadow-2xs">
+            <div className="text-[9px] text-[#7b6e54] uppercase tracking-wider font-bold">TOTAL CATALOG UNITS</div>
+            <div className="text-2xl font-bold text-[#1a1816] mt-1">{totalStockCount} Units</div>
+            <div className="text-[9px] text-[#16a34a] font-bold mt-0.5">Across {products.length || 6} Specimen Silhouettes</div>
+          </div>
+          <div className="bg-[#ede7dd] border border-[#d5cdc0] p-4 shadow-2xs">
+            <div className="text-[9px] text-[#7b6e54] uppercase tracking-wider font-bold">ACTIVE FULFILLMENT NODES</div>
+            <div className="text-2xl font-bold text-[#1a1816] mt-1">4 Metropolitan Hubs</div>
+            <div className="text-[9px] text-[#59544c] mt-0.5">Milan • Paris • Tokyo • New York</div>
+          </div>
+          <div className="bg-[#ede7dd] border border-[#d5cdc0] p-4 shadow-2xs">
+            <div className="text-[9px] text-[#7b6e54] uppercase tracking-wider font-bold">DEPLETION RISK SPECIMENS</div>
+            <div className="text-2xl font-bold text-[#991b1b] mt-1">{lowStockItems.length} Variants</div>
+            <div className="text-[9px] text-[#7b6e54] mt-0.5">Stock threshold &le; 5 units</div>
+          </div>
+          <div className="bg-[#ede7dd] border border-[#d5cdc0] p-4 shadow-2xs">
+            <div className="text-[9px] text-[#7b6e54] uppercase tracking-wider font-bold">DISPATCH SLA TIME</div>
+            <div className="text-2xl font-bold text-[#16a34a] mt-1">&lt; 3.2 Hours</div>
+            <div className="text-[9px] text-[#7b6e54] mt-0.5">Atelier presentation packing</div>
+          </div>
+        </div>
+
+        {/* Fulfillment Nodes Distribution */}
+        <div className="space-y-4 font-mono text-[11px]">
+          <div className="text-[10px] text-[#7b6e54] font-bold uppercase tracking-wider">
+            METROPOLITAN VAULT DISTRIBUTION
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {fulfillmentHubs.map((hub) => (
+              <div key={hub.code} className="border border-[#d5cdc0] bg-[#ede7dd] p-4.5 space-y-3 rounded-xs shadow-xs">
+                <div className="flex items-center justify-between pb-2 border-b border-[#d5cdc0]">
+                  <div className="flex items-center gap-2">
+                    <Truck className="w-3.5 h-3.5 text-[#7b6e54]" />
+                    <span className="font-bold text-[#1a1816]">{hub.name}</span>
+                  </div>
+                  <span className="px-2 py-0.5 bg-[#141312] text-[#f5efe6] text-[9px] font-bold">{hub.code}</span>
+                </div>
+
+                <div className="grid grid-cols-3 gap-2 text-[10px]">
+                  <div>
+                    <div className="text-[9px] text-[#7b6e54]">STORED STOCK</div>
+                    <div className="font-bold text-[#1a1816] text-[13px]">{hub.allocation} Units</div>
+                  </div>
+                  <div>
+                    <div className="text-[9px] text-[#7b6e54]">FLOW STATUS</div>
+                    <div className="font-bold text-[#16a34a] text-[10px]">{hub.status}</div>
+                  </div>
+                  <div>
+                    <div className="text-[9px] text-[#7b6e54]">LOGISTICS COURIER</div>
+                    <div className="font-bold text-[#59544c] text-[10px]">{hub.speed}</div>
+                  </div>
+                </div>
+
+                <div className="pt-2 border-t border-[#d5cdc0]/70 flex items-center justify-between text-[9px]">
+                  <span className="text-[#7b6e54]">NFC QUALITY CONTROL INSPECTED</span>
+                  <button
+                    onClick={() => {
+                      onShowToast(`REALLOCATION TELEMETRY INITIATED FOR ${hub.code}`);
+                    }}
+                    className="font-bold text-[#1a1816] hover:underline cursor-pointer"
+                  >
+                    TRIGGER REBALANCE →
+                  </button>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // SUBVIEW: LOW STOCK RADAR
+  if (activeSection === 'LOW_STOCK_RADAR') {
     return (
       <div className="p-4 sm:p-8 font-sans space-y-8 bg-[#faf7f2] min-h-full">
         <div className="flex items-center justify-between font-mono text-[10px] text-[#7b6e54] tracking-[0.2em] uppercase mb-1">
@@ -578,6 +716,228 @@ export const AdminOverviewView: React.FC<AdminOverviewViewProps> = ({
             </table>
           </div>
         )}
+      </div>
+    );
+  }
+
+  // SUBVIEW: CHRONO DROPS
+  if (activeSection === 'CHRONO_DROPS') {
+    return (
+      <div className="p-4 sm:p-8 font-sans space-y-8 bg-[#faf7f2] min-h-full">
+        <div className="flex items-center justify-between font-mono text-[10px] text-[#7b6e54] tracking-[0.2em] uppercase mb-1">
+          <span>MARKETING ENGINE // CHRONO ARCHIVE RELEASES</span>
+          <button
+            onClick={() => onSelectSection('OVERVIEW')}
+            className="text-[#1a1816] font-bold hover:underline cursor-pointer"
+          >
+            ← BACK TO OVERVIEW
+          </button>
+        </div>
+
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          <div>
+            <h1 className="font-headline text-3xl sm:text-4xl text-[#1a1816] tracking-tight">
+              Chrono Drops &amp; Time-Locked Allocations
+            </h1>
+            <p className="font-sans text-[13px] text-[#59544c] mt-1">
+              Cryptographically scheduled footwear releases with countdown tickers and automated patron dispatch.
+            </p>
+          </div>
+
+          <button
+            onClick={() => setShowDropModal(true)}
+            className="px-4 py-2.5 bg-[#141312] text-[#f5efe6] font-mono text-[11px] font-bold uppercase tracking-wider hover:bg-[#35322e] flex items-center gap-2 cursor-pointer shadow-xs"
+          >
+            <Plus className="w-3.5 h-3.5" />
+            <span>SCHEDULE NEW DROP</span>
+          </button>
+        </div>
+
+        {/* Drops Cards Grid */}
+        <div className="space-y-4 font-mono">
+          {drops.map((drop) => {
+            const isLive = drop.status === 'Active';
+            const countdown = drop.targetTimestamp
+              ? formatCountdown(drop.targetTimestamp)
+              : 'COUNTDOWN SET';
+
+            return (
+              <div
+                key={drop.id}
+                className="bg-[#ede7dd] border border-[#d5cdc0] p-6 space-y-4 rounded-xs shadow-xs"
+              >
+                <div className="flex flex-wrap items-center justify-between gap-3 pb-3 border-b border-[#d5cdc0]">
+                  <div>
+                    <div className="font-bold text-[#1a1816] uppercase text-base sm:text-lg">
+                      {drop.productName}
+                    </div>
+                    <div className="text-[10px] text-[#7b6e54] uppercase mt-0.5">
+                      {drop.edition} • {drop.brand} • {drop.stock} Total Specimen Units
+                    </div>
+                  </div>
+
+                  <div className="flex items-center gap-3">
+                    <span
+                      className={`px-3 py-1 text-[10px] font-bold uppercase rounded-2xs ${
+                        isLive ? 'bg-[#dcfce7] text-[#166534]' : 'bg-[#fef3c7] text-[#92400e]'
+                      }`}
+                    >
+                      {drop.status}
+                    </span>
+                    <button
+                      onClick={() => {
+                        const newStatus = isLive ? 'Scheduled' : 'Active';
+                        onUpdateDropStatus(drop.id, newStatus);
+                        onShowToast(`DROP STATUS ADVANCED: ${drop.productName} -> ${newStatus}`);
+                      }}
+                      className="px-3 py-1 bg-[#faf7f2] border border-[#d5cdc0] text-[#1a1816] text-[10px] font-bold uppercase hover:bg-[#ded6c9] cursor-pointer"
+                    >
+                      TOGGLE STATUS
+                    </button>
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 text-[11px]">
+                  <div className="bg-[#faf7f2] border border-[#d5cdc0] p-3">
+                    <div className="text-[9px] text-[#7b6e54] uppercase font-bold">EDITION PRICE</div>
+                    <div className="font-bold text-[#1a1816] text-[13px] mt-0.5">₹{drop.price?.toLocaleString()}</div>
+                    <div className="text-[9px] text-[#7b6e54] line-through">MRP: ₹{drop.mrp?.toLocaleString()}</div>
+                  </div>
+
+                  <div className="bg-[#faf7f2] border border-[#d5cdc0] p-3">
+                    <div className="text-[9px] text-[#7b6e54] uppercase font-bold">RELEASE WINDOW</div>
+                    <div className="font-bold text-[#1a1816] mt-0.5">{drop.launchDate || '2026-11-01'}</div>
+                    <div className="text-[9px] text-[#7b6e54]">{drop.launchTime || '18:00 UTC'}</div>
+                  </div>
+
+                  <div className="bg-[#faf7f2] border border-[#d5cdc0] p-3">
+                    <div className="text-[9px] text-[#7b6e54] uppercase font-bold">TOTAL ALLOCATION</div>
+                    <div className="font-bold text-[#1a1816] text-[13px] mt-0.5">{drop.stock} Pairs</div>
+                    <div className="text-[9px] text-[#16a34a] font-bold">Limited Vault Production</div>
+                  </div>
+
+                  <div className="bg-[#faf7f2] border border-[#d5cdc0] p-3">
+                    <div className="text-[9px] text-[#7b6e54] uppercase font-bold">TICKING COUNTDOWN</div>
+                    <div className="font-bold text-[#1a1816] mt-0.5 flex items-center gap-1">
+                      <Clock className="w-3 h-3 text-[#7b6e54]" />
+                      <span className="text-[10px]">{countdown}</span>
+                    </div>
+                    <div className="text-[9px] text-[#59544c]">Hardware clock sync</div>
+                  </div>
+                </div>
+
+                <div className="pt-3 border-t border-[#d5cdc0] flex flex-wrap items-center justify-between gap-3 text-[10px]">
+                  <span className="text-[#7b6e54]">640 PATRONS ENROLLED IN HIGH-PRIORITY AIR NOTIFICATION</span>
+                  <button
+                    onClick={() => {
+                      onShowToast(`DISPATCHED TELEMETRY PUSH TO ALL SUBSCRIBERS FOR ${drop.productName}`);
+                    }}
+                    className="px-3 py-1.5 bg-[#141312] text-[#f5efe6] font-bold uppercase text-[9px] tracking-wider hover:bg-[#35322e] cursor-pointer"
+                  >
+                    TRANSMIT DROP NOTIFICATION
+                  </button>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      </div>
+    );
+  }
+
+  // SUBVIEW: COUPONS
+  if (activeSection === 'COUPONS') {
+    return (
+      <div className="p-4 sm:p-8 font-sans space-y-8 bg-[#faf7f2] min-h-full">
+        <div className="flex items-center justify-between font-mono text-[10px] text-[#7b6e54] tracking-[0.2em] uppercase mb-1">
+          <span>COMMERCE ENGINE // PRIVILEGE VOUCHERS</span>
+          <button
+            onClick={() => onSelectSection('OVERVIEW')}
+            className="text-[#1a1816] font-bold hover:underline cursor-pointer"
+          >
+            ← BACK TO OVERVIEW
+          </button>
+        </div>
+
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          <div>
+            <h1 className="font-headline text-3xl sm:text-4xl text-[#1a1816] tracking-tight">
+              Privilege Coupons &amp; Atelier Vouchers
+            </h1>
+            <p className="font-sans text-[13px] text-[#59544c] mt-1">
+              Manage promotional discount tokens, minimum expenditure thresholds, and VIP member codes.
+            </p>
+          </div>
+
+          <button
+            onClick={() => setShowCouponModal(true)}
+            className="px-4 py-2.5 bg-[#141312] text-[#f5efe6] font-mono text-[11px] font-bold uppercase tracking-wider hover:bg-[#35322e] flex items-center gap-2 cursor-pointer shadow-xs"
+          >
+            <Plus className="w-3.5 h-3.5" />
+            <span>GENERATE NEW COUPON</span>
+          </button>
+        </div>
+
+        {/* Coupons Table */}
+        <div className="border border-[#d5cdc0] bg-[#ede7dd] font-mono text-[11px] overflow-hidden rounded-xs shadow-xs">
+          <table className="w-full text-left border-collapse">
+            <thead>
+              <tr className="border-b border-[#d5cdc0] text-[9px] text-[#7b6e54] tracking-widest uppercase bg-[#e4ddcf]">
+                <th className="p-3.5">COUPON CODE</th>
+                <th className="p-3.5">DISCOUNT PERCENT</th>
+                <th className="p-3.5">MINIMUM ORDER</th>
+                <th className="p-3.5">STATUS</th>
+                <th className="p-3.5 text-right">ACTIONS</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-[#d5cdc0]/70">
+              {coupons.map((c) => (
+                <tr key={c.code} className="hover:bg-[#e4ddcf] transition-colors">
+                  <td className="p-3.5">
+                    <div className="flex items-center gap-2">
+                      <span className="font-bold text-[#1a1816] text-[12px]">{c.code}</span>
+                      <button
+                        onClick={() => {
+                          navigator.clipboard?.writeText(c.code);
+                          onShowToast(`COUPON ${c.code} COPIED TO CLIPBOARD`);
+                        }}
+                        className="text-[#7b6e54] hover:text-[#1a1816] cursor-pointer"
+                        title="Copy Code"
+                      >
+                        <Copy className="w-3 h-3" />
+                      </button>
+                    </div>
+                    <div className="text-[9px] text-[#7b6e54]">{c.description || 'Atelier Privilege Voucher'}</div>
+                  </td>
+                  <td className="p-3.5 font-bold text-[#1a1816]">
+                    <span className="px-2 py-0.5 bg-[#faf7f2] border border-[#d5cdc0]">
+                      {c.discountPercent}% OFF
+                    </span>
+                  </td>
+                  <td className="p-3.5 font-bold text-[#59544c]">
+                    ₹{c.minOrderValue.toLocaleString()}
+                  </td>
+                  <td className="p-3.5">
+                    <span className="px-2 py-0.5 bg-[#dcfce7] text-[#166534] text-[9px] font-bold uppercase rounded-2xs">
+                      {c.isActive !== false ? 'ACTIVE ON CHECKOUT' : 'DISABLED'}
+                    </span>
+                  </td>
+                  <td className="p-3.5 text-right">
+                    <button
+                      onClick={() => {
+                        navigator.clipboard?.writeText(c.code);
+                        onShowToast(`COUPON ${c.code} COPIED TO CLIPBOARD`);
+                      }}
+                      className="px-2.5 py-1 bg-[#faf7f2] border border-[#d5cdc0] text-[#1a1816] hover:bg-[#ded6c9] font-bold text-[9px] uppercase cursor-pointer mr-2"
+                    >
+                      COPY
+                    </button>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
       </div>
     );
   }
