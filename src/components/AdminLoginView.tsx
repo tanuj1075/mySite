@@ -38,7 +38,14 @@ export const AdminLoginView: React.FC<AdminLoginViewProps> = ({
       onAdminLoginSuccess({ email: authenticatedAdmin.email, name: authenticatedAdmin.name, role: authenticatedAdmin.role });
       onShowToast(`ADMIN SESSION INITIALIZED: ${authenticatedAdmin.name} // PRIVILEGES UNLOCKED`);
     } catch (error) {
-      onShowToast(error instanceof Error ? error.message.toUpperCase() : 'ADMIN AUTHENTICATION FAILED');
+      const msg = error instanceof Error ? error.message : 'Admin authentication failed';
+      if (msg.toLowerCase().includes('failed to fetch') || msg.toLowerCase().includes('network')) {
+        onShowToast('CANNOT REACH BACKEND (PORT 4000) — RUN `npm run server:dev`');
+      } else if (msg.toLowerCase().includes('invalid admin credentials')) {
+        onShowToast('INVALID CREDENTIALS — USE THE ADMIN_EMAIL AND ADMIN_PASSWORD FROM .ENV');
+      } else {
+        onShowToast(msg.toUpperCase());
+      }
     } finally { setIsAuthenticating(false); }
   };
 
