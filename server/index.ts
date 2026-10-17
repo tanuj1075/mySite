@@ -27,15 +27,37 @@ app.use(helmet({
   contentSecurityPolicy: false, // managed by reverse proxy / CDN in production
 }));
 
-app.use(cors({ origin: process.env.CLIENT_URL ?? 'http://localhost:3000', credentials: true }));
+app.use(cors({
+  origin: (origin, callback) => {
+    if (!origin) return callback(null, true);
+    if (
+      origin === (process.env.CLIENT_URL ?? 'http://localhost:3000') ||
+      origin === 'http://localhost:3000' ||
+      origin === 'http://127.0.0.1:3000' ||
+      /^http:\/\/localhost:\d+$/.test(origin) ||
+      /^http:\/\/127\.0\.0\.1:\d+$/.test(origin) ||
+      /^http:\/\/192\.168\.\d+\.\d+(:\d+)?$/.test(origin) ||
+      /^http:\/\/172\.(1[6-9]|2\d|3[0-1])\.\d+\.\d+(:\d+)?$/.test(origin) ||
+      /^http:\/\/10\.\d+\.\d+\.\d+(:\d+)?$/.test(origin)
+    ) {
+      return callback(null, true);
+    }
+    if (process.env.NODE_ENV !== 'production') {
+      return callback(null, true);
+    }
+    callback(new Error('Blocked by CORS'));
+  },
+  credentials: true,
+}));
 app.use(express.json({ limit: '1mb', verify: (req, _res, buffer) => { (req as express.Request).rawBody = Buffer.from(buffer); } }));
 
-// Auth rate limiter: 10 attempts per 15 minutes per IP (SEC-03)
+// Auth rate limiter: 30 attempts per 15 minutes per IP (skips OPTIONS preflights)
 const authLimiter = rateLimit({
   windowMs: 15 * 60 * 1000,
-  max: 10,
+  max: 30,
   standardHeaders: true,
   legacyHeaders: false,
+  skip: (req) => req.method === 'OPTIONS',
   message: { error: 'Too many authentication attempts. Please try again in 15 minutes.' },
 });
 
@@ -57,4 +79,4 @@ app.use((error: unknown, _req: express.Request, res: express.Response, _next: ex
   console.error(error); res.status(500).json({ error: 'Internal server error' });
 });
 const port = Number(process.env.PORT ?? 4000);
-app.listen(port, () => console.log(`VANTA API listening on :${port}`));
+app.listen(port, '0.0.0.0', () => console.log(`VANTA API listening on :${port}`));
