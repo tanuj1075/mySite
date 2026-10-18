@@ -14,11 +14,31 @@ enum UserRole {
 
 enum PaymentStatus {
   PENDING
+  VERIFYING
   PAID
   FAILED
   REFUNDED
   COD
 }
+
+enum PaymentTransactionStatus {
+  PENDING
+  VERIFYING
+  SUCCESS
+  FAILED
+  EXPIRED
+  CANCELLED
+  REVERSED
+}
+
+enum AuditActorType {
+  SYSTEM
+  WEBHOOK
+  WORKER
+  ADMIN
+  USER
+}
+
 
 enum OrderStatus {
   ORDER_PLACED
@@ -158,12 +178,16 @@ model Order {
   deliveryDaysMin   Int?
   deliveryDaysMax   Int?
   carrier           String        @default("VANTA Logistics")
+  upiUtr            String?
+  activePaymentId   String?
+  payments          Payment[]
   items             OrderItem[]
   exchanges         ExchangeReturnRequest[]
   user              User          @relation(fields: [userId], references: [id])
   createdAt         DateTime      @default(now())
   updatedAt         DateTime      @updatedAt
   @@index([userId, createdAt])
+  @@index([upiUtr])
 }
 
 model SneakerDrop {
@@ -221,3 +245,75 @@ model OrderItem {
   order     Order   @relation(fields: [orderId], references: [id], onDelete: Cascade)
   product   Product @relation(fields: [productId], references: [id])
 }
+
+model Payment {
+  id                    String                   @id @default(cuid())
+  orderId               String
+  order                 Order                    @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  attemptNumber         Int                      @default(1)
+  provider              String                   @default("CASHFREE")
+  merchantId            String?
+  providerOrderId       String?
+  providerPaymentId     String?                  @unique
+  paymentSessionId      String?
+  upiId                 String?
+  upiUtr                String?
+  paymentMethod         String                   @default("UPI_QR")
+  amount                Decimal                  @db.Decimal(12, 2)
+  amountReceived        Decimal?                 @db.Decimal(12, 2)
+  currency              String                   @default("INR")
+  status                PaymentTransactionStatus @default(PENDING)
+  upiPaymentUrl         String?                  @db.Text
+  qrCodeData            String?                  @db.Text
+  expiresAt             DateTime?
+  verifiedAt            DateTime?
+  failedAt              DateTime?
+  failureReason         String?
+  verificationSource    String?
+  metadata              Json?
+  reconcileAttempts     Int                      @default(0)
+  lastReconciledAt      DateTime?
+  isLocked              Boolean                  @default(false)
+  lockedAt              DateTime?
+  auditLogs             PaymentAuditLog[]
+  createdAt             DateTime                 @default(now())
+  updatedAt             DateTime                 @updatedAt
+
+  @@index([orderId])
+  @@index([status])
+  @@index([upiUtr])
+  @@index([providerOrderId])
+}
+
+model PaymentAuditLog {
+  id          String         @id @default(cuid())
+  paymentId   String
+  payment     Payment        @relation(fields: [paymentId], references: [id], onDelete: Cascade)
+  fromStatus  String?
+  toStatus    String
+  action      String
+  actorType   AuditActorType @default(SYSTEM)
+  actorId     String?
+  reason      String?
+  metadata    Json?
+  createdAt   DateTime       @default(now())
+
+  @@index([paymentId])
+  @@index([createdAt])
+}
+
+model WebhookEvent {
+  id          String    @id @default(cuid())
+  provider    String
+  eventId     String    @unique
+  eventType   String
+  signature   String?
+  payload     Json
+  status      String    // PROCESSED, REJECTED, DUPLICATE, FAILED
+  errorReason String?
+  processedAt DateTime?
+  createdAt   DateTime  @default(now())
+
+  @@index([provider, eventType])
+  @@index([createdAt])
+}

@@ -18,6 +18,7 @@ import {
   MessageSquare,
   RotateCcw,
   ShieldCheck,
+  CreditCard,
 } from 'lucide-react';
 
 export type AdminSection =
@@ -29,6 +30,7 @@ export type AdminSection =
   | 'SIZES_COLORS'
   | 'SKU_MATRIX'
   | 'ORDERS'
+  | 'PAYMENTS'
   | 'CUSTOMERS'
   | 'COUPONS'
   | 'STOCK_LOGISTICS'
@@ -77,6 +79,7 @@ export const AdminSidebar: React.FC<AdminSidebarProps> = ({
       group: 'COMMERCE',
       items: [
         { id: 'ORDERS' as AdminSection, label: 'ORDERS', icon: ShoppingBag, badge: ordersCount },
+        { id: 'PAYMENTS' as AdminSection, label: 'PAYMENTS & UPI', icon: CreditCard },
         { id: 'CUSTOMERS' as AdminSection, label: 'CUSTOMERS', icon: Users },
         { id: 'COUPONS' as AdminSection, label: 'COUPONS', icon: Ticket },
       ],

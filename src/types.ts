@@ -33,7 +33,8 @@ export interface Address {
   phone?: string;
 }
 
-export type PaymentMethod = 'CARD' | 'COD';
+export type PaymentMethod = 'UPI' | 'COD' | 'CARD';
+
 
 export interface CheckoutState {
   currentStep: number; // 1 to 5

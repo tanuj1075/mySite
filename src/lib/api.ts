@@ -102,17 +102,35 @@ export const customerApi = {
       `/payments/quote?addressId=${encodeURIComponent(addressId)}`,
     );
   },
-  createRazorpayOrder(orderId: string) {
-    return requestCustomer<{ keyId: string; orderId: string; amount: number; currency: string }>('/payments/razorpay/order', {
+  initiateUpiPayment(orderId: string) {
+    return requestCustomer<{
+      paymentId: string;
+      orderId: string;
+      displayId: string;
+      amount: number;
+      currency: string;
+      status: string;
+      upiPaymentUrl: string;
+      qrCodeDataUrl: string;
+      expiresAt: string;
+      provider: string;
+    }>('/payments/upi/initiate', {
       method: 'POST',
       body: JSON.stringify({ orderId }),
     });
   },
-  verifyRazorpayPayment(input: { orderId: string; razorpayOrderId: string; razorpayPaymentId: string; razorpaySignature: string }) {
-    return requestCustomer<{ status: 'paid'; order: Record<string, unknown> }>('/payments/razorpay/verify', {
-      method: 'POST',
-      body: JSON.stringify(input),
-    });
+  checkUpiPaymentStatus(orderId: string) {
+    return requestCustomer<{
+      orderId: string;
+      displayId: string;
+      orderStatus: string;
+      paymentStatus: string;
+      amount: number;
+      currency: string;
+      upiUtr?: string;
+      verifiedAt?: string;
+      expiresAt?: string;
+    }>(`/payments/upi/status/${encodeURIComponent(orderId)}`);
   },
   exchanges() {
     return requestCustomer<Array<Record<string, unknown>>>('/exchanges');
@@ -188,6 +206,46 @@ export const adminApi = {
   },
   revokeAllSessions() {
     return requestAdmin<{ revokedCount: number; message: string }>('/admin/security/sessions/revoke-all', { method: 'POST' });
+  },
+  payments(params?: { q?: string; status?: string; provider?: string; page?: number; limit?: number }) {
+    const search = new URLSearchParams();
+    if (params?.q) search.set('q', params.q);
+    if (params?.status) search.set('status', params.status);
+    if (params?.provider) search.set('provider', params.provider);
+    if (params?.page) search.set('page', String(params.page));
+    if (params?.limit) search.set('limit', String(params.limit));
+    const qs = search.toString();
+    return requestAdmin<{
+      payments: Array<Record<string, unknown>>;
+      total: number;
+      page: number;
+      limit: number;
+      totalPages: number;
+    }>(`/admin/payments${qs ? `?${qs}` : ''}`);
+  },
+  paymentDetail(id: string) {
+    return requestAdmin<Record<string, unknown>>(`/admin/payments/${encodeURIComponent(id)}`);
+  },
+  reconcilePayment(id: string) {
+    return requestAdmin<{ success: boolean; message: string; status?: string; upiUtr?: string }>(
+      `/admin/payments/${encodeURIComponent(id)}/reconcile`,
+      { method: 'POST' }
+    );
+  },
+  adjustPayment(id: string, newStatus: string, reason: string) {
+    return requestAdmin<{ success: boolean; payment: Record<string, unknown> }>(
+      `/admin/payments/${encodeURIComponent(id)}/adjust`,
+      { method: 'POST', body: JSON.stringify({ newStatus, reason }) }
+    );
+  },
+  reconcileAllPayments() {
+    return requestAdmin<{ checkedCount: number; confirmedCount: number; expiredCount: number; failedCount: number; errors: string[] }>(
+      '/admin/payments/reconcile-all',
+      { method: 'POST' }
+    );
+  },
+  getPaymentsCsvExportUrl() {
+    return `${API_URL}/admin/payments/export/csv`;
   },
   async logout() {
     const refreshToken = getAdminRefreshToken();

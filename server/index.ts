@@ -15,6 +15,7 @@ import exchangeRoutes from './routes/exchanges.js';
 import wishlistRoutes from './routes/wishlist.js';
 import dropRoutes from './routes/drops.js';
 import deliveryRoutes from './routes/delivery.js';
+import { startReconciliationWorker } from './jobs/reconcileWorker.js';
 
 declare global { namespace Express { interface Request { rawBody?: Buffer } } }
 
@@ -79,4 +80,10 @@ app.use((error: unknown, _req: express.Request, res: express.Response, _next: ex
   console.error(error); res.status(500).json({ error: 'Internal server error' });
 });
 const port = Number(process.env.PORT ?? 4000);
-app.listen(port, '0.0.0.0', () => console.log(`VANTA API listening on :${port}`));
+app.listen(port, '0.0.0.0', () => {
+  console.log(`VANTA API listening on :${port}`);
+  if (process.env.NODE_ENV !== 'test') {
+    startReconciliationWorker(60_000);
+  }
+});
+

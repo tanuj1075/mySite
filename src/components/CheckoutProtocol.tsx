@@ -9,6 +9,7 @@ import {
   Phone,
   RefreshCw,
   Truck,
+  QrCode,
 } from 'lucide-react';
 import { Address, PaymentMethod } from '../types';
 import { CHECKOUT_STEPS } from '../data/mockData';
@@ -50,7 +51,7 @@ export const CheckoutProtocol: React.FC<CheckoutProtocolProps> = ({
   isOrderSubmitting,
 }) => {
   const [currentStep, setCurrentStep] = useState<number>(2);
-  const [paymentMethod, setPaymentMethod] = useState<PaymentMethod>('CARD');
+  const [paymentMethod, setPaymentMethod] = useState<PaymentMethod>('UPI');
   const [paymentQuote, setPaymentQuote] = useState<PaymentQuote | null>(null);
   const [quoteError, setQuoteError] = useState<string | null>(null);
   const [isQuoteLoading, setIsQuoteLoading] = useState(false);
@@ -86,7 +87,7 @@ export const CheckoutProtocol: React.FC<CheckoutProtocolProps> = ({
 
   useEffect(() => {
     if (paymentQuote && paymentQuote.currency !== 'INR' && paymentMethod === 'COD') {
-      setPaymentMethod('CARD');
+      setPaymentMethod('UPI');
     }
   }, [paymentQuote, paymentMethod]);
 
@@ -342,7 +343,7 @@ export const CheckoutProtocol: React.FC<CheckoutProtocolProps> = ({
           </span>
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
             {[
-              { id: 'CARD' as const, label: 'RAZORPAY', detail: currency === 'INR' ? 'CARD, UPI, NET BANKING' : 'INTERNATIONAL METHODS', icon: CreditCard },
+              { id: 'UPI' as const, label: 'UPI (QR / APP)', detail: 'GPAY, PHONEPE, PAYTM, BHIM', icon: QrCode },
               { id: 'COD' as const, label: 'CASH ON DELIVERY', detail: 'INDIA ONLY', icon: Banknote },
             ].map((method) => {
               const isActive = paymentMethod === method.id;
@@ -385,13 +386,11 @@ export const CheckoutProtocol: React.FC<CheckoutProtocolProps> = ({
 
         <div className="bg-[#ede7dd] border border-[#d5cdc0] p-4 flex flex-col gap-2 font-mono text-xs">
           <span className="text-[#7b6e54] text-[10px] uppercase font-bold">
-            {paymentMethod === 'CARD' ? 'SECURE RAZORPAY CHECKOUT' : 'CASH ON DELIVERY'}
+            {paymentMethod === 'UPI' ? 'GENUINE UPI DIRECT DISPATCH // NPCI 0% MDR' : 'CASH ON DELIVERY'}
           </span>
           <p className="text-[#1a1816] text-[11px]">
-            {paymentMethod === 'CARD'
-              ? currency === 'INR'
-                ? 'Choose card, UPI, net banking, or supported wallets in Razorpay Checkout. Your card details are never entered or stored on this site.'
-                : 'Razorpay Checkout will show international payment methods enabled for your account and currency. Your card details are never entered or stored on this site.'
+            {paymentMethod === 'UPI'
+              ? 'Scan dynamic UPI QR or authorize via Google Pay, PhonePe, Paytm, or BHIM UPI. Payments are cryptographically verified by the server.'
               : 'Pay the delivery agent when your order arrives.'}
           </p>
         </div>

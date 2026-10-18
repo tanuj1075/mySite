@@ -1,50 +1,19 @@
 import { Router } from 'express';
-import crypto from 'node:crypto';
-import Razorpay from 'razorpay';
 import { z } from 'zod';
 import { prisma } from '../lib/prisma.js';
 import { requireAuth } from '../middleware/auth.js';
-import { amountInMinorUnits, currencyForCountry, CurrencyQuoteError, quoteInrAmount } from '../lib/currency.js';
+import { currencyForCountry, CurrencyQuoteError, quoteInrAmount } from '../lib/currency.js';
+import { upiService } from '../lib/payments/upiService.js';
 
 const router = Router();
-const paymentInput = z.object({ orderId: z.string().min(1) });
-const verifyInput = z.object({
-  orderId: z.string().min(1),
-  razorpayOrderId: z.string().min(1),
-  razorpayPaymentId: z.string().min(1),
-  razorpaySignature: z.string().regex(/^[a-f\d]{64}$/i),
+
+const initiateInput = z.object({
+  orderId: z.string().min(1, 'Order ID is required'),
 });
 
-function getRazorpay() {
-  const keyId = process.env.RAZORPAY_KEY_ID;
-  const keySecret = process.env.RAZORPAY_KEY_SECRET;
-  if (!keyId || !keySecret) return null;
-  return new Razorpay({ key_id: keyId, key_secret: keySecret });
-}
-
-async function markOrderPaid(orderId: string, paymentId: string) {
-  return prisma.$transaction(async (tx) => {
-    const order = await tx.order.findUnique({ where: { id: orderId }, include: { items: true } });
-    if (!order) return null;
-    if (order.paymentStatus === 'PAID') {
-      return order.razorpayPaymentId === paymentId ? order : null;
-    }
-    if (order.paymentStatus !== 'PENDING') return null;
-
-    const paidOrder = await tx.order.update({
-      where: { id: order.id },
-      data: {
-        paymentStatus: 'PAID',
-        razorpayPaymentId: paymentId,
-        orderStatus: 'CONFIRMED',
-      },
-      include: { items: true },
-    });
-    await tx.cartItem.deleteMany({ where: { cart: { userId: order.userId } } });
-    return paidOrder;
-  });
-}
-
+/**
+ * Currency quote endpoint (preserved for pricing and checkout protocol)
+ */
 router.get('/quote', requireAuth, async (req, res, next) => {
   try {
     const addressId = z.string().min(1).parse(req.query.addressId);
@@ -60,7 +29,7 @@ router.get('/quote', requireAuth, async (req, res, next) => {
 
     const subtotal = cart.items.reduce(
       (sum, item) => sum + Number(item.product.price) * item.quantity,
-      0,
+      0
     );
     const currency = currencyForCountry(address.country);
     const quote = await quoteInrAmount(subtotal, currency);
@@ -71,131 +40,78 @@ router.get('/quote', requireAuth, async (req, res, next) => {
   }
 });
 
-router.post('/razorpay/order', requireAuth, async (req, res, next) => {
+/**
+ * Initiates a genuine UPI payment attempt.
+ * Generates dynamic UPI QR code and deep intent link (GPay, PhonePe, Paytm, BHIM).
+ */
+router.post('/upi/initiate', requireAuth, async (req, res, next) => {
   try {
-    const input = paymentInput.parse(req.body);
-    const client = getRazorpay();
-    if (!client) return res.status(503).json({ error: 'Razorpay is not configured on the server' });
+    const input = initiateInput.parse(req.body);
+    const userId = req.auth!.sub;
 
-    const order = await prisma.order.findFirst({
-      where: { id: input.orderId, userId: req.auth!.sub, paymentStatus: 'PENDING' },
-    });
-    if (!order) return res.status(404).json({ error: 'Pending order not found' });
-
-    const amount = amountInMinorUnits(order.paymentAmount, order.paymentCurrency);
-    if (amount <= 0) return res.status(400).json({ error: 'Order total must be greater than zero' });
-
-    const razorpayOrder = order.razorpayOrderId
-      ? await client.orders.fetch(order.razorpayOrderId)
-      : await client.orders.create({
-          amount,
-          currency: order.paymentCurrency,
-          receipt: order.displayId,
-          notes: { localOrderId: order.id, userId: order.userId },
-        });
-    if (!order.razorpayOrderId) {
-      await prisma.order.update({ where: { id: order.id }, data: { razorpayOrderId: razorpayOrder.id } });
+    const result = await upiService.initiatePayment(input.orderId, userId);
+    res.json(result);
+  } catch (error) {
+    if (error instanceof Error && error.message.includes('not configured')) {
+      return res.status(503).json({
+        error: error.message,
+        code: 'PROVIDER_CONFIG_REQUIRED',
+      });
     }
-    if (Number(razorpayOrder.amount) !== amount || razorpayOrder.currency !== order.paymentCurrency) {
-      return res.status(409).json({ error: 'Razorpay order amount does not match the local order' });
-    }
+    next(error);
+  }
+});
 
-    res.json({
-      keyId: process.env.RAZORPAY_KEY_ID,
-      orderId: razorpayOrder.id,
-      amount: razorpayOrder.amount,
-      currency: razorpayOrder.currency,
-    });
+/**
+ * Verified Payment Status endpoint.
+ * Returns server-confirmed state from PostgreSQL and queries provider status API if pending.
+ */
+router.get('/upi/status/:orderId', requireAuth, async (req, res, next) => {
+  try {
+    const orderId = z.string().min(1).parse(req.params.orderId);
+    const userId = req.auth!.sub;
+
+    const status = await upiService.checkPaymentStatus(orderId, userId);
+    res.json(status);
   } catch (error) {
     next(error);
   }
 });
 
-router.post('/razorpay/verify', requireAuth, async (req, res, next) => {
+/**
+ * Authenticated Webhook Notification Handler.
+ * Verifies raw cryptographic HMAC-SHA256 signature and timestamp tolerance.
+ */
+router.post('/webhook', async (req, res, next) => {
   try {
-    const input = verifyInput.parse(req.body);
-    const client = getRazorpay();
-    if (!client) return res.status(503).json({ error: 'Razorpay is not configured on the server' });
-
-    const order = await prisma.order.findFirst({
-      where: {
-        id: input.orderId,
-        userId: req.auth!.sub,
-        razorpayOrderId: input.razorpayOrderId,
-      },
-    });
-    if (!order) return res.status(404).json({ error: 'Order not found' });
-
-    const expected = crypto
-      .createHmac('sha256', process.env.RAZORPAY_KEY_SECRET!)
-      .update(`${input.razorpayOrderId}|${input.razorpayPaymentId}`)
-      .digest();
-    const received = Buffer.from(input.razorpaySignature, 'hex');
-    if (received.length !== expected.length || !crypto.timingSafeEqual(expected, received)) {
-      return res.status(400).json({ error: 'Invalid payment signature' });
-    }
-
-    const payment = await client.payments.fetch(input.razorpayPaymentId);
-    const expectedAmount = amountInMinorUnits(order.paymentAmount, order.paymentCurrency);
-    if (
-      payment.order_id !== input.razorpayOrderId ||
-      Number(payment.amount) !== expectedAmount ||
-      payment.currency !== order.paymentCurrency
-    ) {
-      return res.status(400).json({ error: 'Payment details do not match this order' });
-    }
-
-    const capturedPayment = payment.status === 'authorized'
-      ? await client.payments.capture(input.razorpayPaymentId, expectedAmount, order.paymentCurrency)
-      : payment;
-    if (capturedPayment.status !== 'captured') {
-      return res.status(409).json({ error: 'Payment has not been captured yet' });
-    }
-
-    const paidOrder = await markOrderPaid(order.id, input.razorpayPaymentId);
-    if (!paidOrder) return res.status(409).json({ error: 'Order could not be marked as paid' });
-    res.json({ status: 'paid', order: paidOrder });
-  } catch (error) {
-    next(error);
-  }
-});
-
-router.post('/razorpay/webhook', async (req, res, next) => {
-  try {
-    const secret = process.env.RAZORPAY_WEBHOOK_SECRET;
-    if (!secret) return res.status(503).json({ error: 'Razorpay webhook secret is not configured' });
-    const signature = req.headers['x-razorpay-signature'];
     const rawBody = req.rawBody;
-    if (typeof signature !== 'string' || !rawBody || !/^[a-f\d]{64}$/i.test(signature)) {
-      return res.status(400).json({ error: 'Invalid webhook signature' });
+    const signature = (req.headers['x-webhook-signature'] as string) || '';
+    const timestamp = (req.headers['x-webhook-timestamp'] as string) || '';
+
+    if (!rawBody) {
+      return res.status(400).json({
+        error: 'Missing raw request body for cryptographic signature verification',
+      });
     }
 
-    const expected = crypto.createHmac('sha256', secret).update(rawBody).digest();
-    const received = Buffer.from(signature, 'hex');
-    if (received.length !== expected.length || !crypto.timingSafeEqual(expected, received)) {
-      return res.status(400).json({ error: 'Invalid webhook signature' });
+    const result = await upiService.processWebhook({
+      signature,
+      timestamp,
+      rawBody,
+      headers: req.headers,
+    });
+
+    if (!result.success) {
+      return res.status(result.statusCode).json({ error: result.message });
     }
 
-    const event = req.body as {
-      event?: string;
-      payload?: { payment?: { entity?: { order_id?: string; id?: string; amount?: number; currency?: string } } };
-    };
-    const payment = event.payload?.payment?.entity;
-    if (event.event === 'payment.captured' && payment?.order_id && payment.id) {
-      const order = await prisma.order.findFirst({ where: { razorpayOrderId: payment.order_id } });
-      if (!order) return res.status(404).json({ error: 'Matching local order not found' });
-      if (
-        payment.amount !== amountInMinorUnits(order.paymentAmount, order.paymentCurrency) ||
-        payment.currency !== order.paymentCurrency
-      ) {
-        return res.status(400).json({ error: 'Captured payment does not match the local order' });
-      }
-      const paidOrder = await markOrderPaid(order.id, payment.id);
-      if (!paidOrder) return res.status(409).json({ error: 'Captured payment conflicts with the local order' });
-    }
-
-    res.json({ received: true });
+    res.status(result.statusCode).json({
+      received: true,
+      message: result.message,
+      orderId: result.orderId,
+    });
   } catch (error) {
+    console.error('[WEBHOOK_ERROR]', error);
     next(error);
   }
 });

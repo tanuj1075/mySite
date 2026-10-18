@@ -31,7 +31,7 @@ import { LoginView } from './components/LoginView';
 import { AdminLoginView } from './components/AdminLoginView';
 import { Footer } from './components/Footer';
 import { adminApi, authApi, clearAdminSession, clearSession, customerApi } from './lib/api';
-import { loadRazorpayCheckout } from './lib/razorpay';
+import { UpiPaymentModal } from './components/UpiPaymentModal';
 
 import { INITIAL_CART_ITEMS, INITIAL_ADDRESSES } from './data/mockData';
 import {
@@ -288,6 +288,16 @@ export default function App() {
   const [isCompareModalOpen, setIsCompareModalOpen] = useState(false);
   const [isReturnsModalOpen, setIsReturnsModalOpen] = useState(false);
   const [exchangeTargetOrder, setExchangeTargetOrder] = useState<Order | null>(null);
+  const [upiPaymentSession, setUpiPaymentSession] = useState<{
+    isOpen: boolean;
+    orderId: string;
+    displayId: string;
+    amount: number;
+    currency: string;
+    upiPaymentUrl: string;
+    qrCodeDataUrl: string;
+    expiresAt: string;
+  } | null>(null);
 
   // Notify Me Modal
   const [isNotifyMeOpen, setIsNotifyMeOpen] = useState(false);
@@ -814,77 +824,49 @@ export default function App() {
     }
     setIsOrderSubmitting(true);
     try {
-      const savedOrder = await customerApi.createOrder(selectedAddressId, paymentMethod === 'COD' ? 'COD' : 'CARD');
-      let orderRecord = savedOrder;
+      const savedOrder = await customerApi.createOrder(
+        selectedAddressId,
+        paymentMethod === 'COD' ? 'COD' : 'UPI'
+      );
 
-      if (paymentMethod !== 'COD') {
-        const razorpayOrder = await customerApi.createRazorpayOrder(String(savedOrder.id));
-        const RazorpayCheckout = await loadRazorpayCheckout();
-        const address = addresses.find((item) => item.id === selectedAddressId);
-        const verifiedOrder = await new Promise<Record<string, unknown> | null>((resolve, reject) => {
-          let settled = false;
-          const finish = (result: Record<string, unknown> | null) => {
-            if (settled) return;
-            settled = true;
-            resolve(result);
-          };
-          try {
-            const checkout = new RazorpayCheckout({
-              key: razorpayOrder.keyId,
-              amount: razorpayOrder.amount,
-              currency: razorpayOrder.currency,
-              name: 'VANTA ARCHIVE',
-              description: `Order ${String(savedOrder.displayId ?? savedOrder.id)}`,
-              order_id: razorpayOrder.orderId,
-              prefill: {
-                name: currentUser.name,
-                email: currentUser.email,
-                contact: address?.phone,
-              },
-              theme: { color: '#1a1816' },
-              handler: async (payment) => {
-                try {
-                  const result = await customerApi.verifyRazorpayPayment({
-                    orderId: String(savedOrder.id),
-                    razorpayOrderId: payment.razorpay_order_id,
-                    razorpayPaymentId: payment.razorpay_payment_id,
-                    razorpaySignature: payment.razorpay_signature,
-                  });
-                  finish(result.order);
-                } catch (error) {
-                  if (!settled) {
-                    settled = true;
-                    reject(error);
-                  }
-                }
-              },
-              modal: { ondismiss: () => finish(null) },
-            });
-            checkout.open();
-          } catch (error) {
-            reject(error);
-          }
+      if (paymentMethod === 'COD') {
+        const order = toOrderRecord(savedOrder);
+        setOrders((prev) => [order, ...prev]);
+        setCurrentOrder(order);
+        setCartItems([]);
+        setActiveNav('ORDER_SUCCESS');
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+        showToast(`ORDER SAVED: #${order.id} // PAYMENT COD`);
+      } else {
+        // Genuine UPI payment flow
+        const upiSession = await customerApi.initiateUpiPayment(String(savedOrder.id));
+        setUpiPaymentSession({
+          isOpen: true,
+          orderId: String(savedOrder.id),
+          displayId: String(savedOrder.displayId || savedOrder.id),
+          amount: upiSession.amount,
+          currency: upiSession.currency,
+          upiPaymentUrl: upiSession.upiPaymentUrl,
+          qrCodeDataUrl: upiSession.qrCodeDataUrl,
+          expiresAt: upiSession.expiresAt,
         });
-
-        if (!verifiedOrder) {
-          showToast('PAYMENT CANCELLED // YOUR CART IS PRESERVED');
-          return;
-        }
-        orderRecord = verifiedOrder;
       }
-
-      const order = toOrderRecord(orderRecord);
-      setOrders((prev) => [order, ...prev]);
-      setCurrentOrder(order);
-      setCartItems([]);
-      setActiveNav('ORDER_SUCCESS');
-      window.scrollTo({ top: 0, behavior: 'smooth' });
-      showToast(`ORDER SAVED: #${order.id} // PAYMENT ${order.paymentStatus}`);
     } catch (error) {
       showToast(error instanceof Error ? error.message : 'Order could not be saved');
     } finally {
       setIsOrderSubmitting(false);
     }
+  };
+
+  const handleUpiPaymentVerified = (verifiedOrderRecord: Record<string, unknown>) => {
+    setUpiPaymentSession(null);
+    const order = toOrderRecord(verifiedOrderRecord);
+    setOrders((prev) => [order, ...prev.filter((o) => o.id !== order.id)]);
+    setCurrentOrder(order);
+    setCartItems([]);
+    setActiveNav('ORDER_SUCCESS');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+    showToast(`PAYMENT VERIFIED // ORDER #${order.id} CONFIRMED`);
   };
 
   // Subtotal calculation
@@ -1490,6 +1472,27 @@ export default function App() {
         isOpen={isAccountOpen}
         onClose={() => setIsAccountOpen(false)}
       />
+
+      {/* Genuine UPI Payment Enclave Modal */}
+      {upiPaymentSession && (
+        <UpiPaymentModal
+          isOpen={upiPaymentSession.isOpen}
+          onClose={() => {
+            setUpiPaymentSession(null);
+            showToast('UPI TRANSACTION SUSPENDED // ALLOCATION PRESERVED IN BAG');
+          }}
+          orderId={upiPaymentSession.orderId}
+          displayId={upiPaymentSession.displayId}
+          amount={upiPaymentSession.amount}
+          currency={upiPaymentSession.currency}
+          upiPaymentUrl={upiPaymentSession.upiPaymentUrl}
+          qrCodeDataUrl={upiPaymentSession.qrCodeDataUrl}
+          expiresAt={upiPaymentSession.expiresAt}
+          onPaymentVerified={handleUpiPaymentVerified}
+          onShowToast={showToast}
+        />
+      )}
+
 
       {/* Tactile Brutalist Feedback Toast */}
       {toastMessage && (

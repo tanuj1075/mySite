@@ -7,6 +7,8 @@ import { AdminLogisticsView } from './admin/AdminLogisticsView';
 import { AdminSecurityView } from './admin/AdminSecurityView';
 import { AdminOverviewView } from './admin/AdminOverviewView';
 import { AdminReviewsView } from './admin/AdminReviewsView';
+import { AdminPaymentsView } from './admin/AdminPaymentsView';
+
 
 interface AdminPanelViewProps {
   isOpen: boolean;
@@ -147,6 +149,11 @@ export const AdminPanelView: React.FC<AdminPanelViewProps> = ({
               activeSection={activeSection}
               onSelectSection={(sec) => setActiveSection(sec as AdminSection)}
             />
+          )}
+
+          {/* COMMERCE -> UPI & PAYMENTS AUDIT TRAIL */}
+          {activeSection === 'PAYMENTS' && (
+            <AdminPaymentsView onShowToast={onShowToast} />
           )}
 
           {/* CUSTOMER EXPERIENCE -> RETURNS & EXCHANGES (IMAGE 3 - BOTTOM) */}
