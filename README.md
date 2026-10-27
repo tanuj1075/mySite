@@ -41,3 +41,4 @@ In the Vercel project, set `VITE_API_URL` to `https://<api-host>/api` in the **P
 Set `DATABASE_URL`, separate strong `JWT_SECRET` and `JWT_REFRESH_SECRET`, `RAZORPAY_KEY_ID`, `RAZORPAY_KEY_SECRET`, `RAZORPAY_WEBHOOK_SECRET`, and `CLIENT_URL` in Render's environment settings. Use only live Razorpay keys after activation and configure the live `payment.captured` webhook to `https://<api-host>/api/payments/razorpay/webhook`. Never put server secrets in Vercel, source files, or the frontend bundle.
 
 Vercel deploys from the committed project configuration and creates build output remotely; it does not need to rewrite source files. Local build output (`dist/`, `dist-server/`) and dependencies (`node_modules/`) are gitignored. Database migrations intentionally update the PostgreSQL schema, not application source files. The Vercel frontend deploy and Render API deploy are separate; redeploy Vercel after changing its environment variables.
+# mySite
