@@ -42,3 +42,4 @@ Set `DATABASE_URL`, separate strong `JWT_SECRET` and `JWT_REFRESH_SECRET`, `RAZO
 
 Vercel deploys from the committed project configuration and creates build output remotely; it does not need to rewrite source files. Local build output (`dist/`, `dist-server/`) and dependencies (`node_modules/`) are gitignored. Database migrations intentionally update the PostgreSQL schema, not application source files. The Vercel frontend deploy and Render API deploy are separate; redeploy Vercel after changing its environment variables.
 # mySite
+# mySite
