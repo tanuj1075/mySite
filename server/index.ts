@@ -3,6 +3,8 @@ import express from 'express';
 import cors from 'cors';
 import helmet from 'helmet';
 import { rateLimit } from 'express-rate-limit';
+import path from 'node:path';
+import fs from 'node:fs';
 import authRoutes from './routes/auth.js';
 import productRoutes from './routes/products.js';
 import adminRoutes from './routes/admin.js';
@@ -22,19 +24,28 @@ declare global { namespace Express { interface Request { rawBody?: Buffer } } }
 if (!process.env.DATABASE_URL || !process.env.JWT_SECRET) throw new Error('DATABASE_URL and JWT_SECRET are required');
 const app = express();
 
+// Trust reverse proxy (Render, Railway, Heroku, AWS ALB, Nginx, Cloudflare)
+app.set('trust proxy', 1);
+
 // Security headers (SEC-04)
 app.use(helmet({
   crossOriginResourcePolicy: { policy: 'cross-origin' }, // allow CDN images
   contentSecurityPolicy: false, // managed by reverse proxy / CDN in production
 }));
 
+const allowedOriginsList = (process.env.CLIENT_URL ?? 'http://localhost:3000')
+  .split(',')
+  .map(url => url.trim().replace(/\/$/, ''))
+  .filter(Boolean);
+
 app.use(cors({
   origin: (origin, callback) => {
     if (!origin) return callback(null, true);
+    const normalizedOrigin = origin.replace(/\/$/, '');
     if (
-      origin === (process.env.CLIENT_URL ?? 'http://localhost:3000') ||
-      origin === 'http://localhost:3000' ||
-      origin === 'http://127.0.0.1:3000' ||
+      allowedOriginsList.includes(normalizedOrigin) ||
+      normalizedOrigin === 'http://localhost:3000' ||
+      normalizedOrigin === 'http://127.0.0.1:3000' ||
       /^http:\/\/localhost:\d+$/.test(origin) ||
       /^http:\/\/127\.0\.0\.1:\d+$/.test(origin) ||
       /^http:\/\/192\.168\.\d+\.\d+(:\d+)?$/.test(origin) ||
@@ -75,6 +86,17 @@ app.use('/api/exchanges', exchangeRoutes);
 app.use('/api/wishlist', wishlistRoutes);
 app.use('/api/drops', dropRoutes);
 app.use('/api/delivery', deliveryRoutes);
+
+// Serve static client build if present (Unified full-stack deployment)
+const distDir = path.resolve(process.cwd(), 'dist');
+if (fs.existsSync(distDir)) {
+  app.use(express.static(distDir));
+  app.get('*', (req, res, next) => {
+    if (req.path.startsWith('/api')) return next();
+    res.sendFile(path.join(distDir, 'index.html'));
+  });
+}
+
 app.use((error: unknown, _req: express.Request, res: express.Response, _next: express.NextFunction) => {
   if (error instanceof Error && error.name === 'ZodError') return res.status(400).json({ error: 'Invalid request', details: error.message });
   console.error(error); res.status(500).json({ error: 'Internal server error' });

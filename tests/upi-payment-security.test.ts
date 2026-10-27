@@ -11,9 +11,6 @@ if (!process.env.DATABASE_URL) {
 }
 
 describe('UPI Payment Gateway & Cryptographic Signature Verification Tests', () => {
-  after(async () => {
-    await prisma.$disconnect();
-  });
   const secretKey = 'test_secret_key_mock_secure_12345';
   let provider: CashfreeUpiProvider;
 
@@ -222,6 +219,9 @@ class MockCashfreeProvider extends CashfreeUpiProvider {
 }
 
 describe('UPI End-to-End Payment Flow & Database Integrity Tests', () => {
+  after(async () => {
+    await prisma.$disconnect();
+  });
   const secretKey = 'test_secret_key_mock_secure_12345';
   let service: UpiPaymentService;
   let testUserId: string;
@@ -302,12 +302,13 @@ describe('UPI End-to-End Payment Flow & Database Integrity Tests', () => {
 
     // 2. Mock incoming Cashfree webhook
     const timestamp = String(Date.now());
+    const cfPaymentId = `cf_pay_${Date.now()}_${Math.random().toString(36).slice(2, 7)}`;
     const payload = {
       type: 'PAYMENT_SUCCESS_WEBHOOK',
       data: {
         order: { order_id: testOrderId, order_amount: 2500, order_currency: 'INR' },
         payment: {
-          cf_payment_id: 'cf_pay_999888',
+          cf_payment_id: cfPaymentId,
           payment_status: 'SUCCESS',
           payment_amount: 2500,
           payment_currency: 'INR',
@@ -346,7 +347,7 @@ describe('UPI End-to-End Payment Flow & Database Integrity Tests', () => {
     assert(updatedPayment);
     assert.equal(updatedPayment.status, 'SUCCESS');
     assert.equal(updatedPayment.upiUtr, 'UTR_LIVE_99887766');
-    assert.equal(updatedPayment.providerPaymentId, 'cf_pay_999888');
+    assert.equal(updatedPayment.providerPaymentId, cfPaymentId);
     assert.equal(updatedPayment.verificationSource, 'WEBHOOK');
     assert(updatedPayment.verifiedAt);
 
@@ -407,7 +408,7 @@ describe('UPI End-to-End Payment Flow & Database Integrity Tests', () => {
       data: {
         order: { order_id: testOrderId, order_amount: 2500, order_currency: 'INR' },
         payment: {
-          cf_payment_id: 'cf_idempotent_123',
+          cf_payment_id: `cf_idem_${Date.now()}_${Math.random().toString(36).slice(2, 7)}`,
           payment_status: 'SUCCESS',
           payment_amount: 2500,
           payment_currency: 'INR',

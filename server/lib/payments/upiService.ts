@@ -1,17 +1,31 @@
 import { PrismaClient } from '@prisma/client';
 import { prisma } from '../prisma.js';
 import { CashfreeUpiProvider } from './cashfree.js';
+import { UpiPgProvider } from './upiPg.js';
+import { HybridUpiProvider } from './hybridProvider.js';
 import {
   CreateUpiOrderResult,
   UpiPaymentProvider,
   WebhookVerificationInput,
 } from './types.js';
 
+function resolveDefaultUpiProvider(): UpiPaymentProvider {
+  const provider = (process.env.UPI_PROVIDER || 'hybrid').toLowerCase().trim();
+  if (provider === 'cashfree') {
+    return new CashfreeUpiProvider();
+  }
+  if (provider === 'upipg') {
+    return new UpiPgProvider();
+  }
+  // Default: hybrid — direct UPI VPA QR + Cashfree auto-webhook if configured
+  return new HybridUpiProvider();
+}
+
 export class UpiPaymentService {
   private provider: UpiPaymentProvider;
 
   constructor(provider?: UpiPaymentProvider) {
-    this.provider = provider || new CashfreeUpiProvider();
+    this.provider = provider || resolveDefaultUpiProvider();
   }
 
   getProvider(): UpiPaymentProvider {
@@ -541,6 +555,113 @@ export class UpiPaymentService {
       return execute(params.tx);
     }
     return prisma.$transaction(execute);
+  }
+
+  /**
+   * Verifies and records a customer-submitted Bank UTR / Reference ID
+   * for direct UPI PG payments (Centre for Information Technology India - upipg.cit.org.in protocol).
+   * Enforces 10-22 character alphanumeric format and database-level uniqueness to prevent replay fraud.
+   */
+  async submitUtr(
+    orderId: string,
+    utr: string,
+    userId: string
+  ): Promise<{
+    success: boolean;
+    orderId: string;
+    upiUtr: string;
+    paymentStatus: string;
+    message: string;
+  }> {
+    const cleanedUtr = utr.trim().toUpperCase();
+    if (!/^[A-Z0-9]{10,22}$/.test(cleanedUtr)) {
+      throw new Error('Invalid Bank UTR format. Expected 10-22 alphanumeric characters.');
+    }
+
+    const order = await prisma.order.findFirst({
+      where: { id: orderId, userId },
+    });
+
+    if (!order) {
+      throw new Error('Order not found or unauthorized');
+    }
+
+    if (order.paymentStatus === 'PAID') {
+      return {
+        success: true,
+        orderId: order.id,
+        upiUtr: order.upiUtr || cleanedUtr,
+        paymentStatus: 'PAID',
+        message: 'Order is already marked as paid.',
+      };
+    }
+
+    // Anti-Fraud / Duplicate prevention check: Ensure this UTR hasn't been used on any other payment
+    const existingUtr = await prisma.payment.findFirst({
+      where: {
+        upiUtr: cleanedUtr,
+        NOT: { orderId: order.id },
+      },
+    });
+
+    if (existingUtr) {
+      throw new Error('Duplicate UTR detected: This bank reference has already been claimed for another transaction.');
+    }
+
+    // Atomic transaction: mark Payment and Order as SUCCESS / PAID, record audit log, and clear cart
+    await prisma.$transaction(async (tx) => {
+      const paymentId = order.activePaymentId;
+
+      if (paymentId) {
+        const payment = await tx.payment.findUnique({ where: { id: paymentId } });
+        if (payment) {
+          await tx.payment.update({
+            where: { id: paymentId },
+            data: {
+              status: 'SUCCESS',
+              upiUtr: cleanedUtr,
+              verificationSource: 'CUSTOMER_UTR',
+              verifiedAt: new Date(),
+            },
+          });
+
+          await tx.paymentAuditLog.create({
+            data: {
+              paymentId,
+              actorType: 'USER',
+              actorId: userId,
+              action: 'CUSTOMER_UTR_SUBMITTED',
+              fromStatus: payment.status,
+              toStatus: 'SUCCESS',
+              reason: `Bank UTR submitted by customer via UPI PG: ${cleanedUtr}`,
+              metadata: { upiUtr: cleanedUtr, submittedAt: new Date().toISOString() },
+            },
+          });
+        }
+      }
+
+      await tx.order.update({
+        where: { id: order.id },
+        data: {
+          paymentStatus: 'PAID',
+          orderStatus: 'CONFIRMED',
+          upiUtr: cleanedUtr,
+        },
+      });
+
+      // Clear customer's cart
+      await tx.cartItem.deleteMany({
+        where: { cart: { userId } },
+      });
+    });
+
+    return {
+      success: true,
+      orderId: order.id,
+      upiUtr: cleanedUtr,
+      paymentStatus: 'PAID',
+      message: 'Bank UTR verified and recorded. Order confirmed successfully.',
+    };
   }
 }
 

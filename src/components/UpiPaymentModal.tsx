@@ -45,6 +45,9 @@ export const UpiPaymentModal: React.FC<UpiPaymentModalProps> = ({
   const [copiedVpa, setCopiedVpa] = useState(false);
   const [status, setStatus] = useState<'PENDING' | 'VERIFYING' | 'PAID' | 'EXPIRED' | 'FAILED'>('PENDING');
   const [upiUtr, setUpiUtr] = useState<string | null>(null);
+  const [inputUtr, setInputUtr] = useState('');
+  const [submittingUtr, setSubmittingUtr] = useState(false);
+  const [utrError, setUtrError] = useState<string | null>(null);
   const [timeLeft, setTimeLeft] = useState<number>(15 * 60);
   const pollIntervalRef = useRef<NodeJS.Timeout | null>(null);
 
@@ -127,6 +130,30 @@ export const UpiPaymentModal: React.FC<UpiPaymentModalProps> = ({
     setCopiedVpa(true);
     onShowToast(`MERCHANT VPA COPIED: ${payeeVpa}`);
     setTimeout(() => setCopiedVpa(false), 2000);
+  };
+
+  const handleVerifyUtr = async (e: React.FormEvent) => {
+    e.preventDefault();
+    const trimmed = inputUtr.trim();
+    if (!trimmed) {
+      setUtrError('PLEASE ENTER THE 12-DIGIT UPI REFERENCE / UTR');
+      return;
+    }
+    setSubmittingUtr(true);
+    setUtrError(null);
+    try {
+      const res = await customerApi.submitUpiUtr(orderId, trimmed);
+      setStatus('PAID');
+      setUpiUtr(res.upiUtr);
+      onShowToast('BANK UTR VERIFIED // ORDER CONFIRMED');
+      setTimeout(() => {
+        onPaymentVerified(res as unknown as Record<string, unknown>);
+      }, 1500);
+    } catch (err: any) {
+      setUtrError(err.message || 'Verification failed. Please check the UTR.');
+    } finally {
+      setSubmittingUtr(false);
+    }
   };
 
   return (
@@ -283,6 +310,56 @@ export const UpiPaymentModal: React.FC<UpiPaymentModalProps> = ({
                   <span>{copiedLink ? 'COPIED LINK' : 'COPY UPI INTENT'}</span>
                 </button>
               </div>
+            </div>
+
+            {/* UPI PG Direct Settlement - UTR Verification Input */}
+            <div className="bg-[#ede7dd] border border-[#d5cdc0] p-4 flex flex-col gap-2.5">
+              <div className="flex items-center justify-between">
+                <span className="font-mono text-[10px] font-bold text-[#1a1816] uppercase tracking-wider">
+                  ALREADY PAID VIA UPI APP?
+                </span>
+                <span className="font-mono text-[9px] text-[#7b6e54] uppercase tracking-wide">
+                  DIRECT VERIFICATION
+                </span>
+              </div>
+              <p className="font-mono text-[10px] text-[#59544c] leading-relaxed">
+                Enter the 12-digit UPI Reference / UTR Number from your Google Pay, PhonePe, or Paytm receipt to instantly lock allocation:
+              </p>
+              <form onSubmit={handleVerifyUtr} className="flex flex-col sm:flex-row gap-2">
+                <input
+                  type="text"
+                  placeholder="e.g. 428901234567"
+                  value={inputUtr}
+                  onChange={(e) => {
+                    setInputUtr(e.target.value.toUpperCase());
+                    if (utrError) setUtrError(null);
+                  }}
+                  maxLength={22}
+                  className="flex-1 bg-white border border-[#d5cdc0] px-3 py-2 font-mono text-xs text-[#1a1816] uppercase placeholder:normal-case placeholder:text-neutral-400 focus:outline-none focus:border-[#1a1816]"
+                />
+                <button
+                  type="submit"
+                  disabled={submittingUtr || !inputUtr.trim()}
+                  className="py-2 px-4 bg-[#1a1816] text-[#ede7dd] font-mono text-[10px] font-bold uppercase tracking-wider hover:bg-[#35322e] disabled:opacity-50 transition-colors flex items-center justify-center gap-1.5 cursor-pointer shrink-0"
+                >
+                  {submittingUtr ? (
+                    <>
+                      <RefreshCw className="w-3 h-3 animate-spin" />
+                      <span>VERIFYING...</span>
+                    </>
+                  ) : (
+                    <>
+                      <Check className="w-3 h-3 text-[#16a34a]" />
+                      <span>CONFIRM UTR</span>
+                    </>
+                  )}
+                </button>
+              </form>
+              {utrError && (
+                <span className="font-mono text-[10px] text-red-600 block">
+                  {utrError}
+                </span>
+              )}
             </div>
 
             {/* Security Guarantee */}

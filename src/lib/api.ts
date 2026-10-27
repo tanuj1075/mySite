@@ -132,6 +132,18 @@ export const customerApi = {
       expiresAt?: string;
     }>(`/payments/upi/status/${encodeURIComponent(orderId)}`);
   },
+  submitUpiUtr(orderId: string, utr: string) {
+    return requestCustomer<{
+      success: boolean;
+      orderId: string;
+      upiUtr: string;
+      paymentStatus: string;
+      message: string;
+    }>('/payments/upi/verify-utr', {
+      method: 'POST',
+      body: JSON.stringify({ orderId, utr }),
+    });
+  },
   exchanges() {
     return requestCustomer<Array<Record<string, unknown>>>('/exchanges');
   },

@@ -78,6 +78,31 @@ router.get('/upi/status/:orderId', requireAuth, async (req, res, next) => {
   }
 });
 
+const submitUtrInput = z.object({
+  orderId: z.string().min(1, 'Order ID is required'),
+  utr: z.string().min(10, 'Bank UTR must be at least 10 characters').max(22),
+});
+
+/**
+ * Customer Bank UTR Submission endpoint (upipg.cit.org.in protocol).
+ * Allows buyers to enter the 12-digit UTR shown on their UPI app (GPay/PhonePe/Paytm/BHIM).
+ * Verifies format, checks for duplicate/replay fraud, and updates order status.
+ */
+router.post('/upi/verify-utr', requireAuth, async (req, res, next) => {
+  try {
+    const input = submitUtrInput.parse(req.body);
+    const userId = req.auth!.sub;
+
+    const result = await upiService.submitUtr(input.orderId, input.utr, userId);
+    res.json(result);
+  } catch (error) {
+    if (error instanceof Error && error.message.includes('Duplicate UTR')) {
+      return res.status(409).json({ error: error.message });
+    }
+    next(error);
+  }
+});
+
 /**
  * Authenticated Webhook Notification Handler.
  * Verifies raw cryptographic HMAC-SHA256 signature and timestamp tolerance.
