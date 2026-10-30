@@ -21,10 +21,14 @@ import { startReconciliationWorker } from './jobs/reconcileWorker.js';
 
 declare global { namespace Express { interface Request { rawBody?: Buffer } } }
 
-if (!process.env.DATABASE_URL || !process.env.JWT_SECRET) throw new Error('DATABASE_URL and JWT_SECRET are required');
+if (!process.env.DATABASE_URL || !process.env.JWT_SECRET) {
+  if (process.env.NODE_ENV === 'production' && !process.env.VERCEL) {
+    console.warn('[WARN] DATABASE_URL and JWT_SECRET should be set in environment variables');
+  }
+}
 const app = express();
 
-// Trust reverse proxy (Render, Railway, Heroku, AWS ALB, Nginx, Cloudflare)
+// Trust reverse proxy (Render, Railway, Heroku, AWS ALB, Nginx, Cloudflare, Vercel)
 app.set('trust proxy', 1);
 
 // Security headers (SEC-04)
@@ -48,6 +52,7 @@ app.use(cors({
       normalizedOrigin === 'http://127.0.0.1:3000' ||
       /^http:\/\/localhost:\d+$/.test(origin) ||
       /^http:\/\/127\.0\.0\.1:\d+$/.test(origin) ||
+      /^https:\/\/.*\.vercel\.app$/.test(origin) ||
       /^http:\/\/192\.168\.\d+\.\d+(:\d+)?$/.test(origin) ||
       /^http:\/\/172\.(1[6-9]|2\d|3[0-1])\.\d+\.\d+(:\d+)?$/.test(origin) ||
       /^http:\/\/10\.\d+\.\d+\.\d+(:\d+)?$/.test(origin)
@@ -101,11 +106,16 @@ app.use((error: unknown, _req: express.Request, res: express.Response, _next: ex
   if (error instanceof Error && error.name === 'ZodError') return res.status(400).json({ error: 'Invalid request', details: error.message });
   console.error(error); res.status(500).json({ error: 'Internal server error' });
 });
+
 const port = Number(process.env.PORT ?? 4000);
-app.listen(port, '0.0.0.0', () => {
-  console.log(`VANTA API listening on :${port}`);
-  if (process.env.NODE_ENV !== 'test') {
-    startReconciliationWorker(60_000);
-  }
-});
-
+if (!process.env.VERCEL) {
+  app.listen(port, '0.0.0.0', () => {
+    console.log(`VANTA API listening on :${port}`);
+    if (process.env.NODE_ENV !== 'test') {
+      startReconciliationWorker(60_000);
+    }
+  });
+}
+
+export default app;
+export { app };

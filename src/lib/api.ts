@@ -1,7 +1,12 @@
 import type { ShoeProduct } from '../types';
 
 const configuredApiUrl = import.meta.env.VITE_API_URL?.trim();
-const API_URL = (configuredApiUrl || 'http://localhost:4000/api').replace(/\/+$/, '');
+const API_URL = (
+  configuredApiUrl ||
+  (typeof window !== 'undefined' && window.location.hostname !== 'localhost' && window.location.hostname !== '127.0.0.1'
+    ? '/api'
+    : 'http://localhost:4000/api')
+).replace(/\/+$/, '');
 
 type AuthResponse = {
   accessToken: string;

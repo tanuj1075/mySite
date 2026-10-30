@@ -1,5 +1,5 @@
 import 'dotenv/config';
-import { test, describe, beforeEach, after } from 'node:test';
+import { test, describe, beforeEach, after, before } from 'node:test';
 import assert from 'node:assert/strict';
 import crypto from 'node:crypto';
 import { CashfreeUpiProvider } from '../server/lib/payments/cashfree.js';
@@ -219,6 +219,9 @@ class MockCashfreeProvider extends CashfreeUpiProvider {
 }
 
 describe('UPI End-to-End Payment Flow & Database Integrity Tests', () => {
+  before(async () => {
+    await prisma.$connect();
+  });
   after(async () => {
     await prisma.$disconnect();
   });
