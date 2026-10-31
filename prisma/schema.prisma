@@ -57,6 +57,20 @@ model User {
   passwordHash String
   phone        String?
   role         UserRole       @default(CUSTOMER)
+
+  // Security, Lockout & MFA Controls
+  failedLoginAttempts    Int       @default(0)
+  lockedUntil            DateTime?
+  mfaEnabled             Boolean   @default(false)
+  mfaSecret              String?
+  mfaBackupCodes         String[]  @default([])
+  emailVerified          Boolean   @default(false)
+  emailVerificationToken String?
+  passwordResetToken     String?
+  passwordResetExpires   DateTime?
+  lastLoginAt            DateTime?
+  lastLoginIp            String?
+
   createdAt    DateTime       @default(now())
   updatedAt    DateTime       @updatedAt
   cart         Cart?
@@ -65,12 +79,15 @@ model User {
   exchanges    ExchangeReturnRequest[]
   wishlistItems WishlistItem[]
   refreshTokens RefreshToken[]
+  securityLogs  SecurityLog[]
 }
 
 model RefreshToken {
   id        String   @id @default(cuid())
   tokenHash String   @unique
   userId    String
+  ipAddress String?
+  userAgent String?
   expiresAt DateTime
   revokedAt DateTime?
   user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
@@ -316,4 +333,20 @@ model WebhookEvent {
 
   @@index([provider, eventType])
   @@index([createdAt])
+}
+
+model SecurityLog {
+  id          String   @id @default(cuid())
+  userId      String?
+  user        User?    @relation(fields: [userId], references: [id], onDelete: SetNull)
+  eventType   String   // LOGIN_SUCCESS, LOGIN_FAILED, ACCOUNT_LOCKED, MFA_SETUP, MFA_VERIFIED, MFA_FAILED, PASSWORD_RESET_REQ, PASSWORD_RESET_SUCCESS, LOGOUT, ADMIN_ACCESS_DENIED, SUSPICIOUS_REQUEST, RATE_LIMIT_EXCEEDED
+  severity    String   @default("INFO") // INFO, WARN, CRITICAL
+  ipAddress   String?
+  userAgent   String?
+  details     Json?
+  createdAt   DateTime @default(now())
+
+  @@index([userId, eventType])
+  @@index([createdAt])
+  @@index([eventType])
 }

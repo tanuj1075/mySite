@@ -2,22 +2,43 @@ import { test, describe } from 'node:test';
 import assert from 'node:assert/strict';
 import crypto from 'node:crypto';
 import jwt from 'jsonwebtoken';
+import bcrypt from 'bcryptjs';
 import { hashPassword, verifyPassword, issueAccessToken, verifyAccessToken, AuthPayload } from '../server/lib/auth.js';
 import { requireAuth, requireAdmin } from '../server/middleware/auth.js';
+import {
+  generateTotpSecret,
+  generateTotpCode,
+  verifyTotpToken,
+  getTotpUri,
+  generateTotpQrDataUrl,
+  generateBackupCodes,
+  verifyBackupCode,
+  base32Encode,
+  base32Decode,
+} from '../server/lib/totp.js';
 import type { Request, Response, NextFunction } from 'express';
 
-describe('Authentication & Security Middleware Tests', () => {
+describe('Authentication & Security Architecture Tests', () => {
   // Set test environment secret
   process.env.JWT_SECRET = 'test-super-secret-key-12345678901234567890';
 
-  test('password hashing and verification with bcrypt (cost 12)', async () => {
+  test('password hashing produces Argon2id hash', async () => {
     const plain = 'VantaAtelierSecretPass!2026';
     const hash = await hashPassword(plain);
 
     assert.notEqual(plain, hash);
-    assert.ok(hash.startsWith('$2')); // bcrypt format
+    assert.ok(hash.startsWith('$argon2id$'), `Expected Argon2id format, got: ${hash}`);
     assert.equal(await verifyPassword(plain, hash), true);
     assert.equal(await verifyPassword('WrongPassword', hash), false);
+  });
+
+  test('backwards-compatible verification of legacy bcrypt hashes', async () => {
+    const plain = 'LegacyPassword!123';
+    const legacyBcryptHash = await bcrypt.hash(plain, 10);
+
+    assert.ok(legacyBcryptHash.startsWith('$2'));
+    assert.equal(await verifyPassword(plain, legacyBcryptHash), true);
+    assert.equal(await verifyPassword('IncorrectPassword', legacyBcryptHash), false);
   });
 
   test('issues and verifies access token with correct payload', () => {
@@ -33,7 +54,6 @@ describe('Authentication & Security Middleware Tests', () => {
 
   test('rejects expired access token safely', () => {
     const payload: AuthPayload = { sub: 'usr_test123', email: 'test@vanta.com', role: 'CUSTOMER' };
-    // Create an expired token
     const expiredToken = jwt.sign(payload, process.env.JWT_SECRET!, { expiresIn: '-1s' });
 
     assert.throws(() => {
@@ -116,5 +136,79 @@ describe('Authentication & Security Middleware Tests', () => {
 
     assert.equal(crypto.timingSafeEqual(expectedBuf, validBuf), true);
     assert.equal(crypto.timingSafeEqual(expectedBuf, forgedBuf), false);
+  });
+});
+
+describe('MFA & RFC 6238 TOTP Architecture Tests', () => {
+  test('Base32 encoding and decoding symmetry', () => {
+    const input = Buffer.from('VANTA-SECURITY-KEY-2026');
+    const encoded = base32Encode(input);
+    const decoded = base32Decode(encoded);
+
+    assert.equal(decoded.toString(), input.toString());
+  });
+
+  test('TOTP secret generation produces valid Base32', () => {
+    const secret = generateTotpSecret();
+    assert.ok(secret);
+    assert.ok(secret.length >= 32);
+    // Should decode without throwing
+    const decoded = base32Decode(secret);
+    assert.equal(decoded.length, 20);
+  });
+
+  test('TOTP token generation and verification succeeds for current window', () => {
+    const secret = generateTotpSecret();
+    const code = generateTotpCode(secret);
+
+    assert.equal(code.length, 6);
+    assert.ok(/^\d{6}$/.test(code));
+    assert.equal(verifyTotpToken(code, secret), true);
+    assert.equal(verifyTotpToken('000000', secret === 'JBSWY3DPEHPK3PXP' ? 'A' : secret), false);
+  });
+
+  test('TOTP token verification rejects invalid format or wrong secret', () => {
+    const secret = generateTotpSecret();
+    const otherSecret = generateTotpSecret();
+    const code = generateTotpCode(secret);
+
+    assert.equal(verifyTotpToken('abc', secret), false);
+    assert.equal(verifyTotpToken('12345', secret), false);
+    assert.equal(verifyTotpToken('1234567', secret), false);
+    assert.equal(verifyTotpToken(code, otherSecret), false);
+  });
+
+  test('Generates valid otpauth URI and QR code data URL', async () => {
+    const secret = generateTotpSecret();
+    const uri = getTotpUri('admin@vanta.com', secret, 'VANTA ATELIER');
+
+    assert.ok(uri.startsWith('otpauth://totp/'));
+    assert.ok(uri.includes(encodeURIComponent('admin@vanta.com')));
+    assert.ok(uri.includes(secret));
+
+    const qrDataUrl = await generateTotpQrDataUrl(uri);
+    assert.ok(qrDataUrl.startsWith('data:image/png;base64,'));
+  });
+
+  test('Backup codes generation and single-use consumption', () => {
+    const { plainCodes, hashedCodes } = generateBackupCodes(8);
+
+    assert.equal(plainCodes.length, 8);
+    assert.equal(hashedCodes.length, 8);
+
+    // Consume first code
+    const codeToUse = plainCodes[0];
+    const result1 = verifyBackupCode(codeToUse, hashedCodes);
+    assert.equal(result1.isValid, true);
+    assert.equal(result1.remainingHashedCodes.length, 7);
+
+    // Attempting to consume same code again fails (replay protection)
+    const result2 = verifyBackupCode(codeToUse, result1.remainingHashedCodes);
+    assert.equal(result2.isValid, false);
+    assert.equal(result2.remainingHashedCodes.length, 7);
+
+    // Invalid code fails
+    const invalidResult = verifyBackupCode('INVALID-CODE-99', result1.remainingHashedCodes);
+    assert.equal(invalidResult.isValid, false);
   });
 });

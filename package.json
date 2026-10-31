@@ -24,6 +24,7 @@
   },
   "dependencies": {
     "@google/genai": "^2.4.0",
+    "@node-rs/argon2": "^2.2.2",
     "@prisma/client": "^6.16.2",
     "@tailwindcss/vite": "^4.1.14",
     "@vitejs/plugin-react": "^5.0.4",

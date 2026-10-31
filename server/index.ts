@@ -31,10 +31,32 @@ const app = express();
 // Trust reverse proxy (Render, Railway, Heroku, AWS ALB, Nginx, Cloudflare, Vercel)
 app.set('trust proxy', 1);
 
-// Security headers (SEC-04)
+// Security headers (SEC-04, OWASP A05:2021)
 app.use(helmet({
-  crossOriginResourcePolicy: { policy: 'cross-origin' }, // allow CDN images
-  contentSecurityPolicy: false, // managed by reverse proxy / CDN in production
+  crossOriginResourcePolicy: { policy: 'cross-origin' },
+  contentSecurityPolicy: {
+    directives: {
+      defaultSrc: ["'self'"],
+      scriptSrc: ["'self'", "'unsafe-inline'"],
+      styleSrc: ["'self'", "'unsafe-inline'", 'https://fonts.googleapis.com'],
+      fontSrc: ["'self'", 'https://fonts.gstatic.com', 'data:'],
+      imgSrc: ["'self'", 'data:', 'blob:', 'https:', 'http:'],
+      connectSrc: ["'self'", 'https:', 'http:'],
+      frameAncestors: ["'none'"],
+      objectSrc: ["'none'"],
+      baseUri: ["'self'"],
+      formAction: ["'self'"],
+      upgradeInsecureRequests: process.env.NODE_ENV === 'production' ? [] : null,
+    },
+  },
+  hsts: process.env.NODE_ENV === 'production' ? {
+    maxAge: 31536000,
+    includeSubDomains: true,
+    preload: true,
+  } : false,
+  referrerPolicy: { policy: 'strict-origin-when-cross-origin' },
+  xContentTypeOptions: true,
+  xFrameOptions: { action: 'deny' },
 }));
 
 const allowedOriginsList = (process.env.CLIENT_URL ?? 'http://localhost:3000')
@@ -42,27 +64,35 @@ const allowedOriginsList = (process.env.CLIENT_URL ?? 'http://localhost:3000')
   .map(url => url.trim().replace(/\/$/, ''))
   .filter(Boolean);
 
+if (process.env.VERCEL_URL) {
+  allowedOriginsList.push(`https://${process.env.VERCEL_URL.replace(/\/$/, '')}`);
+}
+if (process.env.VERCEL_PROJECT_PRODUCTION_URL) {
+  allowedOriginsList.push(`https://${process.env.VERCEL_PROJECT_PRODUCTION_URL.replace(/\/$/, '')}`);
+}
+
 app.use(cors({
   origin: (origin, callback) => {
     if (!origin) return callback(null, true);
     const normalizedOrigin = origin.replace(/\/$/, '');
-    if (
-      allowedOriginsList.includes(normalizedOrigin) ||
-      normalizedOrigin === 'http://localhost:3000' ||
-      normalizedOrigin === 'http://127.0.0.1:3000' ||
-      /^http:\/\/localhost:\d+$/.test(origin) ||
-      /^http:\/\/127\.0\.0\.1:\d+$/.test(origin) ||
-      /^https:\/\/.*\.vercel\.app$/.test(origin) ||
-      /^http:\/\/192\.168\.\d+\.\d+(:\d+)?$/.test(origin) ||
-      /^http:\/\/172\.(1[6-9]|2\d|3[0-1])\.\d+\.\d+(:\d+)?$/.test(origin) ||
-      /^http:\/\/10\.\d+\.\d+\.\d+(:\d+)?$/.test(origin)
-    ) {
+    if (allowedOriginsList.includes(normalizedOrigin)) {
       return callback(null, true);
     }
+    // In local development, permit localhost and local network devices
     if (process.env.NODE_ENV !== 'production') {
-      return callback(null, true);
+      if (
+        normalizedOrigin === 'http://localhost:3000' ||
+        normalizedOrigin === 'http://127.0.0.1:3000' ||
+        /^http:\/\/localhost:\d+$/.test(origin) ||
+        /^http:\/\/127\.0\.0\.1:\d+$/.test(origin) ||
+        /^http:\/\/192\.168\.\d+\.\d+(:\d+)?$/.test(origin) ||
+        /^http:\/\/172\.(1[6-9]|2\d|3[0-1])\.\d+\.\d+(:\d+)?$/.test(origin) ||
+        /^http:\/\/10\.\d+\.\d+\.\d+(:\d+)?$/.test(origin)
+      ) {
+        return callback(null, true);
+      }
     }
-    callback(new Error('Blocked by CORS'));
+    callback(new Error('Blocked by CORS policy'));
   },
   credentials: true,
 }));

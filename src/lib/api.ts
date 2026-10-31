@@ -33,8 +33,11 @@ export const authApi = {
   hasSession() {
     return localStorage.getItem(CUSTOMER_ACCESS_KEY) !== null;
   },
-  async login(email: string, password: string) {
-    const result = await request<AuthResponse>('/auth/login', { method: 'POST', body: JSON.stringify({ email, password }) });
+  async login(email: string, password: string, totpToken?: string, backupCode?: string) {
+    const result = await request<AuthResponse>('/auth/login', {
+      method: 'POST',
+      body: JSON.stringify({ email, password, totpToken, backupCode }),
+    });
     saveCustomerSession(result);
     return result.user;
   },
@@ -44,7 +47,7 @@ export const authApi = {
     return result.user;
   },
   session() {
-    return requestCustomer<AuthResponse['user']>('/auth/session');
+    return requestCustomer<AuthResponse['user'] & { mfaEnabled?: boolean }>('/auth/session');
   },
   async logout() {
     const refreshToken = localStorage.getItem(CUSTOMER_REFRESH_KEY);
@@ -57,11 +60,41 @@ export const authApi = {
       }
     }
   },
-  async adminLogin(email: string, password: string, rememberDevice = true) {
-    const result = await request<AuthResponse>('/auth/admin/login', { method: 'POST', body: JSON.stringify({ email, password }) });
+  async adminLogin(email: string, password: string, rememberDevice = true, totpToken?: string) {
+    const result = await request<AuthResponse>('/auth/admin/login', {
+      method: 'POST',
+      body: JSON.stringify({ email, password, totpToken }),
+    });
     if (result.user.role !== 'ADMIN') throw new Error('Admin role required');
     saveAdminSession(result, rememberDevice);
     return result.user;
+  },
+  setupMfa() {
+    return requestCustomer<{ secret: string; qrDataUrl: string; message: string }>('/auth/mfa/setup', { method: 'POST' });
+  },
+  verifyMfa(totpToken: string) {
+    return requestCustomer<{ message: string; backupCodes: string[] }>('/auth/mfa/verify', {
+      method: 'POST',
+      body: JSON.stringify({ totpToken }),
+    });
+  },
+  disableMfa(password: string, totpToken: string) {
+    return requestCustomer<{ message: string }>('/auth/mfa/disable', {
+      method: 'POST',
+      body: JSON.stringify({ password, totpToken }),
+    });
+  },
+  requestPasswordReset(email: string) {
+    return request<{ message: string }>('/auth/password-reset/request', {
+      method: 'POST',
+      body: JSON.stringify({ email }),
+    });
+  },
+  confirmPasswordReset(token: string, password: string) {
+    return request<{ message: string }>('/auth/password-reset/confirm', {
+      method: 'POST',
+      body: JSON.stringify({ token, password }),
+    });
   },
 };
 
@@ -219,10 +252,57 @@ export const adminApi = {
     return requestAdmin(`/admin/exchanges/${encodeURIComponent(id)}/status`, { method: 'PATCH', body: JSON.stringify({ status }) });
   },
   sessions() {
-    return requestAdmin<Array<{ id: string; createdAt: string; expiresAt: string; isCurrent: boolean; environment: string }>>('/admin/security/sessions');
+    return requestAdmin<Array<{ id: string; createdAt: string; expiresAt: string; isCurrent: boolean; ip: string; environment: string }>>('/admin/security/sessions');
   },
   revokeAllSessions() {
     return requestAdmin<{ revokedCount: number; message: string }>('/admin/security/sessions/revoke-all', { method: 'POST' });
+  },
+  securityLogs(params?: { page?: number; limit?: number; severity?: string; eventType?: string; search?: string }) {
+    const search = new URLSearchParams();
+    if (params?.page) search.set('page', String(params.page));
+    if (params?.limit) search.set('limit', String(params.limit));
+    if (params?.severity) search.set('severity', params.severity);
+    if (params?.eventType) search.set('eventType', params.eventType);
+    if (params?.search) search.set('search', params.search);
+    const qs = search.toString();
+    return requestAdmin<{
+      logs: Array<{
+        id: string;
+        userId?: string;
+        eventType: string;
+        severity: string;
+        ipAddress?: string;
+        userAgent?: string;
+        details?: unknown;
+        createdAt: string;
+        user?: { email: string; name: string; role: string };
+      }>;
+      total: number;
+      page: number;
+      limit: number;
+      totalPages: number;
+    }>(`/admin/security/logs${qs ? `?${qs}` : ''}`);
+  },
+  securityStats() {
+    return requestAdmin<{
+      totalLogs: number;
+      criticalEvents: number;
+      threatsBlocked24h: number;
+      activeSessions: number;
+      mfaComplianceRate: number;
+      totalAdmins: number;
+      mfaAdmins: number;
+      lockedAccounts: number;
+      recentLogs: Array<{
+        id: string;
+        eventType: string;
+        severity: string;
+        ipAddress?: string;
+        userAgent?: string;
+        createdAt: string;
+        user?: { email: string; name: string };
+      }>;
+    }>('/admin/security/stats');
   },
   payments(params?: { q?: string; status?: string; provider?: string; page?: number; limit?: number }) {
     const search = new URLSearchParams();

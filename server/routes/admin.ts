@@ -46,7 +46,7 @@ router.get('/security/sessions', async (req, res, next) => {
     const adminId = req.auth!.sub;
     const tokens = await prisma.refreshToken.findMany({
       where: { userId: adminId, revokedAt: null, expiresAt: { gt: new Date() } },
-      select: { id: true, createdAt: true, expiresAt: true },
+      select: { id: true, createdAt: true, expiresAt: true, ipAddress: true, userAgent: true },
       orderBy: { createdAt: 'desc' },
     });
     res.json(tokens.map((t, idx) => ({
@@ -54,7 +54,8 @@ router.get('/security/sessions', async (req, res, next) => {
       createdAt: t.createdAt,
       expiresAt: t.expiresAt,
       isCurrent: idx === 0,
-      environment: 'Admin Session (Authenticated Token)',
+      ip: t.ipAddress || '127.0.0.1 (Local Verified)',
+      environment: t.userAgent || 'Admin Session (Authenticated Token)',
     })));
   } catch (error) { next(error); }
 });
@@ -67,6 +68,95 @@ router.post('/security/sessions/revoke-all', async (req, res, next) => {
       data: { revokedAt: new Date() },
     });
     res.json({ revokedCount: result.count, message: 'All remote administrator sessions revoked' });
+  } catch (error) { next(error); }
+});
+
+router.get('/security/logs', async (req, res, next) => {
+  try {
+    const page = Math.max(1, parseInt(String(req.query.page || '1'), 10));
+    const limit = Math.min(100, Math.max(1, parseInt(String(req.query.limit || '20'), 10)));
+    const skip = (page - 1) * limit;
+    const severity = typeof req.query.severity === 'string' && req.query.severity !== 'ALL' ? req.query.severity : undefined;
+    const eventType = typeof req.query.eventType === 'string' && req.query.eventType !== 'ALL' ? req.query.eventType : undefined;
+    const search = typeof req.query.search === 'string' ? req.query.search.trim() : undefined;
+
+    const where: any = {};
+    if (severity) where.severity = severity;
+    if (eventType) where.eventType = eventType;
+    if (search) {
+      where.OR = [
+        { eventType: { contains: search, mode: 'insensitive' } },
+        { ipAddress: { contains: search, mode: 'insensitive' } },
+        { user: { email: { contains: search, mode: 'insensitive' } } },
+      ];
+    }
+
+    const [logs, total] = await Promise.all([
+      prisma.securityLog.findMany({
+        where,
+        include: { user: { select: { email: true, name: true, role: true } } },
+        orderBy: { createdAt: 'desc' },
+        skip,
+        take: limit,
+      }),
+      prisma.securityLog.count({ where }),
+    ]);
+
+    res.json({
+      logs,
+      total,
+      page,
+      limit,
+      totalPages: Math.ceil(total / limit),
+    });
+  } catch (error) { next(error); }
+});
+
+router.get('/security/stats', async (_req, res, next) => {
+  try {
+    const since24h = new Date(Date.now() - 24 * 60 * 60 * 1000);
+    const [
+      totalLogs,
+      criticalLogsCount,
+      failedLogins24h,
+      activeSessionsCount,
+      totalAdmins,
+      mfaAdmins,
+      lockedAccounts,
+      recentLogs,
+    ] = await Promise.all([
+      prisma.securityLog.count(),
+      prisma.securityLog.count({ where: { severity: { in: ['HIGH', 'CRITICAL'] } } }),
+      prisma.securityLog.count({
+        where: {
+          eventType: { in: ['LOGIN_FAILED', 'ADMIN_LOGIN_FAILED', 'ACCOUNT_LOCKED', 'ADMIN_MFA_FAILED'] },
+          createdAt: { gte: since24h },
+        },
+      }),
+      prisma.refreshToken.count({
+        where: { revokedAt: null, expiresAt: { gt: new Date() } },
+      }),
+      prisma.user.count({ where: { role: 'ADMIN' } }),
+      prisma.user.count({ where: { role: 'ADMIN', mfaEnabled: true } }),
+      prisma.user.count({ where: { lockedUntil: { gt: new Date() } } }),
+      prisma.securityLog.findMany({
+        include: { user: { select: { email: true, name: true } } },
+        orderBy: { createdAt: 'desc' },
+        take: 10,
+      }),
+    ]);
+
+    res.json({
+      totalLogs,
+      criticalEvents: criticalLogsCount,
+      threatsBlocked24h: failedLogins24h,
+      activeSessions: activeSessionsCount,
+      mfaComplianceRate: totalAdmins > 0 ? Math.round((mfaAdmins / totalAdmins) * 100) : 100,
+      totalAdmins,
+      mfaAdmins,
+      lockedAccounts,
+      recentLogs,
+    });
   } catch (error) { next(error); }
 });
 

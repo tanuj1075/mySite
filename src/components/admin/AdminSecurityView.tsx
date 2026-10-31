@@ -23,6 +23,27 @@ interface AdminSecurityViewProps {
 }
 
 export const AdminSecurityView: React.FC<AdminSecurityViewProps> = ({ onShowToast }) => {
+  const [stats, setStats] = useState<{
+    totalLogs: number;
+    criticalEvents: number;
+    threatsBlocked24h: number;
+    activeSessions: number;
+    mfaComplianceRate: number;
+    totalAdmins: number;
+    mfaAdmins: number;
+    lockedAccounts: number;
+  } | null>(null);
+
+  const [realLogs, setRealLogs] = useState<Array<{
+    id: string;
+    eventType: string;
+    severity: string;
+    ipAddress?: string;
+    userAgent?: string;
+    createdAt: string;
+    user?: { email: string; name: string };
+  }>>([]);
+
   const [sessions, setSessions] = useState([
     {
       id: 'vnt_sess_90a1',
@@ -61,10 +82,28 @@ export const AdminSecurityView: React.FC<AdminSecurityViewProps> = ({ onShowToas
           setSessions(realSessions.map((s) => ({
             id: s.id,
             isCurrent: s.isCurrent,
-            ip: 'Verified Token Node',
+            ip: s.ip || 'Verified Token Node',
             location: 'Authenticated Origin',
             environment: s.environment,
           })));
+        }
+      })
+      .catch(() => {
+        // Retain initial reference demonstration records when backend is unavailable
+      });
+
+    adminApi.securityStats()
+      .then((data) => {
+        if (data) setStats(data);
+      })
+      .catch(() => {
+        // Retain initial reference demonstration records when backend is unavailable
+      });
+
+    adminApi.securityLogs({ limit: 10 })
+      .then((data) => {
+        if (data?.logs && data.logs.length > 0) {
+          setRealLogs(data.logs);
         }
       })
       .catch(() => {
@@ -131,12 +170,16 @@ export const AdminSecurityView: React.FC<AdminSecurityViewProps> = ({ onShowToas
             <div className="text-[9px] text-[#7b6e54] uppercase tracking-wider font-bold">
               01 // AUTH ENFORCEMENT
             </div>
-            <div className="text-3xl font-bold text-[#1a1816] mt-2">100%</div>
+            <div className="text-3xl font-bold text-[#1a1816] mt-2">
+              {stats ? `${stats.mfaComplianceRate}%` : '100%'}
+            </div>
             <div className="text-[10px] font-bold text-[#1a1816] uppercase mt-0.5">
               HARDWARE MFA
             </div>
             <p className="text-[10px] text-[#59544c] mt-1 font-sans leading-relaxed">
-              12/12 privileged admins hardware TOTP/WebAuthn authenticated.
+              {stats
+                ? `${stats.mfaAdmins}/${stats.totalAdmins} privileged admins hardware TOTP authenticated.`
+                : '12/12 privileged admins hardware TOTP/WebAuthn authenticated.'}
             </p>
           </div>
           <div className="text-[8px] text-[#7b6e54] uppercase tracking-widest pt-2 mt-2 border-t border-[#d5cdc0]">
@@ -151,13 +194,15 @@ export const AdminSecurityView: React.FC<AdminSecurityViewProps> = ({ onShowToas
               02 // ACTIVE SESSIONS
             </div>
             <div className="text-3xl font-bold text-[#1a1816] mt-2">
-              {sessions.length.toString().padStart(2, '0')}
+              {(stats?.activeSessions ?? sessions.length).toString().padStart(2, '0')}
             </div>
             <div className="text-[10px] font-bold text-[#1a1816] uppercase mt-0.5">
               SECURE TOKENS
             </div>
             <p className="text-[10px] text-[#59544c] mt-1 font-sans leading-relaxed">
-              Verified nodes across London (2), Frankfurt (1), Milan (1).
+              {sessions.length > 0
+                ? `${sessions.length} active database session boundaries strictly verified.`
+                : 'Verified nodes across London (2), Frankfurt (1), Milan (1).'}
             </p>
           </div>
           <div className="text-[8px] text-[#7b6e54] uppercase tracking-widest pt-2 mt-2 border-t border-[#d5cdc0]">
@@ -171,12 +216,14 @@ export const AdminSecurityView: React.FC<AdminSecurityViewProps> = ({ onShowToas
             <div className="text-[9px] text-[#7b6e54] uppercase tracking-wider font-bold">
               03 // INTERCEPTIONS
             </div>
-            <div className="text-3xl font-bold text-[#1a1816] mt-2">02</div>
+            <div className="text-3xl font-bold text-[#1a1816] mt-2">
+              {(stats?.threatsBlocked24h ?? 2).toString().padStart(2, '0')}
+            </div>
             <div className="text-[10px] font-bold text-[#1a1816] uppercase mt-0.5">
               BLOCKED THREATS
             </div>
             <p className="text-[10px] text-[#59544c] mt-1 font-sans leading-relaxed">
-              Rate-limited IP anomalies nullified by perimeter firewall (24h).
+              Rate-limited IP anomalies and lockout events nullified (24h).
             </p>
           </div>
           <div className="text-[8px] text-[#16a34a] font-bold uppercase tracking-widest pt-2 mt-2 border-t border-[#d5cdc0]">
@@ -578,20 +625,35 @@ export const AdminSecurityView: React.FC<AdminSecurityViewProps> = ({ onShowToas
         <div className="flex items-center justify-between text-[10px]">
           <div className="flex items-center gap-2 font-bold text-[#1a1816]">
             <span>STREAM FEED</span>
-            <span className="text-[#16a34a]">● 4 EVENTS CAPTURED TODAY</span>
+            <span className="text-[#16a34a]">
+              ● {realLogs.length > 0 ? `${realLogs.length} REAL DATABASE EVENTS` : '4 EVENTS CAPTURED TODAY'}
+            </span>
           </div>
           <button
             onClick={() => {
+              const exportItems = realLogs.length > 0
+                ? realLogs.map(l => ({
+                    id: l.id,
+                    time: new Date(l.createdAt).toUTCString(),
+                    principal: l.user?.email || 'system.security',
+                    event: l.eventType,
+                    severity: l.severity,
+                    ipAddress: l.ipAddress || 'unknown',
+                    userAgent: l.userAgent || 'unknown',
+                  }))
+                : [
+                    { time: '08:59:12 UTC', principal: 'admin.vance@vanta.com', event: 'MODIFIED_STOCK', detail: 'SKU VNT-X01-CRM-99 (+10 units replenished)', sig: '9f84...12a4', status: 'SUCCESS' },
+                    { time: '08:14:02 UTC', principal: 'order.lead@vanta.com', event: 'STATUS_UPDATE', detail: 'Order #VNT-9821 (PACKED → SHIPPED)', sig: '3e14...44ba', status: 'SUCCESS' },
+                    { time: '07:55:40 UTC', principal: 'system.security', event: 'AUTH_BLOCKED', detail: 'IP 194.26.29.11 exceeded threshold', sig: '0a99...28be', status: 'BLOCKED' },
+                    { time: '06:20:15 UTC', principal: 'admin.vance@vanta.com', event: 'MFA_CHALLENGE_VERIFIED', detail: 'RFC 6238 TOTP Terminal Node London', sig: 'ffa8...77d1', status: 'AUTHORIZED' }
+                  ];
+
               const digestData = {
                 timestamp: new Date().toISOString(),
                 facility: 'VANTA ATELIER // HARDWARE SECURITY ENCLAVE',
+                database: 'PostgreSQL // SecurityLog Model',
                 merkleRoot: 'e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855',
-                events: [
-                  { time: '08:59:12 UTC', principal: 'admin.vance@vanta.com', event: 'MODIFIED_STOCK', detail: 'SKU VNT-X01-CRM-99 (+10 units replenished)', sig: '9f84...12a4', status: 'SUCCESS' },
-                  { time: '08:14:02 UTC', principal: 'order.lead@vanta.com', event: 'STATUS_UPDATE', detail: 'Order #VNT-9821 (PACKED → SHIPPED)', sig: '3e14...44ba', status: 'SUCCESS' },
-                  { time: '07:55:40 UTC', principal: 'system.security', event: 'AUTH_BLOCKED', detail: 'IP 194.26.29.11 exceeded threshold', sig: '0a99...28be', status: 'BLOCKED' },
-                  { time: '06:20:15 UTC', principal: 'admin.vance@vanta.com', event: 'MFA_CHALLENGE_VERIFIED', detail: 'RFC 6238 TOTP Terminal Node London', sig: 'ffa8...77d1', status: 'AUTHORIZED' }
-                ]
+                events: exportItems,
               };
               const blob = new Blob([JSON.stringify(digestData, null, 2)], { type: 'application/json' });
               const url = URL.createObjectURL(blob);
@@ -611,77 +673,120 @@ export const AdminSecurityView: React.FC<AdminSecurityViewProps> = ({ onShowToas
 
         {/* Live events ledger */}
         <div className="divide-y divide-[#d5cdc0]/70 text-[10px]">
-          <div className="py-2.5 flex flex-wrap items-center justify-between gap-2">
-            <div className="flex items-center gap-3">
-              <span className="text-[#7b6e54]">[08:59:12 UTC]</span>
-              <span className="font-bold text-[#1a1816]">admin.vance@vanta.com</span>
-              <span className="bg-[#d5cdc0] text-[#1a1816] px-1.5 py-0.2 font-bold text-[9px]">
-                MODIFIED_STOCK
-              </span>
-              <span className="text-[#59544c]">SKU VNT-X01-CRM-99 (+10 units replenished)</span>
-            </div>
-            <div className="flex items-center gap-3">
-              <span className="text-[#7b6e54] text-[9px]">Sig: 9f84...12a4</span>
-              <span className="bg-[#fef3c7] text-[#92400e] font-bold text-[9px] px-2 py-0.5">
-                RESULT: SUCCESS
-              </span>
-            </div>
-          </div>
+          {realLogs.length > 0 ? (
+            realLogs.map((log) => {
+              const dateStr = new Date(log.createdAt).toISOString().replace('T', ' ').slice(11, 19) + ' UTC';
+              const isDanger = log.severity === 'CRITICAL' || log.severity === 'HIGH';
+              const isWarning = log.severity === 'MEDIUM';
 
-          <div className="py-2.5 flex flex-wrap items-center justify-between gap-2">
-            <div className="flex items-center gap-3">
-              <span className="text-[#7b6e54]">[08:14:02 UTC]</span>
-              <span className="font-bold text-[#1a1816]">order.lead@vanta.com</span>
-              <span className="bg-[#d5cdc0] text-[#1a1816] px-1.5 py-0.2 font-bold text-[9px]">
-                STATUS_UPDATE
-              </span>
-              <span className="text-[#59544c]">Order #VNT-9821 (PACKED → SHIPPED)</span>
-            </div>
-            <div className="flex items-center gap-3">
-              <span className="text-[#7b6e54] text-[9px]">Sig: 3e14...44ba</span>
-              <span className="bg-[#fef3c7] text-[#92400e] font-bold text-[9px] px-2 py-0.5">
-                RESULT: SUCCESS
-              </span>
-            </div>
-          </div>
+              return (
+                <div key={log.id} className="py-2.5 flex flex-wrap items-center justify-between gap-2">
+                  <div className="flex items-center gap-3">
+                    <span className="text-[#7b6e54]">[{dateStr}]</span>
+                    <span className="font-bold text-[#1a1816]">{log.user?.email || 'system.security'}</span>
+                    <span className={`px-1.5 py-0.2 font-bold text-[9px] ${
+                      isDanger
+                        ? 'bg-[#fee2e2] text-[#991b1b]'
+                        : isWarning
+                        ? 'bg-[#fef3c7] text-[#92400e]'
+                        : 'bg-[#d5cdc0] text-[#1a1816]'
+                    }`}>
+                      {log.eventType}
+                    </span>
+                    <span className="text-[#59544c]">
+                      {log.ipAddress ? `IP: ${log.ipAddress}` : 'Telemetry Event'}
+                    </span>
+                  </div>
+                  <div className="flex items-center gap-3">
+                    <span className="text-[#7b6e54] text-[9px]">ID: {log.id.slice(-8)}</span>
+                    <span className={`font-bold text-[9px] px-2 py-0.5 ${
+                      isDanger
+                        ? 'bg-[#fee2e2] text-[#991b1b]'
+                        : isWarning
+                        ? 'bg-[#fef3c7] text-[#92400e]'
+                        : 'bg-[#dcfce7] text-[#166534]'
+                    }`}>
+                      {log.severity}
+                    </span>
+                  </div>
+                </div>
+              );
+            })
+          ) : (
+            <>
+              <div className="py-2.5 flex flex-wrap items-center justify-between gap-2">
+                <div className="flex items-center gap-3">
+                  <span className="text-[#7b6e54]">[08:59:12 UTC]</span>
+                  <span className="font-bold text-[#1a1816]">admin.vance@vanta.com</span>
+                  <span className="bg-[#d5cdc0] text-[#1a1816] px-1.5 py-0.2 font-bold text-[9px]">
+                    MODIFIED_STOCK
+                  </span>
+                  <span className="text-[#59544c]">SKU VNT-X01-CRM-99 (+10 units replenished)</span>
+                </div>
+                <div className="flex items-center gap-3">
+                  <span className="text-[#7b6e54] text-[9px]">Sig: 9f84...12a4</span>
+                  <span className="bg-[#fef3c7] text-[#92400e] font-bold text-[9px] px-2 py-0.5">
+                    RESULT: SUCCESS
+                  </span>
+                </div>
+              </div>
 
-          <div className="py-2.5 flex flex-wrap items-center justify-between gap-2">
-            <div className="flex items-center gap-3">
-              <span className="text-[#7b6e54]">[07:55:40 UTC]</span>
-              <span className="font-bold text-[#1a1816]">system.security</span>
-              <span className="bg-[#fee2e2] text-[#991b1b] px-1.5 py-0.2 font-bold text-[9px]">
-                AUTH_BLOCKED
-              </span>
-              <span className="text-[#59544c]">
-                IP 194.26.29.11 exceeded threshold (5 failed attempts / 30s)
-              </span>
-            </div>
-            <div className="flex items-center gap-3">
-              <span className="text-[#7b6e54] text-[9px]">Sig: 0a99...28be</span>
-              <span className="bg-[#fee2e2] text-[#991b1b] font-bold text-[9px] px-2 py-0.5">
-                RESULT: BLOCKED
-              </span>
-            </div>
-          </div>
+              <div className="py-2.5 flex flex-wrap items-center justify-between gap-2">
+                <div className="flex items-center gap-3">
+                  <span className="text-[#7b6e54]">[08:14:02 UTC]</span>
+                  <span className="font-bold text-[#1a1816]">order.lead@vanta.com</span>
+                  <span className="bg-[#d5cdc0] text-[#1a1816] px-1.5 py-0.2 font-bold text-[9px]">
+                    STATUS_UPDATE
+                  </span>
+                  <span className="text-[#59544c]">Order #VNT-9821 (PACKED → SHIPPED)</span>
+                </div>
+                <div className="flex items-center gap-3">
+                  <span className="text-[#7b6e54] text-[9px]">Sig: 3e14...44ba</span>
+                  <span className="bg-[#fef3c7] text-[#92400e] font-bold text-[9px] px-2 py-0.5">
+                    RESULT: SUCCESS
+                  </span>
+                </div>
+              </div>
 
-          <div className="py-2.5 flex flex-wrap items-center justify-between gap-2">
-            <div className="flex items-center gap-3">
-              <span className="text-[#7b6e54]">[06:20:15 UTC]</span>
-              <span className="font-bold text-[#1a1816]">admin.vance@vanta.com</span>
-              <span className="bg-[#d5cdc0] text-[#1a1816] px-1.5 py-0.2 font-bold text-[9px]">
-                MFA_CHALLENGE_VERIFIED
-              </span>
-              <span className="text-[#59544c]">
-                Challenged &amp; passed via RFC 6238 TOTP (Terminal Node London)
-              </span>
-            </div>
-            <div className="flex items-center gap-3">
-              <span className="text-[#7b6e54] text-[9px]">Sig: ffa8...77d1</span>
-              <span className="bg-[#dcfce7] text-[#166534] font-bold text-[9px] px-2 py-0.5">
-                RESULT: AUTHORIZED
-              </span>
-            </div>
-          </div>
+              <div className="py-2.5 flex flex-wrap items-center justify-between gap-2">
+                <div className="flex items-center gap-3">
+                  <span className="text-[#7b6e54]">[07:55:40 UTC]</span>
+                  <span className="font-bold text-[#1a1816]">system.security</span>
+                  <span className="bg-[#fee2e2] text-[#991b1b] px-1.5 py-0.2 font-bold text-[9px]">
+                    AUTH_BLOCKED
+                  </span>
+                  <span className="text-[#59544c]">
+                    IP 194.26.29.11 exceeded threshold (5 failed attempts / 30s)
+                  </span>
+                </div>
+                <div className="flex items-center gap-3">
+                  <span className="text-[#7b6e54] text-[9px]">Sig: 0a99...28be</span>
+                  <span className="bg-[#fee2e2] text-[#991b1b] font-bold text-[9px] px-2 py-0.5">
+                    RESULT: BLOCKED
+                  </span>
+                </div>
+              </div>
+
+              <div className="py-2.5 flex flex-wrap items-center justify-between gap-2">
+                <div className="flex items-center gap-3">
+                  <span className="text-[#7b6e54]">[06:20:15 UTC]</span>
+                  <span className="font-bold text-[#1a1816]">admin.vance@vanta.com</span>
+                  <span className="bg-[#d5cdc0] text-[#1a1816] px-1.5 py-0.2 font-bold text-[9px]">
+                    MFA_CHALLENGE_VERIFIED
+                  </span>
+                  <span className="text-[#59544c]">
+                    Challenged &amp; passed via RFC 6238 TOTP (Terminal Node London)
+                  </span>
+                </div>
+                <div className="flex items-center gap-3">
+                  <span className="text-[#7b6e54] text-[9px]">Sig: ffa8...77d1</span>
+                  <span className="bg-[#dcfce7] text-[#166534] font-bold text-[9px] px-2 py-0.5">
+                    RESULT: AUTHORIZED
+                  </span>
+                </div>
+              </div>
+            </>
+          )}
         </div>
 
         {/* Merkle Root Hash footer matching Image 4 */}
