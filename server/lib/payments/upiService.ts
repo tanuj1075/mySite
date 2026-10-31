@@ -608,20 +608,53 @@ export class UpiPaymentService {
       throw new Error('Duplicate UTR detected: This bank reference has already been claimed for another transaction.');
     }
 
-    // Atomic transaction: mark Payment and Order as SUCCESS / PAID, record audit log, and clear cart
+    // If the payment provider is configured, attempt immediate provider-side verification
+    if (this.provider.isConfigured()) {
+      try {
+        const providerStatus = await this.provider.fetchPaymentStatus(order.id);
+        if (providerStatus.status === 'SUCCESS') {
+          const paymentId = order.activePaymentId || (await prisma.payment.findFirst({ where: { orderId: order.id } }))?.id;
+          if (paymentId) {
+            await this.markPaymentSuccess({
+              orderId: order.id,
+              paymentId,
+              providerPaymentId: providerStatus.providerPaymentId,
+              upiUtr: providerStatus.upiUtr || cleanedUtr,
+              upiId: providerStatus.upiId,
+              amountReceived: providerStatus.amount || Number(order.total),
+              verificationSource: 'PROVIDER_API',
+              actorType: 'SYSTEM',
+              actorId: userId,
+            });
+
+            return {
+              success: true,
+              orderId: order.id,
+              upiUtr: cleanedUtr,
+              paymentStatus: 'PAID',
+              message: 'Payment verified by banking provider. Order confirmed.',
+            };
+          }
+        }
+      } catch (err) {
+        console.warn('[UTR_VERIFY] Provider check deferred:', err);
+      }
+    }
+
+    // Never mark an order PAID solely based on customer UTR submission without provider confirmation.
+    // Transition to VERIFYING state for reconciliation worker or webhook confirmation.
     await prisma.$transaction(async (tx) => {
       const paymentId = order.activePaymentId;
 
       if (paymentId) {
         const payment = await tx.payment.findUnique({ where: { id: paymentId } });
-        if (payment) {
+        if (payment && payment.status !== 'SUCCESS') {
           await tx.payment.update({
             where: { id: paymentId },
             data: {
-              status: 'SUCCESS',
+              status: 'VERIFYING',
               upiUtr: cleanedUtr,
-              verificationSource: 'CUSTOMER_UTR',
-              verifiedAt: new Date(),
+              verificationSource: 'CUSTOMER_UTR_PENDING',
             },
           });
 
@@ -632,8 +665,8 @@ export class UpiPaymentService {
               actorId: userId,
               action: 'CUSTOMER_UTR_SUBMITTED',
               fromStatus: payment.status,
-              toStatus: 'SUCCESS',
-              reason: `Bank UTR submitted by customer via UPI PG: ${cleanedUtr}`,
+              toStatus: 'VERIFYING',
+              reason: `Bank UTR reference submitted by customer: ${cleanedUtr}. Awaiting bank verification.`,
               metadata: { upiUtr: cleanedUtr, submittedAt: new Date().toISOString() },
             },
           });
@@ -643,15 +676,9 @@ export class UpiPaymentService {
       await tx.order.update({
         where: { id: order.id },
         data: {
-          paymentStatus: 'PAID',
-          orderStatus: 'CONFIRMED',
+          paymentStatus: 'VERIFYING',
           upiUtr: cleanedUtr,
         },
-      });
-
-      // Clear customer's cart
-      await tx.cartItem.deleteMany({
-        where: { cart: { userId } },
       });
     });
 
@@ -659,8 +686,8 @@ export class UpiPaymentService {
       success: true,
       orderId: order.id,
       upiUtr: cleanedUtr,
-      paymentStatus: 'PAID',
-      message: 'Bank UTR verified and recorded. Order confirmed successfully.',
+      paymentStatus: 'VERIFYING',
+      message: 'Bank UTR reference recorded. Payment verification in progress with banking provider.',
     };
   }
 }

@@ -16,6 +16,8 @@ import {
   verifyPassword,
 } from '../lib/auth.js';
 import {
+  decryptTotpSecret,
+  encryptTotpSecret,
   generateBackupCodes,
   generateTotpQrDataUrl,
   generateTotpSecret,
@@ -115,7 +117,8 @@ router.post('/login', async (req, res, next) => {
       const backupCode = z.string().optional().parse(req.body.backupCode);
 
       if (totpToken) {
-        if (!verifyTotpToken(totpToken, user.mfaSecret)) {
+        const plainSecret = decryptTotpSecret(user.mfaSecret);
+        if (!verifyTotpToken(totpToken, plainSecret)) {
           await recordFailedLogin(user.id, ip, ua);
           return res.status(401).json({ error: 'Invalid MFA code', mfaRequired: true });
         }
@@ -185,7 +188,8 @@ router.post('/admin/login', async (req, res, next) => {
       if (!totpToken) {
         return res.status(401).json({ error: 'MFA code required for admin login', mfaRequired: true });
       }
-      if (!verifyTotpToken(totpToken, user.mfaSecret)) {
+      const plainSecret = decryptTotpSecret(user.mfaSecret);
+      if (!verifyTotpToken(totpToken, plainSecret)) {
         await recordFailedLogin(user.id, ip, ua);
         await logSecurityEvent({ userId: user.id, eventType: 'ADMIN_MFA_FAILED', severity: 'CRITICAL', ipAddress: ip, userAgent: ua });
         return res.status(401).json({ error: 'Invalid MFA code', mfaRequired: true });
@@ -263,8 +267,8 @@ router.post('/mfa/setup', requireAuth, async (req, res, next) => {
     const uri = getTotpUri(user.email, secret);
     const qrDataUrl = await generateTotpQrDataUrl(uri);
 
-    // Store temp secret (not yet confirmed)
-    await prisma.user.update({ where: { id: user.id }, data: { mfaSecret: secret } });
+    // Store encrypted secret at rest (not yet confirmed)
+    await prisma.user.update({ where: { id: user.id }, data: { mfaSecret: encryptTotpSecret(secret) } });
 
     const ip = getClientIp(req);
     const ua = req.headers['user-agent'] ?? 'unknown';
@@ -285,7 +289,8 @@ router.post('/mfa/verify', requireAuth, async (req, res, next) => {
     if (!user || !user.mfaSecret) return res.status(400).json({ error: 'MFA setup not initiated. Call /auth/mfa/setup first.' });
     if (user.mfaEnabled) return res.status(409).json({ error: 'MFA is already enabled' });
 
-    if (!verifyTotpToken(totpToken, user.mfaSecret)) {
+    const plainSecret = decryptTotpSecret(user.mfaSecret);
+    if (!verifyTotpToken(totpToken, plainSecret)) {
       return res.status(401).json({ error: 'Invalid TOTP code. Ensure your authenticator app is synced.' });
     }
 
@@ -324,7 +329,8 @@ router.post('/mfa/disable', requireAuth, async (req, res, next) => {
     const passwordOk = await verifyPassword(password, user.passwordHash);
     if (!passwordOk) return res.status(401).json({ error: 'Invalid password' });
 
-    if (!user.mfaSecret || !verifyTotpToken(totpToken, user.mfaSecret)) {
+    const plainSecret = user.mfaSecret ? decryptTotpSecret(user.mfaSecret) : '';
+    if (!plainSecret || !verifyTotpToken(totpToken, plainSecret)) {
       return res.status(401).json({ error: 'Invalid TOTP code' });
     }
 

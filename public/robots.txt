@@ -1,0 +1,8 @@
+# VANTA ARCHIVE - Production Crawling Policy
+User-agent: *
+Allow: /
+Disallow: /api/
+Disallow: /admin
+Disallow: /checkout
+
+Sitemap: https://vanta-archive.vercel.app/sitemap.xml
