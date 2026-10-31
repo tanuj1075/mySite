@@ -1,0 +1,59 @@
+@import "tailwindcss";
+
+@theme {
+  --font-headline: "Bodoni Moda", Georgia, serif;
+  --font-mono: "Space Mono", monospace, monospace;
+  
+  --color-surface: #ede7dd;
+  --color-surface-dim: #e4ddcf;
+  --color-surface-bright: #fbf8f4;
+  --color-surface-lowest: #ded6c8;
+  --color-surface-low: #eae2d4;
+  --color-surface-container: #f5efe6;
+  --color-surface-high: #f9f6f0;
+  --color-surface-highest: #ffffff;
+  --color-on-surface: #1a1816;
+  --color-on-surface-variant: #59544c;
+  --color-outline: #b5ac9d;
+  --color-outline-variant: #d5cdc0;
+  --color-primary: #141312;
+  --color-on-primary: #f5efe6;
+  --color-accent-bronze: #7b6e54;
+}
+
+@layer base {
+  * {
+    border-color: #d5cdc0;
+    border-radius: 0 !important;
+  }
+  
+  html, body {
+    background-color: #ede7dd;
+    color: #1a1816;
+    font-family: "Space Mono", monospace;
+  }
+
+  /* Custom subtle brutalist scrollbar */
+  ::-webkit-scrollbar {
+    width: 5px;
+    height: 5px;
+  }
+  ::-webkit-scrollbar-track {
+    background: #ede7dd;
+  }
+  ::-webkit-scrollbar-thumb {
+    background: #c5bcad;
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    background: #8e8474;
+  }
+}
+
+.font-headline {
+  font-family: "Bodoni Moda", Georgia, serif;
+}
+
+.font-mono-tech {
+  font-family: "Space Mono", monospace;
+}
+

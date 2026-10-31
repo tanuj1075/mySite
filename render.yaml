@@ -1,0 +1,37 @@
+services:
+  - type: web
+    name: vanta-ecommerce
+    env: node
+    plan: standard
+    buildCommand: npm install && npx prisma db push && npm run build
+    startCommand: npm start
+    healthCheckPath: /api/health
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 10000
+      - key: DATABASE_URL
+        fromDatabase:
+          name: vanta-postgres
+          property: connectionString
+      - key: JWT_SECRET
+        generateValue: true
+      - key: JWT_REFRESH_SECRET
+        generateValue: true
+      - key: CLIENT_URL
+        sync: false
+      - key: CASHFREE_APP_ID
+        sync: false
+      - key: CASHFREE_SECRET_KEY
+        sync: false
+      - key: CASHFREE_ENV
+        value: production
+      - key: CASHFREE_API_VERSION
+        value: "2023-08-01"
+
+databases:
+  - name: vanta-postgres
+    plan: standard
+    databaseName: vanta_archive
+    user: postgres
