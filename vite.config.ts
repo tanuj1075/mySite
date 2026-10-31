@@ -1,6 +1,5 @@
 import tailwindcss from '@tailwindcss/vite';
 import react from '@vitejs/plugin-react';
-<<<<<<< HEAD
 import fs from 'node:fs';
 import path from 'path';
 import { defineConfig, loadEnv } from 'vite';
@@ -22,11 +21,6 @@ function copyStaticImagesPlugin() {
   };
 }
 
-=======
-import path from 'path';
-import { defineConfig, loadEnv } from 'vite';
-
->>>>>>> f06a4a73293268b8c14a582969c92981c4dabe61
 export default defineConfig(({ mode }) => {
   const env = loadEnv(mode, process.cwd(), 'VITE_');
   const apiUrl = env.VITE_API_URL?.trim();
@@ -45,14 +39,21 @@ export default defineConfig(({ mode }) => {
   }
 
   return {
-<<<<<<< HEAD
     plugins: [react(), tailwindcss(), copyStaticImagesPlugin()],
-=======
-    plugins: [react(), tailwindcss()],
->>>>>>> f06a4a73293268b8c14a582969c92981c4dabe61
     resolve: {
       alias: {
         '@': path.resolve(__dirname, '.'),
+      },
+    },
+    build: {
+      chunkSizeWarningLimit: 1600,
+      rollupOptions: {
+        output: {
+          manualChunks: {
+            'vendor-react': ['react', 'react-dom'],
+            'vendor-ui': ['lucide-react', 'motion'],
+          },
+        },
       },
     },
     server: {
