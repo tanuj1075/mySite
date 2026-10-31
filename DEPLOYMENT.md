@@ -172,82 +172,12 @@ For additional resilience, you can also run the reconciliation worker via system
 
 ## 6. Verification and Smoke Testing Checklist
 
-After deploying to your production URL, perform this verification:
-1. **Health & Liveness Check**:
-   Visit `https://your-domain.com/api/health` -> verify response is `{"status":"ok", ...}`.
-2. **Readiness Probe**:
-   Visit `https://your-domain.com/api/health/ready` -> verify response is `{"status":"ready","database":"connected", ...}`.
-3. **Catalog & Storefront**:
-   Visit `https://your-domain.com/` -> verify products, cart, wishlist, and authentication load seamlessly.
-4. **UPI Payment Intent & Modal**:
+After deploying to your production URL, perform this 3-step verification:
+1. **Health Check**:
+   Visit `https://your-domain.com/api/health` -> verify response is `{"status":"ok"}`.
+2. **Catalog & Storefront**:
+   Visit `https://your-domain.com/` -> verify products, cart, and authentication load seamlessly.
+3. **UPI Payment Intent & Modal**:
    Place an order with UPI -> verify the dynamic QR code renders and the 15-minute countdown starts.
-5. **Admin Dashboard & MFA**:
+4. **Admin Dashboard**:
    Log in with `ADMIN_EMAIL` and `ADMIN_PASSWORD` -> navigate to **Commerce > Payments & UPI** -> verify transaction metrics and audit logs.
-
----
-
-## 7. Safe Production Database Migration Procedure
-
-In production, **never** execute `prisma migrate reset` or destructive commands.
-Follow this standard operational procedure:
-
-1. **Test Migrations in Staging:**
-   Run migrations against a non-production staging replica first.
-2. **Execute Deployment Migration:**
-   ```bash
-   npx prisma migrate deploy
-   ```
-3. **Verify Schema Status:**
-   ```bash
-   npx prisma migrate status
-   ```
-
----
-
-## 8. Database Backup & Disaster Recovery Strategy
-
-### Automated Nightly Logical Backups
-To create a complete PostgreSQL snapshot including all tables, indexes, and constraints:
-```bash
-pg_dump -U postgres -h 127.0.0.1 -d vanta_archive -F c -b -v -f "/var/backups/vanta_$(date +%Y%m%d_%H%M%S).dump"
-```
-
-### Off-Site Backup Replication (S3 / Cloud Storage)
-```bash
-aws s3 cp /var/backups/vanta_*.dump s3://vanta-production-backups/database/ --sse AES256
-```
-
-### Complete Disaster Recovery & Restoration Procedure
-To restore from a backup snapshot in the event of an outage or data corruption:
-```bash
-# 1. Stop the application server to prevent writes
-pm2 stop vanta-api
-
-# 2. Restore PostgreSQL database from compressed snapshot
-pg_restore -U postgres -h 127.0.0.1 -d vanta_archive -v -c "/var/backups/vanta_target_snapshot.dump"
-
-# 3. Regenerate Prisma client and verify connectivity
-npx prisma generate
-curl http://127.0.0.1:4000/api/health/ready
-
-# 4. Restart application service
-pm2 restart vanta-api
-```
-
----
-
-## 9. Rollback & Emergency Invalidation Procedures
-
-If an unexpected regression occurs following a release:
-1. **Git Rollback:**
-   ```bash
-   git revert HEAD
-   git push origin main
-   ```
-2. **Revoke Active Administrator Sessions:**
-   Call `POST /api/admin/security/sessions/revoke-all` with admin credentials to force all sessions to re-authenticate with MFA.
-3. **Flush Token Cache:**
-   All expired or compromised refresh tokens can be immediately revoked in PostgreSQL:
-   ```sql
-   UPDATE "RefreshToken" SET "revokedAt" = NOW() WHERE "revokedAt" IS NULL;
-   ```

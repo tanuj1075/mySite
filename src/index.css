@@ -57,31 +57,3 @@
   font-family: "Space Mono", monospace;
 }
 
-/* Accessibility: High contrast keyboard focus state */
-:focus-visible {
-  outline: 2px solid #141312 !important;
-  outline-offset: 2px !important;
-}
-
-/* Luxury Skeleton Shimmer Loading Effect */
-@keyframes vanta-shimmer {
-  0% { background-position: -200% 0; }
-  100% { background-position: 200% 0; }
-}
-
-.skeleton-shimmer {
-  background: linear-gradient(90deg, #ede7dd 25%, #f7f2ea 50%, #ede7dd 75%);
-  background-size: 200% 100%;
-  animation: vanta-shimmer 1.8s ease-in-out infinite;
-}
-
-/* WCAG 2.2 AA Reduced-Motion Support */
-@media (prefers-reduced-motion: reduce) {
-  *, ::before, ::after {
-    animation-duration: 0.01ms !important;
-    animation-iteration-count: 1 !important;
-    transition-duration: 0.01ms !important;
-    scroll-behavior: auto !important;
-  }
-}
-

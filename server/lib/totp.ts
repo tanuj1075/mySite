@@ -48,49 +48,6 @@ export function base32Decode(base32: string): Buffer {
   return Buffer.from(bytes);
 }
 
-function getEncryptionKey(): Buffer {
-  const secret = process.env.ENCRYPTION_KEY || process.env.JWT_SECRET || 'vanta-default-key-min-32-chars-long';
-  return crypto.createHash('sha256').update(secret).digest();
-}
-
-/**
- * Encrypts a TOTP secret using AES-256-GCM before saving to database at rest.
- */
-export function encryptTotpSecret(plainSecret: string): string {
-  const key = getEncryptionKey();
-  const iv = crypto.randomBytes(12);
-  const cipher = crypto.createCipheriv('aes-256-gcm', key, iv);
-  const encrypted = Buffer.concat([cipher.update(plainSecret, 'utf8'), cipher.final()]);
-  const authTag = cipher.getAuthTag();
-  return `${iv.toString('hex')}:${authTag.toString('hex')}:${encrypted.toString('hex')}`;
-}
-
-/**
- * Decrypts an encrypted TOTP secret from database. Backwards-compatible with unencrypted Base32 secrets.
- */
-export function decryptTotpSecret(storedSecret: string): string {
-  if (!storedSecret) return '';
-  const parts = storedSecret.split(':');
-  if (parts.length !== 3) {
-    // Unencrypted legacy Base32 format
-    return storedSecret;
-  }
-  try {
-    const [ivHex, authTagHex, encryptedHex] = parts;
-    const key = getEncryptionKey();
-    const iv = Buffer.from(ivHex, 'hex');
-    const authTag = Buffer.from(authTagHex, 'hex');
-    const encrypted = Buffer.from(encryptedHex, 'hex');
-    const decipher = crypto.createDecipheriv('aes-256-gcm', key, iv);
-    decipher.setAuthTag(authTag);
-    const decrypted = Buffer.concat([decipher.update(encrypted), decipher.final()]);
-    return decrypted.toString('utf8');
-  } catch {
-    // Fallback if not an encrypted string
-    return storedSecret;
-  }
-}
-
 /**
  * Generates a cryptographically secure 20-byte Base32 secret for TOTP.
  */
