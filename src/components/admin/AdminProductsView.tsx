@@ -165,7 +165,11 @@ const INITIAL_SPECIMENS: SpecimenRegistryItem[] = [
     variantsText: 'Pending CAD',
     status: 'DRAFT',
     lastSynchronized: '3 DAYS AGO',
+<<<<<<< HEAD
     image: '/src/assets/images/kinesis_zero_shoe_1788838347108.jpg',
+=======
+    image: '/src/assets/images/kinesis_zero_shoe_17888347108.jpg',
+>>>>>>> f06a4a73293268b8c14a582969c92981c4dabe61
     colorways: [],
   },
   {

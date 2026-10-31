@@ -5,6 +5,7 @@
   "rewrites": [
     { "source": "/api/(.*)", "destination": "/api" },
     { "source": "/(.*)", "destination": "/index.html" }
+<<<<<<< HEAD
   ],
   "headers": [
     {
@@ -14,5 +15,7 @@
         { "key": "Access-Control-Allow-Origin", "value": "*" }
       ]
     }
+=======
+>>>>>>> f06a4a73293268b8c14a582969c92981c4dabe61
   ]
 }

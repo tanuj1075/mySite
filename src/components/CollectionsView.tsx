@@ -147,7 +147,11 @@ export const CollectionsView: React.FC<CollectionsViewProps> = ({
       name: 'NIKE',
       tag: 'High-performance running',
       image:
+<<<<<<< HEAD
         'https://cdn.shopify.com/s/files/1/0659/0722/8923/files/3_f738959c-aee1-4f94-8196-4e8f5851b0f1.jpg?v=1786627248',
+=======
+        'https://static.nike.com/a/images/t_PDP_1728_v1/f_auto,q_auto:eco/3b3f51b7-1d7d-4718-a5bc-7ec8d3dc9869/air-force-1-07-mens-shoes-DZejrQoC.png',
+>>>>>>> f06a4a73293268b8c14a582969c92981c4dabe61
       accent: '#d8c8af',
     },
     {
@@ -158,17 +162,28 @@ export const CollectionsView: React.FC<CollectionsViewProps> = ({
       accent: '#bfb7a8',
     },
     {
+<<<<<<< HEAD
       name: 'NEW BALANCE',
       tag: 'Archival precision craft',
       image:
         'https://cdn.shopify.com/s/files/1/0659/0722/8923/files/1_a5825699-1271-458f-bc53-256835127394.jpg?v=1787745826',
+=======
+      name: 'SKECHERS',
+      tag: 'Comfort-first movement',
+      image:
+        'https://images.skechers.com/images/400/118885_MBLK_01.jpg',
+>>>>>>> f06a4a73293268b8c14a582969c92981c4dabe61
       accent: '#d0c0a4',
     },
     {
       name: 'ASICS',
       tag: 'Cushioned everyday speed',
       image:
+<<<<<<< HEAD
         'https://cdn.shopify.com/s/files/1/0659/0722/8923/files/2_6aafbf14-2e6c-4363-96d4-024f073a6482.jpg?v=1790772488',
+=======
+        'https://www.asics.com/dw/image/v2/BBTN_PRD/on/demandware.static/-/Sites-ASICS-US-Library/default/dw9fb2d5a7/2024/ASICS-Running/JPL/Express/ASICS_Gel-Kayano_30_Storm_White_Silver.jpg?sw=600&sh=600',
+>>>>>>> f06a4a73293268b8c14a582969c92981c4dabe61
       accent: '#c7c5be',
     },
   ];
@@ -355,9 +370,12 @@ export const CollectionsView: React.FC<CollectionsViewProps> = ({
                   <img
                     src={brand.image}
                     alt={`${brand.name} sneaker product detail`}
+<<<<<<< HEAD
                     onError={(e) => {
                       (e.target as HTMLImageElement).src = '/src/assets/images/cream_runner_pedestal_1788842341279.jpg';
                     }}
+=======
+>>>>>>> f06a4a73293268b8c14a582969c92981c4dabe61
                     className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                   />
                 </div>

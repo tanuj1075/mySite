@@ -226,12 +226,15 @@ export const ProductDetailsView: React.FC<ProductDetailsViewProps> = ({
               <img
                 src={activeColor.images[activeAngle] || activeColor.images.front}
                 alt={`${product.name} - ${activeAngle} view`}
+<<<<<<< HEAD
                 onError={(e) => {
                   const target = e.target as HTMLImageElement;
                   if (!target.src.includes('cream_runner_pedestal')) {
                     target.src = '/src/assets/images/cream_runner_pedestal_1788842341279.jpg';
                   }
                 }}
+=======
+>>>>>>> f06a4a73293268b8c14a582969c92981c4dabe61
                 className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
               />
 
