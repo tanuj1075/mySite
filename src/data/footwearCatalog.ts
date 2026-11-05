@@ -24825,11 +24825,11 @@ export const INITIAL_PRODUCTS: ShoeProduct[] = [
         "hex": "#ede7dd",
         "name": "Bone White Suede",
         "images": {
-          "top": "/src/assets/images/blueprint_deconstruct_1788842375340.jpg",
-          "back": "/src/assets/images/craft_heel_detail_1788842306184.jpg",
-          "side": "/src/assets/images/core_silhouettes_shoe_1788838314612.jpg",
-          "sole": "/src/assets/images/cream_runner_pedestal_1788842341279.jpg",
-          "front": "/src/assets/images/taupe_runner_pedestal_1788842355799.jpg"
+          "top": "/assets/images/blueprint_deconstruct_1788842375340.jpg",
+          "back": "/assets/images/craft_heel_detail_1788842306184.jpg",
+          "side": "/assets/images/core_silhouettes_shoe_1788838314612.jpg",
+          "sole": "/assets/images/cream_runner_pedestal_1788842341279.jpg",
+          "front": "/assets/images/taupe_runner_pedestal_1788842355799.jpg"
         }
       }
     ],
@@ -24896,11 +24896,11 @@ export const INITIAL_PRODUCTS: ShoeProduct[] = [
         "hex": "#f5efe6",
         "name": "Cream & Electro Peach",
         "images": {
-          "top": "/src/assets/images/blueprint_deconstruct_1788842375340.jpg",
-          "back": "/src/assets/images/craft_heel_detail_1788842306184.jpg",
-          "side": "/src/assets/images/hero_welt_macro_1788842274475.jpg",
-          "sole": "/src/assets/images/core_silhouettes_shoe_1788838314612.jpg",
-          "front": "/src/assets/images/cream_runner_pedestal_1788842341279.jpg"
+          "top": "/assets/images/blueprint_deconstruct_1788842375340.jpg",
+          "back": "/assets/images/craft_heel_detail_1788842306184.jpg",
+          "side": "/assets/images/hero_welt_macro_1788842274475.jpg",
+          "sole": "/assets/images/core_silhouettes_shoe_1788838314612.jpg",
+          "front": "/assets/images/cream_runner_pedestal_1788842341279.jpg"
         }
       }
     ],
@@ -24972,22 +24972,22 @@ export const INITIAL_PRODUCTS: ShoeProduct[] = [
         "hex": "#ded6c9",
         "name": "Parchment & Egret",
         "images": {
-          "top": "/src/assets/images/blueprint_deconstruct_1788842375340.jpg",
-          "back": "/src/assets/images/hero_welt_macro_1788842274475.jpg",
-          "side": "/src/assets/images/core_silhouettes_shoe_1788838314612.jpg",
-          "sole": "/src/assets/images/craft_heel_detail_1788842306184.jpg",
-          "front": "/src/assets/images/cream_runner_pedestal_1788842341279.jpg"
+          "top": "/assets/images/blueprint_deconstruct_1788842375340.jpg",
+          "back": "/assets/images/hero_welt_macro_1788842274475.jpg",
+          "side": "/assets/images/core_silhouettes_shoe_1788838314612.jpg",
+          "sole": "/assets/images/craft_heel_detail_1788842306184.jpg",
+          "front": "/assets/images/cream_runner_pedestal_1788842341279.jpg"
         }
       },
       {
         "hex": "#141312",
         "name": "Classic Black",
         "images": {
-          "top": "/src/assets/images/core_silhouettes_shoe_1788838314612.jpg",
-          "back": "/src/assets/images/kinesis_zero_shoe_1788838347108.jpg",
-          "side": "/src/assets/images/void_runner_heel_1788838329834.jpg",
-          "sole": "/src/assets/images/blueprint_deconstruct_1788842375340.jpg",
-          "front": "/src/assets/images/void_shadow_low_1788838363234.jpg"
+          "top": "/assets/images/core_silhouettes_shoe_1788838314612.jpg",
+          "back": "/assets/images/kinesis_zero_shoe_1788838347108.jpg",
+          "side": "/assets/images/void_runner_heel_1788838329834.jpg",
+          "sole": "/assets/images/blueprint_deconstruct_1788842375340.jpg",
+          "front": "/assets/images/void_shadow_low_1788838363234.jpg"
         }
       }
     ],
@@ -25101,11 +25101,11 @@ export const INITIAL_PRODUCTS: ShoeProduct[] = [
         "hex": "#232220",
         "name": "Phantom Black & Raw Ochre",
         "images": {
-          "top": "/src/assets/images/core_silhouettes_shoe_1788838314612.jpg",
-          "back": "/src/assets/images/void_shadow_low_1788838363234.jpg",
-          "side": "/src/assets/images/kinesis_zero_shoe_1788838347108.jpg",
-          "sole": "/src/assets/images/blueprint_deconstruct_1788842375340.jpg",
-          "front": "/src/assets/images/void_runner_heel_1788838329834.jpg"
+          "top": "/assets/images/core_silhouettes_shoe_1788838314612.jpg",
+          "back": "/assets/images/void_shadow_low_1788838363234.jpg",
+          "side": "/assets/images/kinesis_zero_shoe_1788838347108.jpg",
+          "sole": "/assets/images/blueprint_deconstruct_1788842375340.jpg",
+          "front": "/assets/images/void_runner_heel_1788838329834.jpg"
         }
       }
     ],
@@ -25178,11 +25178,11 @@ export const INITIAL_PRODUCTS: ShoeProduct[] = [
         "hex": "#6a6864",
         "name": "Castlerock Grey & Suede",
         "images": {
-          "top": "/src/assets/images/blueprint_deconstruct_1788842375340.jpg",
-          "back": "/src/assets/images/craft_heel_detail_1788842306184.jpg",
-          "side": "/src/assets/images/core_silhouettes_shoe_1788838314612.jpg",
-          "sole": "/src/assets/images/cream_runner_pedestal_1788842341279.jpg",
-          "front": "/src/assets/images/taupe_runner_pedestal_1788842355799.jpg"
+          "top": "/assets/images/blueprint_deconstruct_1788842375340.jpg",
+          "back": "/assets/images/craft_heel_detail_1788842306184.jpg",
+          "side": "/assets/images/core_silhouettes_shoe_1788838314612.jpg",
+          "sole": "/assets/images/cream_runner_pedestal_1788842341279.jpg",
+          "front": "/assets/images/taupe_runner_pedestal_1788842355799.jpg"
         }
       }
     ],
@@ -25260,22 +25260,22 @@ export const INITIAL_PRODUCTS: ShoeProduct[] = [
         "hex": "#ede7dd",
         "name": "Chalk White & Sand",
         "images": {
-          "top": "/src/assets/images/hero_welt_macro_1788842274475.jpg",
-          "back": "/src/assets/images/craft_heel_detail_1788842306184.jpg",
-          "side": "/src/assets/images/cream_runner_pedestal_1788842341279.jpg",
-          "sole": "/src/assets/images/core_silhouettes_shoe_1788838314612.jpg",
-          "front": "/src/assets/images/taupe_runner_pedestal_1788842355799.jpg"
+          "top": "/assets/images/hero_welt_macro_1788842274475.jpg",
+          "back": "/assets/images/craft_heel_detail_1788842306184.jpg",
+          "side": "/assets/images/cream_runner_pedestal_1788842341279.jpg",
+          "sole": "/assets/images/core_silhouettes_shoe_1788838314612.jpg",
+          "front": "/assets/images/taupe_runner_pedestal_1788842355799.jpg"
         }
       },
       {
         "hex": "#1a1816",
         "name": "Core Black",
         "images": {
-          "top": "/src/assets/images/core_silhouettes_shoe_1788838314612.jpg",
-          "back": "/src/assets/images/kinesis_zero_shoe_1788838347108.jpg",
-          "side": "/src/assets/images/void_runner_heel_1788838329834.jpg",
-          "sole": "/src/assets/images/blueprint_deconstruct_1788842375340.jpg",
-          "front": "/src/assets/images/void_shadow_low_1788838363234.jpg"
+          "top": "/assets/images/core_silhouettes_shoe_1788838314612.jpg",
+          "back": "/assets/images/kinesis_zero_shoe_1788838347108.jpg",
+          "side": "/assets/images/void_runner_heel_1788838329834.jpg",
+          "sole": "/assets/images/blueprint_deconstruct_1788842375340.jpg",
+          "front": "/assets/images/void_shadow_low_1788838363234.jpg"
         }
       }
     ],
@@ -25375,22 +25375,22 @@ export const INITIAL_PRODUCTS: ShoeProduct[] = [
         "hex": "#ded6c9",
         "name": "Wolf Grey & Pure White",
         "images": {
-          "top": "/src/assets/images/blueprint_deconstruct_1788842375340.jpg",
-          "back": "/src/assets/images/craft_heel_detail_1788842306184.jpg",
-          "side": "/src/assets/images/hero_welt_macro_1788842274475.jpg",
-          "sole": "/src/assets/images/core_silhouettes_shoe_1788838314612.jpg",
-          "front": "/src/assets/images/cream_runner_pedestal_1788842341279.jpg"
+          "top": "/assets/images/blueprint_deconstruct_1788842375340.jpg",
+          "back": "/assets/images/craft_heel_detail_1788842306184.jpg",
+          "side": "/assets/images/hero_welt_macro_1788842274475.jpg",
+          "sole": "/assets/images/core_silhouettes_shoe_1788838314612.jpg",
+          "front": "/assets/images/cream_runner_pedestal_1788842341279.jpg"
         }
       },
       {
         "hex": "#1f1e1d",
         "name": "Triple Black",
         "images": {
-          "top": "/src/assets/images/core_silhouettes_shoe_1788838314612.jpg",
-          "back": "/src/assets/images/kinesis_zero_shoe_1788838347108.jpg",
-          "side": "/src/assets/images/void_runner_heel_1788838329834.jpg",
-          "sole": "/src/assets/images/blueprint_deconstruct_1788842375340.jpg",
-          "front": "/src/assets/images/void_shadow_low_1788838363234.jpg"
+          "top": "/assets/images/core_silhouettes_shoe_1788838314612.jpg",
+          "back": "/assets/images/kinesis_zero_shoe_1788838347108.jpg",
+          "side": "/assets/images/void_runner_heel_1788838329834.jpg",
+          "sole": "/assets/images/blueprint_deconstruct_1788842375340.jpg",
+          "front": "/assets/images/void_shadow_low_1788838363234.jpg"
         }
       }
     ],
@@ -25495,11 +25495,11 @@ export const INITIAL_PRODUCTS: ShoeProduct[] = [
         "hex": "#0a0a09",
         "name": "Matte Vanta Obsidian",
         "images": {
-          "top": "/src/assets/images/core_silhouettes_shoe_1788838314612.jpg",
-          "back": "/src/assets/images/kinesis_zero_shoe_1788838347108.jpg",
-          "side": "/src/assets/images/void_shadow_low_1788838363234.jpg",
-          "sole": "/src/assets/images/blueprint_deconstruct_1788842375340.jpg",
-          "front": "/src/assets/images/void_runner_heel_1788838329834.jpg"
+          "top": "/assets/images/core_silhouettes_shoe_1788838314612.jpg",
+          "back": "/assets/images/kinesis_zero_shoe_1788838347108.jpg",
+          "side": "/assets/images/void_shadow_low_1788838363234.jpg",
+          "sole": "/assets/images/blueprint_deconstruct_1788842375340.jpg",
+          "front": "/assets/images/void_runner_heel_1788838329834.jpg"
         }
       }
     ],
@@ -25574,23 +25574,23 @@ export const INITIAL_PRODUCTS: ShoeProduct[] = [
         "hex": "#3a3836",
         "name": "Slate Grey & Noir",
         "images": {
-          "top": "/src/assets/images/blueprint_deconstruct_1788842375340.jpg",
-          "back": "/src/assets/images/hero_welt_macro_1788842274475.jpg",
-          "side": "/src/assets/images/core_silhouettes_shoe_1788838314612.jpg",
-          "sole": "/src/assets/images/cream_runner_pedestal_1788842341279.jpg",
-          "front": "/src/assets/images/craft_heel_detail_1788842306184.jpg",
-          "lifestyle": "/src/assets/images/overcoat_model_1788842290581.jpg"
+          "top": "/assets/images/blueprint_deconstruct_1788842375340.jpg",
+          "back": "/assets/images/hero_welt_macro_1788842274475.jpg",
+          "side": "/assets/images/core_silhouettes_shoe_1788838314612.jpg",
+          "sole": "/assets/images/cream_runner_pedestal_1788842341279.jpg",
+          "front": "/assets/images/craft_heel_detail_1788842306184.jpg",
+          "lifestyle": "/assets/images/overcoat_model_1788842290581.jpg"
         }
       },
       {
         "hex": "#1a1816",
         "name": "Polished Basalt Noir",
         "images": {
-          "top": "/src/assets/images/core_silhouettes_shoe_1788838314612.jpg",
-          "back": "/src/assets/images/kinesis_zero_shoe_1788838347108.jpg",
-          "side": "/src/assets/images/void_runner_heel_1788838329834.jpg",
-          "sole": "/src/assets/images/cream_runner_pedestal_1788842341279.jpg",
-          "front": "/src/assets/images/void_shadow_low_1788838363234.jpg"
+          "top": "/assets/images/core_silhouettes_shoe_1788838314612.jpg",
+          "back": "/assets/images/kinesis_zero_shoe_1788838347108.jpg",
+          "side": "/assets/images/void_runner_heel_1788838329834.jpg",
+          "sole": "/assets/images/cream_runner_pedestal_1788842341279.jpg",
+          "front": "/assets/images/void_shadow_low_1788838363234.jpg"
         }
       }
     ],
@@ -25691,36 +25691,36 @@ export const INITIAL_PRODUCTS: ShoeProduct[] = [
         "hex": "#e4ddcf",
         "name": "Travertine Cream & Natural Crepe",
         "images": {
-          "top": "/src/assets/images/blueprint_deconstruct_1788842375340.jpg",
-          "back": "/src/assets/images/craft_heel_detail_1788842306184.jpg",
-          "side": "/src/assets/images/hero_welt_macro_1788842274475.jpg",
-          "sole": "/src/assets/images/core_silhouettes_shoe_1788838314612.jpg",
-          "front": "/src/assets/images/cream_runner_pedestal_1788842341279.jpg",
-          "onFeet": "/src/assets/images/ss25_monolith_model_1788838295128.jpg",
-          "lifestyle": "/src/assets/images/travertine_model_1788842319956.jpg"
+          "top": "/assets/images/blueprint_deconstruct_1788842375340.jpg",
+          "back": "/assets/images/craft_heel_detail_1788842306184.jpg",
+          "side": "/assets/images/hero_welt_macro_1788842274475.jpg",
+          "sole": "/assets/images/core_silhouettes_shoe_1788838314612.jpg",
+          "front": "/assets/images/cream_runner_pedestal_1788842341279.jpg",
+          "onFeet": "/assets/images/ss25_monolith_model_1788838295128.jpg",
+          "lifestyle": "/assets/images/travertine_model_1788842319956.jpg"
         }
       },
       {
         "hex": "#141312",
         "name": "Obsidian Black",
         "images": {
-          "top": "/src/assets/images/core_silhouettes_shoe_1788838314612.jpg",
-          "back": "/src/assets/images/kinesis_zero_shoe_1788838347108.jpg",
-          "side": "/src/assets/images/void_shadow_low_1788838363234.jpg",
-          "sole": "/src/assets/images/blueprint_deconstruct_1788842375340.jpg",
-          "front": "/src/assets/images/void_runner_heel_1788838329834.jpg",
-          "lifestyle": "/src/assets/images/brutalist_hoodie_model_1788838400495.jpg"
+          "top": "/assets/images/core_silhouettes_shoe_1788838314612.jpg",
+          "back": "/assets/images/kinesis_zero_shoe_1788838347108.jpg",
+          "side": "/assets/images/void_shadow_low_1788838363234.jpg",
+          "sole": "/assets/images/blueprint_deconstruct_1788842375340.jpg",
+          "front": "/assets/images/void_runner_heel_1788838329834.jpg",
+          "lifestyle": "/assets/images/brutalist_hoodie_model_1788838400495.jpg"
         }
       },
       {
         "hex": "#8e8474",
         "name": "Mineral Taupe",
         "images": {
-          "top": "/src/assets/images/hero_welt_macro_1788842274475.jpg",
-          "back": "/src/assets/images/cream_runner_pedestal_1788842341279.jpg",
-          "side": "/src/assets/images/craft_heel_detail_1788842306184.jpg",
-          "sole": "/src/assets/images/core_silhouettes_shoe_1788838314612.jpg",
-          "front": "/src/assets/images/taupe_runner_pedestal_1788842355799.jpg"
+          "top": "/assets/images/hero_welt_macro_1788842274475.jpg",
+          "back": "/assets/images/cream_runner_pedestal_1788842341279.jpg",
+          "side": "/assets/images/craft_heel_detail_1788842306184.jpg",
+          "sole": "/assets/images/core_silhouettes_shoe_1788838314612.jpg",
+          "front": "/assets/images/taupe_runner_pedestal_1788842355799.jpg"
         }
       }
     ],
@@ -25861,7 +25861,7 @@ export const INITIAL_DROPS: SneakerDrop[] = [
     productName: 'Void Runner Spec 02 Limited Drop',
     brand: 'VANTA ATELIER',
     edition: 'STASIS PROTOCOL // 500 UNITS GLOBALLY',
-    image: '/src/assets/images/void_runner_heel_1788838329834.jpg',
+    image: '/assets/images/void_runner_heel_1788838329834.jpg',
     price: 590,
     mrp: 750,
     launchDate: '2026-09-10',
@@ -25877,7 +25877,7 @@ export const INITIAL_DROPS: SneakerDrop[] = [
     productName: 'X-01 Carbon Basalt Monochrome',
     brand: 'VANTA ATELIER',
     edition: 'SPECIAL TI-01 HARDWARE EDITION',
-    image: '/src/assets/images/cream_runner_pedestal_1788842341279.jpg',
+    image: '/assets/images/cream_runner_pedestal_1788842341279.jpg',
     price: 520,
     mrp: 650,
     launchDate: '2026-09-18',
@@ -25903,7 +25903,7 @@ export const INITIAL_ORDERS: Order[] = [
         size: '8',
         price: 480,
         quantity: 1,
-        image: '/src/assets/images/cream_runner_pedestal_1788842341279.jpg',
+        image: '/assets/images/cream_runner_pedestal_1788842341279.jpg',
       },
     ],
     subtotal: 480,
@@ -25988,7 +25988,7 @@ export const INITIAL_EXCHANGES: ExchangeReturnRequest[] = [
     type: 'EXCHANGE',
     productId: 'vn-shoe-01',
     productName: 'X-01 Architectural Runner',
-    productImage: '/src/assets/images/cream_runner_pedestal_1788842341279.jpg',
+    productImage: '/assets/images/cream_runner_pedestal_1788842341279.jpg',
     currentSize: '8',
     requestedSize: '9',
     reason: 'Size too small. Require half size larger for running stride.',
@@ -26039,8 +26039,8 @@ export const INITIAL_REVIEWS: ReviewItem[] = [
     qualityRating: 5,
     designRating: 5,
     photos: [
-      '/src/assets/images/cream_runner_pedestal_1788842341279.jpg',
-      '/src/assets/images/hero_welt_macro_1788842274475.jpg',
+      '/assets/images/cream_runner_pedestal_1788842341279.jpg',
+      '/assets/images/hero_welt_macro_1788842274475.jpg',
     ],
     helpfulCount: 38,
   },
@@ -26059,7 +26059,7 @@ export const INITIAL_REVIEWS: ReviewItem[] = [
     fitRating: 4,
     qualityRating: 5,
     designRating: 5,
-    photos: ['/src/assets/images/craft_heel_detail_1788842306184.jpg'],
+    photos: ['/assets/images/craft_heel_detail_1788842306184.jpg'],
     helpfulCount: 24,
   },
   {

@@ -57,7 +57,7 @@ const INITIAL_ORDERS: OrderItem[] = [
     lifetimeOrders: '8 Lifetime Orders // ₹3.4L',
     destination: 'Via Montenapoleone 14, Piano 3, Apt 12B, 20121 Milan, Italy',
     snapshotItem: 'X-01 Core Runner Travertine / US 9',
-    itemImage: '/src/assets/images/cream_runner_pedestal_1788842341279.jpg',
+    itemImage: '/assets/images/cream_runner_pedestal_1788842341279.jpg',
     shade: 'Cream Travertine',
     size: 'EU 43 / US 9',
     sku: 'VNT-X01-CRM-09',
@@ -107,7 +107,7 @@ const INITIAL_ORDERS: OrderItem[] = [
     lifetimeOrders: '4 Lifetime Orders // ₹1.6L',
     destination: '42 Rue du Faubourg Saint-Honoré, 75008 Paris, France',
     snapshotItem: 'Aero Minimalist Derby Obsidian / US 8',
-    itemImage: '/src/assets/images/void_shadow_low_1788838363234.jpg',
+    itemImage: '/assets/images/void_shadow_low_1788838363234.jpg',
     shade: 'Obsidian Black',
     size: 'EU 42 / US 8',
     sku: 'VNT-M04-DER-01',
@@ -145,7 +145,7 @@ const INITIAL_ORDERS: OrderItem[] = [
     lifetimeOrders: '12 Lifetime Orders // ₹5.8L',
     destination: 'Biblioteksgatan 9, 111 46 Stockholm, Sweden',
     snapshotItem: 'Monolith Mules S-02 Raw Slate / US 11',
-    itemImage: '/src/assets/images/taupe_runner_pedestal_1788842355799.jpg',
+    itemImage: '/assets/images/taupe_runner_pedestal_1788842355799.jpg',
     shade: 'Raw Slate',
     size: 'EU 45 / US 11',
     sku: 'VNT-S02-MUL-11',
@@ -177,7 +177,7 @@ const INITIAL_ORDERS: OrderItem[] = [
     lifetimeOrders: '6 Lifetime Orders // ₹2.9L',
     destination: 'Altamount Road, Tower B-14, Cumballa Hill, Mumbai 400026',
     snapshotItem: 'Tectonic Chelsea Boot Nocciola / US 10',
-    itemImage: '/src/assets/images/core_silhouettes_shoe_1788838314612.jpg',
+    itemImage: '/assets/images/core_silhouettes_shoe_1788838314612.jpg',
     shade: 'Nocciola Brown',
     size: 'EU 44 / US 10',
     sku: 'VNT-C01-NOC-10',
@@ -209,7 +209,7 @@ const INITIAL_ORDERS: OrderItem[] = [
     lifetimeOrders: '9 Lifetime Orders // ₹4.1L',
     destination: '10 Marina Boulevard, Tower 2 #24-02, Singapore 018983',
     snapshotItem: 'X-01 Core Runner Chalk Bone / US 7',
-    itemImage: '/src/assets/images/cream_runner_pedestal_1788842341279.jpg',
+    itemImage: '/assets/images/cream_runner_pedestal_1788842341279.jpg',
     shade: 'Chalk Bone',
     size: 'EU 40 / US 7',
     sku: 'VNT-X01-CHK-07',
@@ -269,7 +269,7 @@ export const AdminLogisticsView: React.FC<AdminLogisticsViewProps> = ({
         color: 'Onyx',
         size: 'US 9',
         sku: 'VNT-SPEC-01',
-        image: '/src/assets/images/cream_runner_pedestal_1788842341279.jpg',
+        image: '/assets/images/cream_runner_pedestal_1788842341279.jpg',
         price: ord.total,
       };
 
@@ -298,7 +298,7 @@ export const AdminLogisticsView: React.FC<AdminLogisticsViewProps> = ({
           ord.shippingAddress.phone ? `📞 ${ord.shippingAddress.phone}` : null,
         ].filter(Boolean).join(', '),
         snapshotItem: `${firstItem.name} ${firstItem.color} / Size ${firstItem.size}`,
-        itemImage: firstItem.image || '/src/assets/images/cream_runner_pedestal_1788842341279.jpg',
+        itemImage: firstItem.image || '/assets/images/cream_runner_pedestal_1788842341279.jpg',
         shade: firstItem.color,
         size: `${firstItem.sizeSystem && firstItem.sizeSystem !== 'Size' ? `${firstItem.sizeSystem} ` : firstItem.sizeSystem ? '' : 'US '}${firstItem.size}`,
         sku: firstItem.sku,
@@ -907,7 +907,7 @@ export const AdminLogisticsView: React.FC<AdminLogisticsViewProps> = ({
                   </div>
                   <div className="flex gap-3">
                     <img
-                      src="/src/assets/images/cream_runner_pedestal_1788842341279.jpg"
+                      src="/assets/images/cream_runner_pedestal_1788842341279.jpg"
                       alt="Returned"
                       className="w-20 h-20 object-cover border border-[#d5cdc0] rounded-2xs"
                     />
@@ -940,7 +940,7 @@ export const AdminLogisticsView: React.FC<AdminLogisticsViewProps> = ({
                     </div>
                     <div className="flex gap-3">
                       <img
-                        src="/src/assets/images/cream_runner_pedestal_1788842341279.jpg"
+                        src="/assets/images/cream_runner_pedestal_1788842341279.jpg"
                         alt="Replacement"
                         className="w-20 h-20 object-cover border border-[#d5cdc0] rounded-2xs"
                       />

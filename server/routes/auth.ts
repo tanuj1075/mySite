@@ -367,7 +367,11 @@ router.post('/password-reset/request', async (req, res, next) => {
 
     // TODO: Send email with reset link containing rawToken
     // Example: sendEmail(user.email, `Reset your password: https://yoursite.com/reset-password?token=${rawToken}`)
-    console.info(`[DEV] Password reset token for ${user.email}: ${rawToken}`);
+    // SECURITY: Only log the reset token in development. In production, the token MUST be delivered
+    // exclusively via email to prevent account takeover via log access.
+    if (process.env.NODE_ENV !== 'production') {
+      console.info(`[DEV] Password reset token for ${user.email}: ${rawToken}`);
+    }
   } catch (error) { next(error); }
 });
 

@@ -38,7 +38,7 @@ const INITIAL_SPECIMENS: SpecimenRegistryItem[] = [
     variantsText: '2 Clrs / 16 SKUs',
     status: 'ACTIVE',
     lastSynchronized: '12 MINS AGO',
-    image: '/src/assets/images/cream_runner_pedestal_1788842341279.jpg',
+    image: '/assets/images/cream_runner_pedestal_1788842341279.jpg',
     colorways: [
       {
         name: 'COLORWAY: TRAVERTINE CREAM',
@@ -84,7 +84,7 @@ const INITIAL_SPECIMENS: SpecimenRegistryItem[] = [
     variantsText: '1 Clr / 8 SKUs',
     status: 'ACTIVE',
     lastSynchronized: '1 HR AGO',
-    image: '/src/assets/images/void_shadow_low_1788838363234.jpg',
+    image: '/assets/images/void_shadow_low_1788838363234.jpg',
     colorways: [
       {
         name: 'COLORWAY: PITCH OBSIDIAN',
@@ -112,7 +112,7 @@ const INITIAL_SPECIMENS: SpecimenRegistryItem[] = [
     variantsText: '3 Clrs / 24 SKUs',
     status: 'CRITICAL',
     lastSynchronized: '3 HRS AGO',
-    image: '/src/assets/images/taupe_runner_pedestal_1788842355799.jpg',
+    image: '/assets/images/taupe_runner_pedestal_1788842355799.jpg',
     colorways: [
       {
         name: 'COLORWAY: RAW CLAY // DESERT',
@@ -139,7 +139,7 @@ const INITIAL_SPECIMENS: SpecimenRegistryItem[] = [
     variantsText: '2 Clrs / 8 SKUs',
     status: 'ACTIVE',
     lastSynchronized: 'YESTERDAY',
-    image: '/src/assets/images/modular_shell_jacket_1788838380925.jpg',
+    image: '/assets/images/modular_shell_jacket_1788838380925.jpg',
     colorways: [
       {
         name: 'COLORWAY: SANDSTONE MEMBRANE',
@@ -165,7 +165,7 @@ const INITIAL_SPECIMENS: SpecimenRegistryItem[] = [
     variantsText: 'Pending CAD',
     status: 'DRAFT',
     lastSynchronized: '3 DAYS AGO',
-    image: '/src/assets/images/kinesis_zero_shoe_1788838347108.jpg',
+    image: '/assets/images/kinesis_zero_shoe_1788838347108.jpg',
     colorways: [],
   },
   {
@@ -178,7 +178,7 @@ const INITIAL_SPECIMENS: SpecimenRegistryItem[] = [
     variantsText: 'Vaulted',
     status: 'ARCHIVED',
     lastSynchronized: '14 DAYS AGO',
-    image: '/src/assets/images/core_silhouettes_shoe_1788838314612.jpg',
+    image: '/assets/images/core_silhouettes_shoe_1788838314612.jpg',
     colorways: [],
   },
 ];
@@ -272,7 +272,7 @@ export const AdminProductsView: React.FC<AdminProductsViewProps> = ({
         )} SKUs`,
         status: totalStock === 0 ? 'DRAFT' : totalStock <= 6 ? 'CRITICAL' : 'ACTIVE',
         lastSynchronized: 'SYNCED LIVE',
-        image: prod.colors[0]?.images.front || '/src/assets/images/cream_runner_pedestal_1788842341279.jpg',
+        image: prod.colors[0]?.images.front || '/assets/images/cream_runner_pedestal_1788842341279.jpg',
         colorways,
       };
     });
@@ -399,7 +399,7 @@ export const AdminProductsView: React.FC<AdminProductsViewProps> = ({
       variantsText: '1 Clr / 6 SKUs',
       status: 'ACTIVE',
       lastSynchronized: 'JUST NOW',
-      image: '/src/assets/images/taupe_runner_pedestal_1788842355799.jpg',
+      image: '/assets/images/taupe_runner_pedestal_1788842355799.jpg',
       colorways: [
         {
           name: 'COLORWAY: ARCHIVAL RAW',
@@ -438,11 +438,11 @@ export const AdminProductsView: React.FC<AdminProductsViewProps> = ({
           name: 'Archival Raw',
           hex: '#E8E2D7',
           images: {
-            front: '/src/assets/images/taupe_runner_pedestal_1788842355799.jpg',
-            side: '/src/assets/images/taupe_runner_pedestal_1788842355799.jpg',
-            back: '/src/assets/images/taupe_runner_pedestal_1788842355799.jpg',
-            top: '/src/assets/images/taupe_runner_pedestal_1788842355799.jpg',
-            sole: '/src/assets/images/taupe_runner_pedestal_1788842355799.jpg',
+            front: '/assets/images/taupe_runner_pedestal_1788842355799.jpg',
+            side: '/assets/images/taupe_runner_pedestal_1788842355799.jpg',
+            back: '/assets/images/taupe_runner_pedestal_1788842355799.jpg',
+            top: '/assets/images/taupe_runner_pedestal_1788842355799.jpg',
+            sole: '/assets/images/taupe_runner_pedestal_1788842355799.jpg',
           },
         },
       ],

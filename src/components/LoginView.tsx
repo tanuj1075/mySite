@@ -300,7 +300,7 @@ export const LoginView: React.FC<LoginViewProps> = ({
             {/* Specimen Centerpiece Photograph */}
             <div className="my-8 overflow-hidden border border-[#d5cdc0] shadow-sm bg-[#ede7dd]">
               <img
-                src="/src/assets/images/cream_runner_pedestal_1788842341279.jpg"
+                src="/assets/images/cream_runner_pedestal_1788842341279.jpg"
                 alt="VANTA V-01 Archival Specimen"
                 className="w-full h-auto object-cover object-center transition-transform duration-700 hover:scale-[1.02]"
               />

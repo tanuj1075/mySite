@@ -74,7 +74,7 @@ export const CollectionsView: React.FC<CollectionsViewProps> = ({
       name: 'X-01 ARCHITECTURAL RUNNER',
       edition: 'EDITION 01 // CREAM LEATHER & TRAVERTINE',
       price: 480,
-      image: '/src/assets/images/cream_runner_pedestal_1788842341279.jpg',
+      image: '/assets/images/cream_runner_pedestal_1788842341279.jpg',
       colorway: 'Travertine Cream & Natural Crepe',
       specification: 'Size EU 42 / US 9',
       availableSizes: ['EU 39', 'EU 40', 'EU 41', 'EU 42', 'EU 43', 'EU 44', 'EU 45', 'EU 46'],
@@ -91,7 +91,7 @@ export const CollectionsView: React.FC<CollectionsViewProps> = ({
       name: 'ARCHIVAL LOW RUNNER',
       edition: 'SERIES 02 // TAUPE SUEDE CHASSIS',
       price: 520,
-      image: '/src/assets/images/taupe_runner_pedestal_1788842355799.jpg',
+      image: '/assets/images/taupe_runner_pedestal_1788842355799.jpg',
       colorway: 'Mineral Taupe & Raw Limestone',
       specification: 'Size EU 43 / US 10',
       availableSizes: ['EU 40', 'EU 41', 'EU 42', 'EU 43', 'EU 44', 'EU 45'],
@@ -108,7 +108,7 @@ export const CollectionsView: React.FC<CollectionsViewProps> = ({
       name: 'OVERSIZED TAILORED OVERCOAT',
       edition: 'CHAPTER 01 // HEAVY WOOL & STONE WEAVE',
       price: 890,
-      image: '/src/assets/images/overcoat_model_1788842290581.jpg',
+      image: '/assets/images/overcoat_model_1788842290581.jpg',
       colorway: 'Raw Travertine & Heavy Wool',
       specification: 'Size Large / 50',
       availableSizes: ['Size 46', 'Size 48', 'Size 50', 'Size 52'],
@@ -244,7 +244,7 @@ export const CollectionsView: React.FC<CollectionsViewProps> = ({
           <div className="mt-8 relative border border-[#d5cdc0] bg-[#e4ddcf] overflow-hidden group">
             <div className="relative aspect-[16/9] sm:aspect-[21/10] w-full max-h-[640px] overflow-hidden">
               <img
-                src="/src/assets/images/hero_welt_macro_1788842274475.jpg"
+                src="/assets/images/hero_welt_macro_1788842274475.jpg"
                 alt="Macro detail of artisan saddle stitching and welt on cream leather runner"
                 className="w-full h-full object-cover object-center transform transition-transform duration-700 group-hover:scale-105"
               />
@@ -356,7 +356,7 @@ export const CollectionsView: React.FC<CollectionsViewProps> = ({
                     src={brand.image}
                     alt={`${brand.name} sneaker product detail`}
                     onError={(e) => {
-                      (e.target as HTMLImageElement).src = '/src/assets/images/cream_runner_pedestal_1788842341279.jpg';
+                      (e.target as HTMLImageElement).src = '/assets/images/cream_runner_pedestal_1788842341279.jpg';
                     }}
                     className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                   />
@@ -462,7 +462,7 @@ export const CollectionsView: React.FC<CollectionsViewProps> = ({
               </div>
               <div className="aspect-[3/4] overflow-hidden relative bg-[#e4ddcf]">
                 <img
-                  src="/src/assets/images/overcoat_model_1788842290581.jpg"
+                  src="/assets/images/overcoat_model_1788842290581.jpg"
                   alt="Oversized tailored overcoat model in brutalist limestone setting"
                   className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                 />
@@ -494,7 +494,7 @@ export const CollectionsView: React.FC<CollectionsViewProps> = ({
               </div>
               <div className="aspect-[3/4] overflow-hidden relative bg-[#e4ddcf]">
                 <img
-                  src="/src/assets/images/craft_heel_detail_1788842306184.jpg"
+                  src="/assets/images/craft_heel_detail_1788842306184.jpg"
                   alt="Macro detail of shoe heel and welt stitching"
                   className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                 />
@@ -529,7 +529,7 @@ export const CollectionsView: React.FC<CollectionsViewProps> = ({
               </div>
               <div className="aspect-[3/4] overflow-hidden relative bg-[#e4ddcf]">
                 <img
-                  src="/src/assets/images/travertine_model_1788842319956.jpg"
+                  src="/assets/images/travertine_model_1788842319956.jpg"
                   alt="Model wearing neutral cream suiting and court runner in sunlit stone courtyard"
                   className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                 />
@@ -561,7 +561,7 @@ export const CollectionsView: React.FC<CollectionsViewProps> = ({
               </div>
               <div className="aspect-[3/4] overflow-hidden relative bg-[#e4ddcf]">
                 <img
-                  src="/src/assets/images/cream_runner_pedestal_1788842341279.jpg"
+                  src="/assets/images/cream_runner_pedestal_1788842341279.jpg"
                   alt="Handmade luxury cream sneaker resting on rough travertine block"
                   className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                 />
@@ -733,7 +733,7 @@ export const CollectionsView: React.FC<CollectionsViewProps> = ({
               </div>
               <div className="aspect-[4/3] bg-[#ede7dd] border border-[#d5cdc0] overflow-hidden relative">
                 <img
-                  src="/src/assets/images/cream_runner_pedestal_1788842341279.jpg"
+                  src="/assets/images/cream_runner_pedestal_1788842341279.jpg"
                   alt="Cream runner on travertine stone pedestal"
                   className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                 />
@@ -770,7 +770,7 @@ export const CollectionsView: React.FC<CollectionsViewProps> = ({
               </div>
               <div className="aspect-[4/3] bg-[#ede7dd] border border-[#d5cdc0] overflow-hidden relative">
                 <img
-                  src="/src/assets/images/taupe_runner_pedestal_1788842355799.jpg"
+                  src="/assets/images/taupe_runner_pedestal_1788842355799.jpg"
                   alt="Archival low runner in mineral taupe suede on limestone"
                   className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                 />
@@ -862,7 +862,7 @@ export const CollectionsView: React.FC<CollectionsViewProps> = ({
               </div>
               <div className="aspect-[16/10] bg-[#ede7dd] border border-[#d5cdc0] overflow-hidden relative flex items-center justify-center">
                 <img
-                  src="/src/assets/images/blueprint_deconstruct_1788842375340.jpg"
+                  src="/assets/images/blueprint_deconstruct_1788842375340.jpg"
                   alt="Vintage architectural exploded blueprint schematic of shoe construction on cream parchment paper"
                   className="w-full h-full object-cover"
                 />

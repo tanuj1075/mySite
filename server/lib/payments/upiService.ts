@@ -1,4 +1,4 @@
-import { PrismaClient } from '@prisma/client';
+import { PrismaClient, Prisma } from '@prisma/client';
 import { prisma } from '../prisma.js';
 import { CashfreeUpiProvider } from './cashfree.js';
 import { UpiPgProvider } from './upiPg.js';
@@ -473,7 +473,7 @@ export class UpiPaymentService {
     verificationSource: string;
     actorType: 'SYSTEM' | 'WEBHOOK' | 'WORKER' | 'ADMIN';
     actorId?: string;
-    tx?: any;
+    tx?: Prisma.TransactionClient;
   }) {
     const {
       orderId,
@@ -487,7 +487,7 @@ export class UpiPaymentService {
       actorId,
     } = params;
 
-    const execute = async (tx: any) => {
+    const execute = async (tx: Prisma.TransactionClient) => {
       const order = await tx.order.findUnique({
         where: { id: orderId },
         include: { items: true },

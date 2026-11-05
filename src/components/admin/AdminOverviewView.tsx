@@ -207,7 +207,7 @@ export const AdminOverviewView: React.FC<AdminOverviewViewProps> = ({
             color,
             size: s.size,
             stock: s.stock,
-            image: p.media?.[0]?.url || p.featuredImage || '/src/assets/images/cream_runner_pedestal_1788842341279.jpg',
+            image: p.media?.[0]?.url || p.featuredImage || '/assets/images/cream_runner_pedestal_1788842341279.jpg',
           });
         }
       });
@@ -223,7 +223,7 @@ export const AdminOverviewView: React.FC<AdminOverviewViewProps> = ({
       productName: dropTitle.toUpperCase(),
       brand: 'VANTA ATELIER',
       edition: dropEdition.toUpperCase(),
-      image: '/src/assets/images/cream_runner_pedestal_1788842341279.jpg',
+      image: '/assets/images/cream_runner_pedestal_1788842341279.jpg',
       price: Number(dropPrice) || 46000,
       mrp: Number(dropMrp) || 52000,
       launchDate: '2026-11-01',

@@ -638,7 +638,7 @@ export const ProductListingView: React.FC<ProductListingViewProps> = ({
                             onError={(e) => {
                               const target = e.target as HTMLImageElement;
                               if (!target.src.includes('cream_runner_pedestal')) {
-                                target.src = '/src/assets/images/cream_runner_pedestal_1788842341279.jpg';
+                                target.src = '/assets/images/cream_runner_pedestal_1788842341279.jpg';
                               }
                             }}
                             className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"

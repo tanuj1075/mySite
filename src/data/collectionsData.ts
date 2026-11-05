@@ -23,7 +23,7 @@ export const MAIN_COLLECTION_HERO = {
     'Engineered with raw titanium hardware inserts, basalt carbon composites, and high-density woven tech-membrane. Built to withstand environmental attrition while maintaining stark brutalist silhouettes.',
   composition: 'TITANIUM / BASALT / DRY-SHELL',
   allocation: 'TIER-1 CLIENT PRIVILEGE',
-  image: '/src/assets/images/ss25_monolith_model_1788838295128.jpg',
+  image: '/assets/images/ss25_monolith_model_1788838295128.jpg',
   actionLabel: 'EXPLORE COLLECTION',
 };
 
@@ -34,7 +34,7 @@ export const CORE_SILHOUETTES_DATA = {
   editionsCount: '14 EDITIONS',
   description:
     'Timeless architectural footwear and garments constructed for permanent wear. Continuous iterative refinement eliminates the non-essential down to structural line-work and tactile mass.',
-  image: '/src/assets/images/core_silhouettes_shoe_1788838314612.jpg',
+  image: '/assets/images/core_silhouettes_shoe_1788838314612.jpg',
   status: 'PERMANENT ROTATION',
   actionLabel: 'VIEW SILHOUETTES',
 };
@@ -45,7 +45,7 @@ export const VOID_RUNNER_DROP = {
   title: 'VOID RUNNER',
   description:
     'Exclusive small-batch production numbered 01 through 500. Carbon-composite plate dynamics encased in dense, sound-dampening expanded cellular rubber.',
-  image: '/src/assets/images/void_runner_heel_1788838329834.jpg',
+  image: '/assets/images/void_runner_heel_1788838329834.jpg',
   serial: 'RUN SERIAL: M001-M500',
   authenticated: 'AUTHENTICATED',
   actionLabel: 'CLAIM FROM RUN',
@@ -66,7 +66,7 @@ export const TECHNICAL_STREETWEAR_DATA = {
       title: 'VANTA MODULAR SHELL 01',
       spec: 'WATERPROOF MEMBRANE / 3L CORDURA',
       badge: 'WATERPROOF MEMBRANE // CORE SHELL',
-      image: '/src/assets/images/modular_shell_jacket_1788838380925.jpg',
+      image: '/assets/images/modular_shell_jacket_1788838380925.jpg',
       price: 680,
       code: 'SHELL_01',
     },
@@ -75,7 +75,7 @@ export const TECHNICAL_STREETWEAR_DATA = {
       title: 'BRUTALIST ARCHIVAL HOODIE',
       spec: '600GSM DENSE WEAVE / DOUBLE SEAMED',
       badge: 'HEAVY FLEECE // SYSTEM HOOD',
-      image: '/src/assets/images/brutalist_hoodie_model_1788838400495.jpg',
+      image: '/assets/images/brutalist_hoodie_model_1788838400495.jpg',
       price: 340,
       code: 'HOODIE_01',
     },
@@ -90,7 +90,7 @@ export const BOTTOM_CHAPTERS_DATA = [
     title: 'RETRO RUNNER & BASALT',
     description:
       'Vintage brutalist track and marathon shapes re-engineered for hostile urban conditions. Deconstructed toe profiles, exposed seam taping, and high-impact dampening.',
-    image: '/src/assets/images/core_silhouettes_shoe_1788838314612.jpg',
+    image: '/assets/images/core_silhouettes_shoe_1788838314612.jpg',
     footerInfo: 'ARCHIVED EDITIONS: 11 PIECES',
     actionLabel: 'EXPLORE ARCHIVE',
   },

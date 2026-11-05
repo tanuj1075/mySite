@@ -14,7 +14,7 @@ const require = createRequire(import.meta.url);
 const countries = require('i18n-iso-countries') as typeof import('i18n-iso-countries');
 countries.registerLocale(require('i18n-iso-countries/langs/en.json'));
 
-const razorpayCurrencies = new Set([
+const supportedPaymentCurrencies = new Set([
   'AED', 'ALL', 'AMD', 'AUD', 'AWG', 'AZN', 'BAM', 'BBD', 'BDT', 'BGN', 'BHD',
   'BIF', 'BMD', 'BND', 'BOB', 'BRL', 'BSD', 'BTN', 'BWP', 'BZD', 'CAD', 'CHF',
   'CLP', 'CNY', 'COP', 'CRC', 'CUP', 'CVE', 'CZK', 'DJF', 'DKK', 'DOP', 'DZD',
@@ -30,7 +30,7 @@ const razorpayCurrencies = new Set([
 ]);
 
 const minorUnits = new Map<string, number>();
-for (const currency of razorpayCurrencies) {
+for (const currency of supportedPaymentCurrencies) {
   minorUnits.set(
     currency,
     new Intl.NumberFormat('en', { style: 'currency', currency }).resolvedOptions().maximumFractionDigits,
@@ -47,15 +47,15 @@ export function currencyForCountry(country: string) {
   if (!countryCode) throw new CurrencyQuoteError(`Could not identify shipping country "${country}"`, 422);
 
   const currency = (countryToCurrency as Record<string, string>)[countryCode];
-  if (!currency || !razorpayCurrencies.has(currency)) {
-    throw new CurrencyQuoteError(`Razorpay international checkout does not support the currency for ${country}`, 422);
+  if (!currency || !supportedPaymentCurrencies.has(currency)) {
+    throw new CurrencyQuoteError(`International payment checkout does not support the currency for ${country}`, 422);
   }
   return currency;
 }
 
 export function currencyExponent(currency: string) {
   const exponent = minorUnits.get(currency);
-  if (exponent === undefined) throw new CurrencyQuoteError(`Razorpay does not support ${currency}`, 422);
+  if (exponent === undefined) throw new CurrencyQuoteError(`Payment system does not support currency ${currency}`, 422);
   return exponent;
 }
 

@@ -431,6 +431,16 @@ export default function App() {
       return;
     }
 
+    if (adminRoute === 'panel' && !adminApi.hasSession()) {
+      setIsAdminAuthenticated(false);
+      setAdminIdentity(null);
+      setIsAdminPanelOpen(false);
+      setIsAdminSessionLoading(false);
+      setAdminSessionError(null);
+      navigateAdminRoute('/admin/login', true);
+      return;
+    }
+
     let isCurrent = true;
     setIsAdminSessionLoading(true);
     setAdminSessionError(null);
@@ -453,7 +463,7 @@ export default function App() {
     }).catch((error: unknown) => {
       if (!isCurrent) return;
       const message = error instanceof Error ? error.message : 'Admin session validation failed';
-      const isInvalidSession = /session required|invalid or expired|admin role required|no longer valid/i.test(message);
+      const isInvalidSession = /session required|invalid or expired|admin role required|no longer valid|unauthorized|forbidden|not authenticated|failed to authenticate/i.test(message);
       if (isInvalidSession) {
         clearAdminSession();
         setIsAdminAuthenticated(false);
@@ -796,7 +806,7 @@ export default function App() {
       name: 'VOID RUNNER SPEC 02',
       edition: 'ACTIVE DROP // SPEC 02 // 500 UNITS',
       price: 590,
-      image: '/src/assets/images/void_runner_heel_1788838329834.jpg',
+      image: '/assets/images/void_runner_heel_1788838329834.jpg',
       colorway: 'Carbon Void / Black',
       specification: 'US 10 / EU 44',
       availableSizes: ['US 9 / EU 42.5', 'US 9.5 / EU 43', 'US 10 / EU 44', 'US 11 / EU 45'],

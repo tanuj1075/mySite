@@ -1,4 +1,5 @@
 import { Router } from 'express';
+import type { Prisma } from '@prisma/client';
 import { z } from 'zod';
 import { prisma } from '../lib/prisma.js';
 import { requireAdmin, requireAuth } from '../middleware/auth.js';
@@ -33,7 +34,7 @@ const couponInput = z.object({ code: z.string().min(1), discountPercent: z.numbe
 router.get('/coupons', async (_req, res, next) => { try { res.json(await prisma.coupon.findMany({ orderBy: { code: 'asc' } })); } catch (error) { next(error); } });
 router.put('/coupons/:code', async (req, res, next) => { try { const input = couponInput.parse(req.body); res.json(await prisma.coupon.upsert({ where: { code: req.params.code }, update: input, create: { code: input.code!, discountPercent: input.discountPercent!, minOrderValue: input.minOrderValue!, maxDiscount: input.maxDiscount, description: input.description!, isActive: input.isActive! } })); } catch (error) { next(error); } });
 
-const dropInput = z.object({ id: z.string(), productId: z.string(), productName: z.string(), brand: z.string(), edition: z.string(), image: z.string(), price: z.number().nonnegative(), mrp: z.number().nonnegative(), launchDate: z.string(), launchTime: z.string(), stock: z.number().int().nonnegative(), status: z.enum(['Scheduled', 'Active', 'Paused', 'Completed']), targetTimestamp: z.number(), notifySubscribers: z.array(z.string()) });
+const dropInput = z.object({ id: z.string(), productId: z.string(), productName: z.string(), brand: z.string(), edition: z.string(), image: z.string(), price: z.number().nonnegative(), mrp: z.number().nonnegative(), launchDate: z.string(), launchTime: z.string(), stock: z.number().int().nonnegative(), status: z.enum(['Scheduled', 'Active', 'Paused', 'Completed']), targetTimestamp: z.number(), notifySubscribers: z.array(z.string()).max(1000) });
 router.get('/drops', async (_req, res, next) => { try { res.json(await prisma.sneakerDrop.findMany({ orderBy: { createdAt: 'desc' } })); } catch (error) { next(error); } });
 router.put('/drops/:id', async (req, res, next) => { try { const input = dropInput.parse(req.body); if (input.id !== req.params.id) return res.status(400).json({ error: 'Drop ID mismatch' }); res.json(await prisma.sneakerDrop.upsert({ where: { id: input.id }, update: input, create: { id: input.id!, productId: input.productId!, productName: input.productName!, brand: input.brand!, edition: input.edition!, image: input.image!, price: input.price!, mrp: input.mrp!, launchDate: input.launchDate!, launchTime: input.launchTime!, stock: input.stock!, status: input.status!, targetTimestamp: input.targetTimestamp!, notifySubscribers: input.notifySubscribers! } })); } catch (error) { next(error); } });
 router.patch('/drops/:id/status', async (req, res, next) => { try { const status = z.enum(['Scheduled', 'Active', 'Paused', 'Completed']).parse(req.body.status); res.json(await prisma.sneakerDrop.update({ where: { id: req.params.id }, data: { status } })); } catch (error) { next(error); } });
@@ -78,9 +79,10 @@ router.get('/security/logs', async (req, res, next) => {
     const skip = (page - 1) * limit;
     const severity = typeof req.query.severity === 'string' && req.query.severity !== 'ALL' ? req.query.severity : undefined;
     const eventType = typeof req.query.eventType === 'string' && req.query.eventType !== 'ALL' ? req.query.eventType : undefined;
-    const search = typeof req.query.search === 'string' ? req.query.search.trim() : undefined;
+    const rawSearch = typeof req.query.search === 'string' ? req.query.search.trim().slice(0, 100) : undefined;
+    const search = rawSearch || undefined;
 
-    const where: any = {};
+    const where: Prisma.SecurityLogWhereInput = {};
     if (severity) where.severity = severity;
     if (eventType) where.eventType = eventType;
     if (search) {
@@ -166,16 +168,16 @@ router.get('/security/stats', async (_req, res, next) => {
 
 router.get('/payments', async (req, res, next) => {
   try {
-    const q = typeof req.query.q === 'string' ? req.query.q.trim() : '';
+    const q = typeof req.query.q === 'string' ? req.query.q.trim().slice(0, 100) : '';
     const status = typeof req.query.status === 'string' ? req.query.status : undefined;
     const provider = typeof req.query.provider === 'string' ? req.query.provider : undefined;
     const page = Math.max(1, parseInt(String(req.query.page || '1'), 10));
     const limit = Math.min(100, Math.max(1, parseInt(String(req.query.limit || '20'), 10)));
     const skip = (page - 1) * limit;
 
-    const where: any = {};
+    const where: Prisma.PaymentWhereInput = {};
     if (status && status !== 'ALL') {
-      where.status = status;
+      where.status = status as any;
     }
     if (provider && provider !== 'ALL') {
       where.provider = provider;

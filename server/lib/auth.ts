@@ -1,51 +1,59 @@
 import bcrypt from 'bcryptjs';
 import crypto from 'node:crypto';
 import jwt from 'jsonwebtoken';
-import { hash as argon2Hash, verify as argon2Verify } from '@node-rs/argon2';
 import { prisma } from './prisma.js';
 import type { Request } from 'express';
 
 export type AuthPayload = { sub: string; role: 'CUSTOMER' | 'ADMIN'; email: string };
-const accessSecret = () => process.env.JWT_SECRET ?? '';
-const refreshSecret = () => process.env.JWT_REFRESH_SECRET ?? process.env.JWT_SECRET ?? '';
-
-// ─── Argon2id Configuration (OWASP recommended minimums) ────────────────────
-const ARGON2_OPTIONS = {
-  memoryCost: 19456,  // 19 MiB
-  timeCost: 2,
-  parallelism: 1,
+const accessSecret = () => {
+  const secret = process.env.JWT_SECRET;
+  if (!secret) {
+    if (process.env.NODE_ENV === 'production') {
+      throw new Error('JWT_SECRET must be configured in production environment');
+    }
+    return 'dev-vanta-secret-fallback-key-min-32-chars';
+  }
+  return secret;
+};
+const refreshSecret = () => {
+  const secret = process.env.JWT_REFRESH_SECRET;
+  if (!secret) {
+    if (process.env.NODE_ENV === 'production') {
+      console.warn('[SECURITY WARN] JWT_REFRESH_SECRET not configured; falling back to JWT_SECRET');
+    }
+    return accessSecret();
+  }
+  return secret;
 };
 
 // Account lockout constants
 const MAX_FAILED_ATTEMPTS = 5;
 const LOCKOUT_DURATION_MS = 15 * 60 * 1000; // 15 minutes
 
-// ─── Password Hashing (Argon2id with bcrypt migration) ────────────────────────
+// ─── Password Hashing (bcryptjs — works on all platforms including Vercel serverless) ──
+// Note: bcryptjs is used instead of @node-rs/argon2 because argon2 requires
+// native platform binaries that are not available in Vercel's Lambda runtime.
+const BCRYPT_ROUNDS = 12;
+
 export async function hashPassword(password: string): Promise<string> {
-  return argon2Hash(password, ARGON2_OPTIONS);
+  return bcrypt.hash(password, BCRYPT_ROUNDS);
 }
 
 export async function verifyPassword(password: string, storedHash: string): Promise<boolean> {
-  // Backwards-compatible: detect legacy bcrypt hashes (cost 12) and verify with bcrypt
-  if (storedHash.startsWith('$2b$') || storedHash.startsWith('$2a$')) {
-    return bcrypt.compare(password, storedHash);
-  }
-  return argon2Verify(storedHash, password);
+  // bcryptjs handles both $2b$ and $2a$ prefix hashes natively
+  return bcrypt.compare(password, storedHash);
 }
 
 /**
- * Silently migrates a bcrypt hash to Argon2id on successful login.
- * Call this after a successful verifyPassword() if you want live migration.
+ * No-op: previously migrated bcrypt → argon2id. Now we stay on bcrypt
+ * for Vercel serverless compatibility. This function is kept for API compat.
  */
 export async function migratePasswordIfNeeded(
-  userId: string,
-  password: string,
-  storedHash: string,
+  _userId: string,
+  _password: string,
+  _storedHash: string,
 ): Promise<void> {
-  if (storedHash.startsWith('$2b$') || storedHash.startsWith('$2a$')) {
-    const newHash = await hashPassword(password);
-    await prisma.user.update({ where: { id: userId }, data: { passwordHash: newHash } });
-  }
+  // No migration needed — all passwords use bcryptjs
 }
 
 // ─── Client IP Helper ─────────────────────────────────────────────────────────

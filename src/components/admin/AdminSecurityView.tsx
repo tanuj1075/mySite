@@ -399,7 +399,7 @@ export const AdminSecurityView: React.FC<AdminSecurityViewProps> = ({ onShowToas
         <div className="border border-[#d5cdc0] bg-[#ede7dd] overflow-hidden rounded-xs shadow-xs">
           <div className="relative h-48 overflow-hidden">
             <img
-              src="/src/assets/images/milan_hardware_enclave_1788929608298.jpg"
+              src="/assets/images/milan_hardware_enclave_1788929608298.jpg"
               alt="Milan Hardware Enclave"
               className="w-full h-full object-cover"
             />
@@ -417,7 +417,7 @@ export const AdminSecurityView: React.FC<AdminSecurityViewProps> = ({ onShowToas
         <div className="border border-[#d5cdc0] bg-[#ede7dd] overflow-hidden rounded-xs shadow-xs">
           <div className="relative h-48 overflow-hidden">
             <img
-              src="/src/assets/images/zero_trust_corridor_1788929623519.jpg"
+              src="/assets/images/zero_trust_corridor_1788929623519.jpg"
               alt="Zero-Trust Physical Corridor"
               className="w-full h-full object-cover"
             />
@@ -435,7 +435,7 @@ export const AdminSecurityView: React.FC<AdminSecurityViewProps> = ({ onShowToas
         <div className="border border-[#d5cdc0] bg-[#ede7dd] overflow-hidden rounded-xs shadow-xs">
           <div className="relative h-48 overflow-hidden">
             <img
-              src="/src/assets/images/biometric_security_desk_1788929637950.jpg"
+              src="/assets/images/biometric_security_desk_1788929637950.jpg"
               alt="Biometric Hardware Security"
               className="w-full h-full object-cover"
             />

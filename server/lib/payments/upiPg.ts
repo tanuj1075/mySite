@@ -86,6 +86,19 @@ export class UpiPgProvider implements UpiPaymentProvider {
    * If an automated webhook hook or forwarder is attached, verifies signature or payload authenticity.
    */
   async verifyWebhook(input: WebhookVerificationInput): Promise<WebhookVerificationResult> {
+    const webhookSecret = process.env.UPI_PG_WEBHOOK_SECRET || process.env.UPI_WEBHOOK_SECRET;
+    if (!webhookSecret) {
+      return {
+        isValid: false,
+        error: 'UPI PG direct provider requires a configured webhook secret (UPI_PG_WEBHOOK_SECRET). For verified webhooks, use Cashfree or customer Bank UTR submission.',
+      };
+    }
+
+    const receivedSecret = (input.headers['x-webhook-secret'] as string) || input.signature;
+    if (!receivedSecret || receivedSecret !== webhookSecret) {
+      return { isValid: false, error: 'Cryptographic signature or secret mismatch on UPI PG webhook' };
+    }
+
     try {
       if (!input.rawBody || input.rawBody.length === 0) {
         return { isValid: false, error: 'Empty webhook payload' };

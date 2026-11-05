@@ -122,7 +122,7 @@ export const AdminLoginView: React.FC<AdminLoginViewProps> = ({
               {/* Shoe Specimen Photographic Display */}
               <div className="mt-6 rounded-lg overflow-hidden border border-[#d5cdc0] relative shadow-xs bg-[#e4ddcf]">
                 <img
-                  src="/src/assets/images/cream_runner_pedestal_1788842341279.jpg"
+                  src="/assets/images/cream_runner_pedestal_1788842341279.jpg"
                   alt="VANTA Administrative Specimen"
                   className="w-full h-[250px] sm:h-[280px] object-cover object-center"
                 />
