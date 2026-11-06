@@ -40,7 +40,15 @@ export const AdminLoginView: React.FC<AdminLoginViewProps> = ({
     } catch (error) {
       const msg = error instanceof Error ? error.message : 'Admin authentication failed';
       if (msg.toLowerCase().includes('failed to fetch') || msg.toLowerCase().includes('network')) {
-        onShowToast('CANNOT REACH BACKEND (PORT 4000) — RUN `npm run server:dev`');
+        const isLocalDevelopment =
+          window.location.hostname === 'localhost' ||
+          window.location.hostname === '127.0.0.1' ||
+          window.location.hostname === '[::1]';
+        onShowToast(
+          isLocalDevelopment
+            ? 'CANNOT REACH BACKEND (PORT 4000) — RUN `npm run server:dev`'
+            : 'BACKEND UNREACHABLE — CHECK THE VERCEL API DEPLOYMENT AND VITE_API_URL (HTTPS; NOT localhost:4000).',
+        );
       } else if (msg.toLowerCase().includes('invalid admin credentials')) {
         onShowToast('INVALID CREDENTIALS — USE THE ADMIN_EMAIL AND ADMIN_PASSWORD FROM .ENV');
       } else {
