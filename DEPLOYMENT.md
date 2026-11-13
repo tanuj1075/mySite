@@ -32,8 +32,7 @@ Ensure these variables are configured in your hosting platform's Environment Set
 | `CASHFREE_SECRET_KEY`| Cashfree Merchant Secret Key | Found in Cashfree Dashboard under API Keys |
 | `CASHFREE_ENV` | Gateway environment | `production` (use `sandbox` for testing) |
 | `CASHFREE_API_VERSION`| Cashfree API Version | `2023-08-01` |
-| `ADMIN_EMAIL` | Initial admin account email | `admin@your-domain.com` |
-| `ADMIN_PASSWORD` | Initial admin account password | Secure 16+ character password |
+| Admin credentials | Existing administrator accounts are stored in PostgreSQL and are not created or changed by deployment builds. | No `ADMIN_*` variables are required for login or deployment. |
 
 ---
 
@@ -180,4 +179,4 @@ After deploying to your production URL, perform this 3-step verification:
 3. **UPI Payment Intent & Modal**:
    Place an order with UPI -> verify the dynamic QR code renders and the 15-minute countdown starts.
 4. **Admin Dashboard**:
-   Log in with `ADMIN_EMAIL` and `ADMIN_PASSWORD` -> navigate to **Commerce > Payments & UPI** -> verify transaction metrics and audit logs.
+   Log in with the existing administrator account -> navigate to **Commerce > Payments & UPI** -> verify transaction metrics and audit logs.
