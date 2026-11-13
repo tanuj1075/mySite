@@ -13,7 +13,7 @@ export const AdminLoginView: React.FC<AdminLoginViewProps> = ({
   onNavigateStore,
   onShowToast,
 }) => {
-  const [email, setEmail] = useState('admin@vanta.com');
+  const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [rememberDevice, setRememberDevice] = useState(true);
@@ -195,7 +195,7 @@ export const AdminLoginView: React.FC<AdminLoginViewProps> = ({
                     required
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
-                    placeholder="admin@vanta.com"
+                    placeholder="Configured admin email"
                     className="w-full bg-white border border-[#d5cdc0] px-4 py-3.5 text-[13px] text-[#1a1816] font-mono tracking-wide focus:outline-none focus:border-[#1a1816] rounded-xs shadow-2xs transition-colors"
                   />
                 </div>
