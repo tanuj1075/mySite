@@ -50,7 +50,7 @@ export const AdminLoginView: React.FC<AdminLoginViewProps> = ({
             : 'BACKEND UNREACHABLE — CHECK THE VERCEL API DEPLOYMENT AND VITE_API_URL (HTTPS; NOT localhost:4000).',
         );
       } else if (msg.toLowerCase().includes('invalid admin credentials')) {
-        onShowToast('INVALID CREDENTIALS — USE THE ADMIN_EMAIL AND ADMIN_PASSWORD FROM .ENV');
+        onShowToast('INVALID CREDENTIALS — CHECK THE EXISTING ADMIN ACCOUNT CREDENTIALS');
       } else {
         onShowToast(msg.toUpperCase());
       }
@@ -325,8 +325,8 @@ export const AdminLoginView: React.FC<AdminLoginViewProps> = ({
             </p>
             <div className="bg-[#ede7dd] border border-[#d5cdc0] p-4 mb-6 space-y-1">
               <div>
-                <span className="text-[#7b6e54]">ADMIN: </span>
-                <span className="font-bold text-[#1a1816]">admin@vanta.com</span>
+                <span className="text-[#7b6e54]">ACCOUNT: </span>
+                <span className="font-bold text-[#1a1816]">EXISTING ADMINISTRATOR</span>
               </div>
               <div>
                 <span className="text-[#7b6e54]">ROLE: </span>
