@@ -1,3 +1,5 @@
+import { hash as argon2Hash, verify as argon2Verify } from '@node-rs/argon2';
+import type { Options } from '@node-rs/argon2';
 import bcrypt from 'bcryptjs';
 import crypto from 'node:crypto';
 import jwt from 'jsonwebtoken';
@@ -30,30 +32,52 @@ const refreshSecret = () => {
 const MAX_FAILED_ATTEMPTS = 5;
 const LOCKOUT_DURATION_MS = 15 * 60 * 1000; // 15 minutes
 
-// ─── Password Hashing (bcryptjs — works on all platforms including Vercel serverless) ──
-// Note: bcryptjs is used instead of @node-rs/argon2 because argon2 requires
-// native platform binaries that are not available in Vercel's Lambda runtime.
-const BCRYPT_ROUNDS = 12;
+// @node-rs/argon2 exposes Algorithm as a const enum, unavailable at runtime with isolatedModules.
+const ARGON2ID_ALGORITHM = 2 as NonNullable<Options['algorithm']>;
+const ARGON2_OPTIONS: Options = {
+  algorithm: ARGON2ID_ALGORITHM,
+  memoryCost: 19_456,
+  timeCost: 2,
+  parallelism: 1,
+  outputLen: 32,
+};
+const BCRYPT_HASH_PATTERN = /^\$2[aby]\$\d{2}\$/;
 
 export async function hashPassword(password: string): Promise<string> {
-  return bcrypt.hash(password, BCRYPT_ROUNDS);
+  return argon2Hash(password, ARGON2_OPTIONS);
 }
 
 export async function verifyPassword(password: string, storedHash: string): Promise<boolean> {
-  // bcryptjs handles both $2b$ and $2a$ prefix hashes natively
-  return bcrypt.compare(password, storedHash);
+  try {
+    if (storedHash.startsWith('$argon2id$')) {
+      return await argon2Verify(storedHash, password);
+    }
+
+    if (BCRYPT_HASH_PATTERN.test(storedHash)) {
+      const compatibleHash = storedHash.startsWith('$2y$')
+        ? `$2b$${storedHash.slice(4)}`
+        : storedHash;
+      return await bcrypt.compare(password, compatibleHash);
+    }
+
+    return false;
+  } catch {
+    return false;
+  }
 }
 
-/**
- * No-op: previously migrated bcrypt → argon2id. Now we stay on bcrypt
- * for Vercel serverless compatibility. This function is kept for API compat.
- */
 export async function migratePasswordIfNeeded(
-  _userId: string,
-  _password: string,
-  _storedHash: string,
+  userId: string,
+  password: string,
+  storedHash: string,
 ): Promise<void> {
-  // No migration needed — all passwords use bcryptjs
+  if (!BCRYPT_HASH_PATTERN.test(storedHash)) return;
+
+  const upgradedHash = await hashPassword(password);
+  await prisma.user.updateMany({
+    where: { id: userId, passwordHash: storedHash },
+    data: { passwordHash: upgradedHash },
+  });
 }
 
 // ─── Client IP Helper ─────────────────────────────────────────────────────────

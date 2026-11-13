@@ -41,6 +41,12 @@ describe('Authentication & Security Architecture Tests', () => {
     assert.equal(await verifyPassword('IncorrectPassword', legacyBcryptHash), false);
   });
 
+  test('rejects malformed password hashes without throwing', async () => {
+    assert.equal(await verifyPassword('any-password', 'not-a-supported-hash'), false);
+    assert.equal(await verifyPassword('any-password', '$argon2id$invalid'), false);
+    assert.equal(await verifyPassword('any-password', '$2b$malformed'), false);
+  });
+
   test('issues and verifies access token with correct payload', () => {
     const payload: AuthPayload = { sub: 'usr_test123', email: 'test@vanta.com', role: 'CUSTOMER' };
     const token = issueAccessToken(payload);
