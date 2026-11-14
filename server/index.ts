@@ -21,10 +21,11 @@ import { startReconciliationWorker } from './jobs/reconcileWorker.js';
 
 declare global { namespace Express { interface Request { rawBody?: Buffer } } }
 
-if (!process.env.DATABASE_URL || !process.env.JWT_SECRET) {
-  if (process.env.NODE_ENV === 'production' && !process.env.VERCEL) {
-    console.warn('[WARN] DATABASE_URL and JWT_SECRET should be set in environment variables');
-  }
+const missingRuntimeConfig = ['DATABASE_URL', 'JWT_SECRET', 'JWT_REFRESH_SECRET'].filter(
+  (name) => !process.env[name],
+);
+if (missingRuntimeConfig.length > 0 && process.env.NODE_ENV !== 'test') {
+  throw new Error(`Missing required backend environment variables: ${missingRuntimeConfig.join(', ')}`);
 }
 const app = express();
 

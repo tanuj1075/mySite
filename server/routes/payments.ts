@@ -85,8 +85,8 @@ const submitUtrInput = z.object({
 
 /**
  * Customer Bank UTR Submission endpoint (upipg.cit.org.in protocol).
- * Allows buyers to enter the 12-digit UTR shown on their UPI app (GPay/PhonePe/Paytm/BHIM).
- * Verifies format, checks for duplicate/replay fraud, and updates order status.
+ * Allows buyers to submit the UTR shown on their UPI app (GPay/PhonePe/Paytm/BHIM).
+ * Validates format and duplicate claims, then leaves the order in VERIFYING until a trusted provider confirms settlement.
  */
 router.post('/upi/verify-utr', requireAuth, async (req, res, next) => {
   try {

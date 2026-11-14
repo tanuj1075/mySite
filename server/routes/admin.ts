@@ -4,6 +4,8 @@ import { z } from 'zod';
 import { prisma } from '../lib/prisma.js';
 import { requireAdmin, requireAuth } from '../middleware/auth.js';
 import { upiService } from '../lib/payments/upiService.js';
+import { matchesVerifiedProviderPayment, paymentAmountMatches } from '../lib/payments/verification.js';
+
 
 const router = Router();
 router.use(requireAuth, requireAdmin);
@@ -280,19 +282,38 @@ router.post('/payments/:id/reconcile', async (req, res, next) => {
     const providerStatus = await provider.fetchPaymentStatus(payment.providerOrderId || payment.orderId);
 
     if (providerStatus.status === 'SUCCESS') {
+      const storedPaymentMatchesOrder =
+        paymentAmountMatches(Number(payment.order.total), Number(payment.amount)) &&
+        payment.currency.toUpperCase() === payment.order.paymentCurrency.toUpperCase();
+      const providerPaymentMatches = matchesVerifiedProviderPayment(
+        {
+          orderId: payment.orderId,
+          providerOrderId: payment.providerOrderId,
+          amount: Number(payment.order.total),
+          currency: payment.order.paymentCurrency,
+        },
+        providerStatus,
+      );
+      if (!storedPaymentMatchesOrder || !providerPaymentMatches) {
+        return res.status(409).json({
+          error: 'Provider success response did not match the stored order, amount, currency, or transaction reference. Payment remains unconfirmed.',
+        });
+      }
+
       await upiService.markPaymentSuccess({
         orderId: payment.orderId,
         paymentId: payment.id,
         providerPaymentId: providerStatus.providerPaymentId,
         upiUtr: providerStatus.upiUtr,
         upiId: providerStatus.upiId,
-        amountReceived: providerStatus.amount || Number(payment.amount),
+        amountReceived: Number(providerStatus.amount),
         verificationSource: 'ADMIN_RECONCILE',
         actorType: 'ADMIN',
         actorId: req.auth!.sub,
       });
 
       return res.json({
+
         success: true,
         message: 'Payment verified and confirmed via provider status API',
         status: 'SUCCESS',
@@ -440,4 +461,4 @@ router.get('/payments/export/csv', async (req, res, next) => {
   } catch (error) { next(error); }
 });
 
-export default router;
+export default router;

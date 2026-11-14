@@ -9,22 +9,12 @@ import type { Request } from 'express';
 export type AuthPayload = { sub: string; role: 'CUSTOMER' | 'ADMIN'; email: string };
 const accessSecret = () => {
   const secret = process.env.JWT_SECRET;
-  if (!secret) {
-    if (process.env.NODE_ENV === 'production') {
-      throw new Error('JWT_SECRET must be configured in production environment');
-    }
-    return 'dev-vanta-secret-fallback-key-min-32-chars';
-  }
+  if (!secret) throw new Error('JWT_SECRET must be configured before authentication is used.');
   return secret;
 };
 const refreshSecret = () => {
   const secret = process.env.JWT_REFRESH_SECRET;
-  if (!secret) {
-    if (process.env.NODE_ENV === 'production') {
-      console.warn('[SECURITY WARN] JWT_REFRESH_SECRET not configured; falling back to JWT_SECRET');
-    }
-    return accessSecret();
-  }
+  if (!secret) throw new Error('JWT_REFRESH_SECRET must be configured before refresh tokens are used.');
   return secret;
 };
 

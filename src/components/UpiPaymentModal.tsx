@@ -88,6 +88,8 @@ export const UpiPaymentModal: React.FC<UpiPaymentModalProps> = ({
           setTimeout(() => {
             onPaymentVerified(res as unknown as Record<string, unknown>);
           }, 1500);
+        } else if (res.paymentStatus === 'VERIFYING') {
+          setStatus('VERIFYING');
         } else if (res.paymentStatus === 'EXPIRED') {
           setStatus('EXPIRED');
         } else if (res.paymentStatus === 'FAILED') {
@@ -143,12 +145,17 @@ export const UpiPaymentModal: React.FC<UpiPaymentModalProps> = ({
     setUtrError(null);
     try {
       const res = await customerApi.submitUpiUtr(orderId, trimmed);
-      setStatus('PAID');
-      setUpiUtr(res.upiUtr);
-      onShowToast('BANK UTR VERIFIED // ORDER CONFIRMED');
-      setTimeout(() => {
-        onPaymentVerified(res as unknown as Record<string, unknown>);
-      }, 1500);
+      setUpiUtr(res.upiUtr || null);
+      if (res.paymentStatus === 'PAID') {
+        setStatus('PAID');
+        onShowToast('SERVER CONFIRMED THIS ORDER AS PAID');
+        setTimeout(() => {
+          onPaymentVerified(res as unknown as Record<string, unknown>);
+        }, 1500);
+      } else {
+        setStatus('VERIFYING');
+        onShowToast('UPI REFERENCE SUBMITTED // AWAITING PROVIDER CONFIRMATION');
+      }
     } catch (err: any) {
       setUtrError(err.message || 'Verification failed. Please check the UTR.');
     } finally {
@@ -264,7 +271,9 @@ export const UpiPaymentModal: React.FC<UpiPaymentModalProps> = ({
                 <div className="flex items-center gap-2 text-[#7b6e54]">
                   <RefreshCw className="w-3.5 h-3.5 animate-spin text-[#1a1816]" />
                   <span className="font-bold text-[#1a1816] uppercase tracking-wide">
-                    LISTENING FOR SETTLEMENT...
+                    {status === 'VERIFYING'
+                      ? 'REFERENCE SUBMITTED // AWAITING PROVIDER CONFIRMATION'
+                      : 'LISTENING FOR SETTLEMENT...'}
                   </span>
                 </div>
                 <div className="flex items-center gap-1 font-bold text-[#1a1816] bg-[#ded6c9] px-2 py-0.5">
@@ -319,7 +328,7 @@ export const UpiPaymentModal: React.FC<UpiPaymentModalProps> = ({
                   ALREADY PAID VIA UPI APP?
                 </span>
                 <span className="font-mono text-[9px] text-[#7b6e54] uppercase tracking-wide">
-                  DIRECT VERIFICATION
+                  REFERENCE SUBMISSION
                 </span>
               </div>
               <p className="font-mono text-[10px] text-[#59544c] leading-relaxed">
@@ -350,7 +359,7 @@ export const UpiPaymentModal: React.FC<UpiPaymentModalProps> = ({
                   ) : (
                     <>
                       <Check className="w-3 h-3 text-[#16a34a]" />
-                      <span>CONFIRM UTR</span>
+                      <span>SUBMIT UTR</span>
                     </>
                   )}
                 </button>

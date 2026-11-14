@@ -1,5 +1,6 @@
 import { prisma } from '../lib/prisma.js';
 import { upiService } from '../lib/payments/upiService.js';
+import { matchesVerifiedProviderPayment, paymentAmountMatches } from '../lib/payments/verification.js';
 
 export interface ReconciliationSummary {
   checkedCount: number;
@@ -74,18 +75,37 @@ export async function runReconciliationPass(): Promise<ReconciliationSummary> {
           );
 
           if (providerStatus.status === 'SUCCESS') {
-            await upiService.markPaymentSuccess({
-              orderId: payment.orderId,
-              paymentId: payment.id,
-              providerPaymentId: providerStatus.providerPaymentId,
-              upiUtr: providerStatus.upiUtr,
-              upiId: providerStatus.upiId,
-              amountReceived: providerStatus.amount || Number(payment.amount),
-              verificationSource: 'RECONCILIATION',
-              actorType: 'WORKER',
-              actorId: 'reconcile_worker',
-            });
-            summary.confirmedCount++;
+            const storedPaymentMatchesOrder =
+              paymentAmountMatches(Number(payment.order.total), Number(payment.amount)) &&
+              payment.currency.toUpperCase() === payment.order.paymentCurrency.toUpperCase();
+            const providerPaymentMatches = matchesVerifiedProviderPayment(
+              {
+                orderId: payment.orderId,
+                providerOrderId: payment.providerOrderId,
+                amount: Number(payment.order.total),
+                currency: payment.order.paymentCurrency,
+              },
+              providerStatus,
+            );
+
+            if (storedPaymentMatchesOrder && providerPaymentMatches) {
+              await upiService.markPaymentSuccess({
+                orderId: payment.orderId,
+                paymentId: payment.id,
+                providerPaymentId: providerStatus.providerPaymentId,
+                upiUtr: providerStatus.upiUtr,
+                upiId: providerStatus.upiId,
+                amountReceived: Number(providerStatus.amount),
+                verificationSource: 'RECONCILIATION',
+                actorType: 'WORKER',
+                actorId: 'reconcile_worker',
+              });
+              summary.confirmedCount++;
+              continue;
+            }
+
+            summary.errors.push(`Payment ${payment.id}: provider success response did not match the stored order, amount, currency, or transaction reference.`);
+            await prisma.payment.update({ where: { id: payment.id }, data: { isLocked: false, lockedAt: null } });
             continue;
           } else if (providerStatus.status === 'FAILED') {
             await prisma.payment.update({
