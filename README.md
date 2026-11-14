@@ -14,7 +14,7 @@ The `.env.example` also retains `GEMINI_API_KEY` and `APP_URL` for existing AI S
 6. Start the API in one terminal: `npm run server:dev`.
 7. Start Vite in another: `npm run dev`.
 
-The API health check is `http://localhost:4000/api/health`. Admin accounts are managed in the database; deployment and seed scripts do not create accounts or change existing passwords.
+The API health check is `http://localhost:4000/api/health`. The catalog seed does not create or modify admin accounts. To create or reset an admin, use the production provisioning instructions below; never commit real credentials.
 
 To discover and append products from the authorized Superkicks and Campus public catalogs, start PostgreSQL and apply the migrations first, then run `npm run catalog:import` (default: up to 60 new products; `npm run catalog:import -- --limit=100` imports up to 100). The importer keeps the existing Prisma `Product` table and catalog JSON, skips duplicate brands/models/SKUs/source URLs, validates and downloads product images into `public/catalog-images`, and records source URLs and product metadata. It only imports products with available sizes, a consistent listed price, a description, and at least three valid images. Existing catalog products are not replaced. Product feeds report size availability rather than unit counts; imported stock is therefore an availability snapshot, not an exact quantity.
 
@@ -36,9 +36,9 @@ For local testing, set `RAZORPAY_KEY_ID` and `RAZORPAY_KEY_SECRET` to your Razor
 
 This repository deploys the Vite client and Express API in the same Vercel project. `api/index.ts` exports the Express application as a Vercel Function; `vercel.json` routes `/api/*` to it, serves `dist`, and provides the SPA fallback. The configured build command is `npm run vercel-build`.
 
-On production builds, `vercel-build` applies checked-in Prisma migrations with `npm run db:deploy` before `npm run build`. The auth-security migration is additive: it adds missing columns and the security-log table without resetting existing rows. The catalog seed is not part of deployment, and neither deploy nor seed scripts create or modify administrator accounts.
+On production builds, `vercel-build` generates Prisma Client and applies checked-in migrations before building. After migrations, it runs `admin:provision`: when `ADMIN_EMAIL` and `ADMIN_PASSWORD` are configured, it creates the specified admin if missing. It never promotes an existing customer account. For an existing admin, the password is unchanged unless `ADMIN_RESET_PASSWORD=true` is explicitly set. The catalog seed is not part of deployment.
 
-Configure `DATABASE_URL`, `DATABASE_URL_UNPOOLED`, `JWT_SECRET`, `JWT_REFRESH_SECRET`, `CLIENT_URL`, and the server-side payment-provider variables used by the API in Vercel Production. The client defaults to same-origin `/api`; leave `VITE_API_URL` unset or point it to the same Vercel origin plus `/api`. Never put secrets in a `VITE_` variable. `ADMIN_EMAIL` and `ADMIN_PASSWORD` are not used by this build or login flow; the existing admin account and password remain in PostgreSQL.
+Configure `DATABASE_URL`, `DATABASE_URL_UNPOOLED`, `JWT_SECRET`, `JWT_REFRESH_SECRET`, `CLIENT_URL`, and the server-side payment-provider variables used by the API in Vercel Production. The client defaults to same-origin `/api`; leave `VITE_API_URL` unset or point it to the same Vercel origin plus `/api`. Never put secrets in a `VITE_` variable. To provision the admin account, set `ADMIN_EMAIL` and a unique `ADMIN_PASSWORD` of at least 12 characters in Vercel Production, then redeploy. If the account already exists and its password must be reset, also set `ADMIN_RESET_PASSWORD=true` for that deployment; remove that flag after a successful deployment. Admin credentials remain server-side and are never sent to the client bundle.
 
 After deployment, check `/api/health`, the product API, and the admin login. If a migration fails, inspect the migration error before changing the database; do not reset or bypass migration state.
 # mySite
