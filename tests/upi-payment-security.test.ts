@@ -1,14 +1,9 @@
-import 'dotenv/config';
 import { test, describe, beforeEach, after, before } from 'node:test';
 import assert from 'node:assert/strict';
 import crypto from 'node:crypto';
 import { CashfreeUpiProvider } from '../server/lib/payments/cashfree.js';
 import { UpiPaymentService } from '../server/lib/payments/upiService.js';
 import { prisma } from '../server/lib/prisma.js';
-
-if (!process.env.DATABASE_URL) {
-  process.env.DATABASE_URL = 'postgresql://postgres:postgres@127.0.0.1:5432/vanta_archive?schema=public';
-}
 
 describe('UPI Payment Gateway & Cryptographic Signature Verification Tests', () => {
   const secretKey = 'test_secret_key_mock_secure_12345';
@@ -220,6 +215,9 @@ class MockCashfreeProvider extends CashfreeUpiProvider {
 
 describe('UPI End-to-End Payment Flow & Database Integrity Tests', () => {
   before(async () => {
+    if (!process.env.DATABASE_URL) {
+      throw new Error('DATABASE_URL is required for UPI database integration tests. Configure a dedicated PostgreSQL test database.');
+    }
     await prisma.$connect();
   });
   after(async () => {

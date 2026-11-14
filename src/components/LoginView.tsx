@@ -3,6 +3,8 @@ import { ArrowRight, Eye, EyeOff, ShieldCheck, Check, ArrowLeft } from 'lucide-r
 import { authApi } from '../lib/api';
 
 interface LoginViewProps {
+  initialMode?: 'LOGIN' | 'REGISTER';
+  onAuthModeChange?: (mode: 'LOGIN' | 'REGISTER') => void;
   onNavigate: (nav: string) => void;
   onLoginSuccess: (user: { name: string; email: string; memberId: string }) => void;
   onShowToast: (msg: string) => void;
@@ -11,13 +13,19 @@ interface LoginViewProps {
 }
 
 export const LoginView: React.FC<LoginViewProps> = ({
+  initialMode = 'LOGIN',
+  onAuthModeChange,
   onNavigate,
   onLoginSuccess,
   onShowToast,
   currentUser,
   onLogout,
 }) => {
-  const [authMode, setAuthMode] = useState<'LOGIN' | 'REGISTER' | 'FORGOT'>('LOGIN');
+  const [authMode, setAuthMode] = useState<'LOGIN' | 'REGISTER' | 'FORGOT'>(initialMode);
+  const updateAuthMode = (mode: 'LOGIN' | 'REGISTER') => {
+    setAuthMode(mode);
+    onAuthModeChange?.(mode);
+  };
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [name, setName] = useState('');
@@ -78,7 +86,7 @@ export const LoginView: React.FC<LoginViewProps> = ({
     } finally { setIsSubmitting(false); }
   };
 
-  const handleForgotPassword = (e: React.FormEvent) => {
+  const handleForgotPassword = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!email || !email.includes('@')) {
       onShowToast('PLEASE ENTER YOUR REGISTERED CLIENT EMAIL');
@@ -86,26 +94,19 @@ export const LoginView: React.FC<LoginViewProps> = ({
     }
 
     setIsSubmitting(true);
-    setTimeout(() => {
+    try {
+      const result = await authApi.requestPasswordReset(email);
+      onShowToast(result.message.toUpperCase());
+      updateAuthMode('LOGIN');
+    } catch (error) {
+      onShowToast(error instanceof Error ? error.message.toUpperCase() : 'PASSWORD RESET REQUEST FAILED');
+    } finally {
       setIsSubmitting(false);
-      onShowToast(`CRYPTOGRAPHIC RESET DIRECTIVE DISPATCHED TO ${email.toUpperCase()}`);
-      setAuthMode('LOGIN');
-    }, 800);
+    }
   };
 
   const handleGoogleSignIn = () => {
-    setIsSubmitting(true);
-    setTimeout(() => {
-      setIsSubmitting(false);
-      const googleUser = {
-        name: 'TANUJ D.',
-        email: 'tanujdorugade0226@gmail.com',
-        memberId: 'CLIENT_0084_VIP',
-      };
-      onLoginSuccess(googleUser);
-      onShowToast('GOOGLE OAUTH TOKEN VERIFIED. VAULT ACCESS GRANTED.');
-      onNavigate('COLLECTIONS');
-    }, 800);
+    onShowToast('GOOGLE SIGN-IN IS NOT CONFIGURED. USE EMAIL AND PASSWORD.');
   };
 
   // If user is already authenticated
@@ -478,7 +479,7 @@ export const LoginView: React.FC<LoginViewProps> = ({
                   <span>Don't have an account?</span>{' '}
                   <button
                     type="button"
-                    onClick={() => setAuthMode('REGISTER')}
+                    onClick={() => updateAuthMode('REGISTER')}
                     className="text-[#1a1816] font-bold underline uppercase ml-1 cursor-pointer tracking-wider"
                   >
                     CREATE ACCOUNT
@@ -561,7 +562,7 @@ export const LoginView: React.FC<LoginViewProps> = ({
                   <span>Already verified?</span>{' '}
                   <button
                     type="button"
-                    onClick={() => setAuthMode('LOGIN')}
+                    onClick={() => updateAuthMode('LOGIN')}
                     className="text-[#1a1816] font-bold underline uppercase ml-1 cursor-pointer tracking-wider"
                   >
                     SIGN IN
@@ -615,7 +616,7 @@ export const LoginView: React.FC<LoginViewProps> = ({
                 <div className="text-center font-mono text-[11px] text-[#59544c] mt-8 pt-4 border-t border-[#d5cdc0]">
                   <button
                     type="button"
-                    onClick={() => setAuthMode('LOGIN')}
+                    onClick={() => updateAuthMode('LOGIN')}
                     className="text-[#1a1816] font-bold underline uppercase cursor-pointer tracking-wider"
                   >
                     &larr; BACK TO SIGN IN

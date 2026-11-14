@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "vite --port=3000 --host=0.0.0.0",
-    "server:dev": "tsx server/index.ts",
+    "server:dev": "node --import tsx --import ./scripts/load-env.mjs server/index.ts",
     "server:build": "tsc -p server/tsconfig.json",
     "server:start": "node dist-server/server/index.js",
     "db:generate": "prisma generate",
@@ -20,7 +20,7 @@
     "preview": "vite preview",
     "clean": "rm -rf dist dist-server server.js",
     "lint": "tsc --noEmit",
-    "test": "tsx --test tests/**/*.test.ts",
+    "test": "node --import tsx --import ./scripts/load-env.mjs --test tests/**/*.test.ts",
     "payments:reconcile": "tsx scripts/reconcile-payments.ts"
   },
   "dependencies": {

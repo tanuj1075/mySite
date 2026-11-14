@@ -3,6 +3,7 @@ import { prisma } from '../prisma.js';
 import { CashfreeUpiProvider } from './cashfree.js';
 import { UpiPgProvider } from './upiPg.js';
 import { HybridUpiProvider } from './hybridProvider.js';
+import { matchesVerifiedProviderPayment, paymentAmountMatches } from './verification.js';
 import {
   CreateUpiOrderResult,
   UpiPaymentProvider,
@@ -236,7 +237,7 @@ export class UpiPaymentService {
 
     // 4. Validate payment amount and currency integrity
     const expectedAmount = Number(order.total);
-    if (Math.abs(event.amount - expectedAmount) > 0.01) {
+    if (!paymentAmountMatches(expectedAmount, event.amount)) {
       await prisma.webhookEvent.update({
         where: { eventId: event.eventId },
         data: {
@@ -258,14 +259,32 @@ export class UpiPaymentService {
       return { statusCode: 400, success: false, message: 'Payment currency mismatch' };
     }
 
-    // Find the latest active payment for this order
-    const payment = await prisma.payment.findFirst({
-      where: { orderId: order.id },
-      orderBy: { createdAt: 'desc' },
-    });
+    // Bind the event to the active payment attempt, not merely the newest attempt for this order.
+    const payment = order.activePaymentId
+      ? await prisma.payment.findFirst({ where: { id: order.activePaymentId, orderId: order.id } })
+      : await prisma.payment.findFirst({ where: { orderId: order.id }, orderBy: { createdAt: 'desc' } });
 
     if (!payment) {
-      return { statusCode: 404, success: false, message: 'No payment record found for order' };
+      return { statusCode: 404, success: false, message: 'No active payment record found for order' };
+    }
+
+    const providerMatches = payment.provider === 'HYBRID' || payment.provider === event.provider;
+    const providerOrderMatches =
+      !event.providerOrderId || event.providerOrderId === order.id || event.providerOrderId === payment.providerOrderId;
+    if (!providerMatches || !providerOrderMatches) {
+      await prisma.webhookEvent.update({
+        where: { eventId: event.eventId },
+        data: { status: 'REJECTED', errorReason: 'Provider or payment reference did not match the active payment attempt.' },
+      });
+      return { statusCode: 400, success: false, message: 'Payment reference mismatch' };
+    }
+
+    if (event.status === 'SUCCESS' && !event.providerPaymentId && !event.upiUtr) {
+      await prisma.webhookEvent.update({
+        where: { eventId: event.eventId },
+        data: { status: 'REJECTED', errorReason: 'Successful provider event did not include a transaction reference.' },
+      });
+      return { statusCode: 400, success: false, message: 'Provider transaction reference is missing' };
     }
 
     // 5. Atomic state update in PostgreSQL
@@ -380,29 +399,46 @@ export class UpiPaymentService {
           );
 
           if (providerStatus.status === 'SUCCESS') {
-            await this.markPaymentSuccess({
-              orderId: order.id,
-              paymentId: latestPayment.id,
-              providerPaymentId: providerStatus.providerPaymentId,
-              upiUtr: providerStatus.upiUtr,
-              upiId: providerStatus.upiId,
-              amountReceived: providerStatus.amount || Number(order.total),
-              verificationSource: 'STATUS_API',
-              actorType: 'SYSTEM',
-              actorId: 'status_poll',
-            });
+            const storedPaymentMatchesOrder =
+              paymentAmountMatches(Number(order.total), Number(latestPayment.amount)) &&
+              latestPayment.currency.toUpperCase() === order.paymentCurrency.toUpperCase();
+            const providerPaymentMatches = matchesVerifiedProviderPayment(
+              {
+                orderId: order.id,
+                providerOrderId: latestPayment.providerOrderId,
+                amount: Number(order.total),
+                currency: order.paymentCurrency,
+              },
+              providerStatus,
+            );
 
-            return {
-              orderId: order.id,
-              displayId: order.displayId,
-              orderStatus: 'CONFIRMED',
-              paymentStatus: 'PAID',
-              amount: Number(order.total),
-              currency: order.paymentCurrency,
-              upiUtr: providerStatus.upiUtr,
-              verifiedAt: new Date(),
-              expiresAt: latestPayment.expiresAt || undefined,
-            };
+            if (storedPaymentMatchesOrder && providerPaymentMatches) {
+              await this.markPaymentSuccess({
+                orderId: order.id,
+                paymentId: latestPayment.id,
+                providerPaymentId: providerStatus.providerPaymentId,
+                upiUtr: providerStatus.upiUtr,
+                upiId: providerStatus.upiId,
+                amountReceived: Number(providerStatus.amount),
+                verificationSource: 'STATUS_API',
+                actorType: 'SYSTEM',
+                actorId: 'status_poll',
+              });
+
+              return {
+                orderId: order.id,
+                displayId: order.displayId,
+                orderStatus: 'CONFIRMED',
+                paymentStatus: 'PAID',
+                amount: Number(order.total),
+                currency: order.paymentCurrency,
+                upiUtr: providerStatus.upiUtr,
+                verifiedAt: new Date(),
+                expiresAt: latestPayment.expiresAt || undefined,
+              };
+            }
+
+            console.warn('[UPI_POLL] Provider success response did not match the persisted order, amount, currency, or payment reference.');
           } else if (providerStatus.status === 'FAILED') {
             await prisma.payment.update({
               where: { id: latestPayment.id },
@@ -502,6 +538,16 @@ export class UpiPaymentService {
 
       const payment = await tx.payment.findUnique({ where: { id: paymentId } });
       if (!payment) return null;
+      if (
+        !paymentAmountMatches(Number(order.total), amountReceived) ||
+        !paymentAmountMatches(Number(order.total), Number(payment.amount)) ||
+        payment.currency.toUpperCase() !== order.paymentCurrency.toUpperCase()
+      ) {
+        throw new Error('Verified payment amount or currency does not match the persisted order.');
+      }
+      if (!providerPaymentId && !upiUtr) {
+        throw new Error('A verified provider transaction reference is required before confirming payment.');
+      }
 
       // 1. Update Payment record to SUCCESS
       await tx.payment.update({
@@ -514,6 +560,8 @@ export class UpiPaymentService {
           amountReceived,
           verifiedAt: new Date(),
           verificationSource,
+          isLocked: false,
+          lockedAt: null,
         },
       });
 
@@ -578,80 +626,81 @@ export class UpiPaymentService {
       throw new Error('Invalid Bank UTR format. Expected 10-22 alphanumeric characters.');
     }
 
-    const order = await prisma.order.findFirst({
-      where: { id: orderId, userId },
-    });
-
-    if (!order) {
-      throw new Error('Order not found or unauthorized');
-    }
+    const order = await prisma.order.findFirst({ where: { id: orderId, userId } });
+    if (!order) throw new Error('Order not found or unauthorized');
 
     if (order.paymentStatus === 'PAID') {
       return {
         success: true,
         orderId: order.id,
-        upiUtr: order.upiUtr || cleanedUtr,
+        upiUtr: order.upiUtr || '',
         paymentStatus: 'PAID',
-        message: 'Order is already marked as paid.',
+        message: 'Order is already confirmed by the server.',
       };
     }
 
-    // Anti-Fraud / Duplicate prevention check: Ensure this UTR hasn't been used on any other payment
-    const existingUtr = await prisma.payment.findFirst({
-      where: {
-        upiUtr: cleanedUtr,
-        NOT: { orderId: order.id },
-      },
-    });
+    if (!order.activePaymentId) {
+      throw new Error('No active UPI payment attempt is available for this order.');
+    }
 
+    const payment = await prisma.payment.findFirst({
+      where: { id: order.activePaymentId, orderId: order.id },
+    });
+    if (!payment || !['PENDING', 'VERIFYING'].includes(payment.status)) {
+      throw new Error('The active payment attempt cannot accept a reference.');
+    }
+    if (
+      !paymentAmountMatches(Number(order.total), Number(payment.amount)) ||
+      payment.currency.toUpperCase() !== order.paymentCurrency.toUpperCase()
+    ) {
+      throw new Error('The active payment amount or currency does not match the order.');
+    }
+
+    const existingUtr = await prisma.payment.findFirst({
+      where: { upiUtr: cleanedUtr, id: { not: payment.id } },
+      select: { id: true },
+    });
     if (existingUtr) {
       throw new Error('Duplicate UTR detected: This bank reference has already been claimed for another transaction.');
     }
 
-    // Atomic transaction: mark Payment and Order as SUCCESS / PAID, record audit log, and clear cart
     await prisma.$transaction(async (tx) => {
-      const paymentId = order.activePaymentId;
-
-      if (paymentId) {
-        const payment = await tx.payment.findUnique({ where: { id: paymentId } });
-        if (payment) {
-          await tx.payment.update({
-            where: { id: paymentId },
-            data: {
-              status: 'SUCCESS',
-              upiUtr: cleanedUtr,
-              verificationSource: 'CUSTOMER_UTR',
-              verifiedAt: new Date(),
-            },
-          });
-
-          await tx.paymentAuditLog.create({
-            data: {
-              paymentId,
-              actorType: 'USER',
-              actorId: userId,
-              action: 'CUSTOMER_UTR_SUBMITTED',
-              fromStatus: payment.status,
-              toStatus: 'SUCCESS',
-              reason: `Bank UTR submitted by customer via UPI PG: ${cleanedUtr}`,
-              metadata: { upiUtr: cleanedUtr, submittedAt: new Date().toISOString() },
-            },
-          });
-        }
-      }
-
-      await tx.order.update({
-        where: { id: order.id },
+      const paymentUpdate = await tx.payment.updateMany({
+        where: { id: payment.id, orderId: order.id, status: { in: ['PENDING', 'VERIFYING'] } },
         data: {
-          paymentStatus: 'PAID',
-          orderStatus: 'CONFIRMED',
+          status: 'VERIFYING',
           upiUtr: cleanedUtr,
+          verificationSource: 'CUSTOMER_UTR_SUBMITTED',
         },
       });
+      if (paymentUpdate.count !== 1) {
+        throw new Error('The active payment attempt is no longer awaiting verification.');
+      }
 
-      // Clear customer's cart
-      await tx.cartItem.deleteMany({
-        where: { cart: { userId } },
+      const orderUpdate = await tx.order.updateMany({
+        where: {
+          id: order.id,
+          userId,
+          activePaymentId: payment.id,
+          paymentStatus: { not: 'PAID' },
+        },
+        data: { paymentStatus: 'VERIFYING' },
+      });
+      if (orderUpdate.count !== 1) {
+        throw new Error('The order is no longer eligible for payment verification.');
+      }
+
+      await tx.paymentAuditLog.create({
+        data: {
+          paymentId: payment.id,
+          actorType: 'USER',
+          actorId: userId,
+          action: 'CUSTOMER_UTR_SUBMITTED',
+          fromStatus: payment.status,
+          toStatus: 'VERIFYING',
+          reason: 'Customer submitted a bank UTR; provider confirmation is still required.',
+          metadata: { upiUtr: cleanedUtr, submittedAt: new Date().toISOString() },
+        },
       });
     });
 
@@ -659,8 +708,8 @@ export class UpiPaymentService {
       success: true,
       orderId: order.id,
       upiUtr: cleanedUtr,
-      paymentStatus: 'PAID',
-      message: 'Bank UTR verified and recorded. Order confirmed successfully.',
+      paymentStatus: 'VERIFYING',
+      message: 'UPI reference submitted. The order remains unpaid until server-side provider verification confirms settlement.',
     };
   }
 }

@@ -57,11 +57,19 @@ import {
 } from './types';
 
 type AdminRoute = 'login' | 'panel' | null;
+type CustomerAuthRoute = 'login' | 'register' | null;
 
 function readAdminRoute(): AdminRoute {
   const pathname = window.location.pathname.replace(/\/+$/, '') || '/';
   if (pathname === '/admin') return 'panel';
   if (pathname === '/admin/login') return 'login';
+  return null;
+}
+
+function readCustomerAuthRoute(): CustomerAuthRoute {
+  const pathname = window.location.pathname.replace(/\/+$/, '') || '/';
+  if (pathname === '/login') return 'login';
+  if (pathname === '/register') return 'register';
   return null;
 }
 
@@ -275,8 +283,12 @@ export default function App() {
     role: string;
   } | null>(null);
 
-  // Active Navigation Tab: default to 'COLLECTIONS'
-  const [activeNav, setActiveNav] = useState<NavSection>('COLLECTIONS');
+  const [customerAuthMode, setCustomerAuthMode] = useState<'LOGIN' | 'REGISTER'>(() =>
+    readCustomerAuthRoute() === 'register' ? 'REGISTER' : 'LOGIN'
+  );
+  const [activeNav, setActiveNav] = useState<NavSection>(() =>
+    readCustomerAuthRoute() ? 'LOGIN' : 'COLLECTIONS'
+  );
 
   // Modal & Drawer States
   const [isNewAddressModalOpen, setIsNewAddressModalOpen] = useState(false);
@@ -325,6 +337,19 @@ export default function App() {
     if (replace) window.history.replaceState({}, '', path);
     else window.history.pushState({}, '', path);
     setAdminRoute(readAdminRoute());
+  };
+
+  const navigateCustomerAuthMode = (mode: 'LOGIN' | 'REGISTER') => {
+    const path = mode === 'REGISTER' ? '/register' : '/login';
+    if (window.location.pathname !== path) window.history.pushState({}, '', path);
+    setCustomerAuthMode(mode);
+    setActiveNav('LOGIN');
+  };
+
+  const navigateFromCustomerAuth = (nav: string) => {
+    if (readCustomerAuthRoute()) window.history.pushState({}, '', '/');
+    setCustomerAuthMode('LOGIN');
+    setActiveNav(nav as NavSection);
   };
 
   const restoreCustomerRecords = async (user: { name: string; email: string; memberId: string }) => {
@@ -400,7 +425,17 @@ export default function App() {
   };
 
   useEffect(() => {
-    const handlePopState = () => setAdminRoute(readAdminRoute());
+    const handlePopState = () => {
+      setAdminRoute(readAdminRoute());
+      const customerRoute = readCustomerAuthRoute();
+      if (customerRoute) {
+        setCustomerAuthMode(customerRoute === 'register' ? 'REGISTER' : 'LOGIN');
+        setActiveNav('LOGIN');
+      } else if (window.location.pathname === '/') {
+        setCustomerAuthMode('LOGIN');
+        setActiveNav('COLLECTIONS');
+      }
+    };
     window.addEventListener('popstate', handlePopState);
     return () => window.removeEventListener('popstate', handlePopState);
   }, []);
@@ -1026,8 +1061,15 @@ export default function App() {
     return (
       <>
         <LoginView
+          key={customerAuthMode}
+          initialMode={customerAuthMode}
+          onAuthModeChange={navigateCustomerAuthMode}
           onNavigate={(nav) => {
-            setActiveNav(nav as NavSection);
+            if (nav === 'LOGIN') navigateCustomerAuthMode('LOGIN');
+            else if (nav === 'ADMIN_LOGIN') {
+              setActiveNav('ADMIN_LOGIN');
+              navigateAdminRoute('/admin/login');
+            } else navigateFromCustomerAuth(nav);
             window.scrollTo({ top: 0, behavior: 'smooth' });
           }}
           currentUser={currentUser}
@@ -1122,6 +1164,7 @@ export default function App() {
         onOpenAdminPortal={() => {
           if (!isAdminAuthenticated) {
             setActiveNav('ADMIN_LOGIN');
+            navigateAdminRoute('/admin/login');
             window.scrollTo({ top: 0, behavior: 'smooth' });
             showToast('RESTRICTED: PRIVILEGED ADMIN CREDENTIALS REQUIRED');
           } else {
@@ -1129,7 +1172,7 @@ export default function App() {
           }
         }}
         onOpenAccount={() => {
-          setActiveNav('LOGIN');
+          navigateCustomerAuthMode('LOGIN');
           window.scrollTo({ top: 0, behavior: 'smooth' });
         }}
         onOpenCompare={() => setIsCompareModalOpen(true)}
@@ -1137,6 +1180,7 @@ export default function App() {
         onSelectNav={(nav) => {
           if ((nav === 'ADMIN' || nav === 'ADMIN_LOGIN') && !isAdminAuthenticated) {
             setActiveNav('ADMIN_LOGIN');
+            navigateAdminRoute('/admin/login');
             window.scrollTo({ top: 0, behavior: 'smooth' });
             showToast('RESTRICTED: PRIVILEGED ADMIN CREDENTIALS REQUIRED');
             return;

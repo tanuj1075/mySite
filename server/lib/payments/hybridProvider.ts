@@ -17,15 +17,14 @@ import {
  *     server-side webhook signature verification and automatic order confirmation.
  *     Requires GSTIN + Bank Account KYC onboarding on Cashfree Dashboard.
  *
- *  2. UPI PG / Direct VPA (manual fallback) — Always embeds the merchant's own
- *     UPI ID (MERCHANT_UPI_ID) in the QR and deep-link. Even if Cashfree webhook
- *     is delayed, the customer can paste their bank UTR from the UPI app receipt
- *     to instantly confirm the order.
+ *  2. UPI PG / Direct VPA — Always embeds the merchant's own UPI ID in the QR
+ *     and deep-link. A customer-submitted UTR is only a claim and never confirms
+ *     an order; a trusted provider webhook or status API must verify settlement.
  *
  * Payment flow:
  *   Customer pays → Cashfree webhook arrives → Order auto-confirmed ✅
  *              OR
- *   Customer pays → Pastes UTR from app → Server validates → Order confirmed ✅
+ *   Customer pays → Submits UTR from app → Order remains VERIFYING until trusted provider confirmation
  *
  * Both paths write to PostgreSQL audit logs and are idempotency-safe.
  */
