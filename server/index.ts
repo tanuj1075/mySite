@@ -128,7 +128,15 @@ const distDir = path.resolve(process.cwd(), 'dist');
 if (fs.existsSync(distDir)) {
   app.use(express.static(distDir));
   app.get('*', (req, res, next) => {
-    if (req.path.startsWith('/api')) return next();
+    if (
+      req.path.startsWith('/api') ||
+      req.path.startsWith('/auth') ||
+      req.path.startsWith('/admin') ||
+      req.path.startsWith('/products') ||
+      req.path.startsWith('/orders') ||
+      req.path.startsWith('/payments') ||
+      req.path.startsWith('/health')
+    ) return next();
     res.sendFile(path.join(distDir, 'index.html'));
   });
 }

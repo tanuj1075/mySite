@@ -13,8 +13,8 @@ export const AdminLoginView: React.FC<AdminLoginViewProps> = ({
   onNavigateStore,
   onShowToast,
 }) => {
-  const [email, setEmail] = useState('admin@vanta.com');
-  const [password, setPassword] = useState('VantaAdmin2026!');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [rememberDevice, setRememberDevice] = useState(true);
   const [isAuthenticating, setIsAuthenticating] = useState(false);
@@ -201,7 +201,7 @@ export const AdminLoginView: React.FC<AdminLoginViewProps> = ({
                 </div>
 
                 {/* Main Heading */}
-                <div className="mt-8 mb-6">
+                <div className="mt-8 mb-8">
                   <h1 className="font-headline text-3xl sm:text-4xl text-[#1a1816] tracking-tight">
                     {mfaChallenge ? 'Verify your identity' : 'Welcome, Admin'}
                   </h1>
@@ -211,30 +211,6 @@ export const AdminLoginView: React.FC<AdminLoginViewProps> = ({
                       : 'Sign in to access the VANTA Admin Portal.'}
                   </p>
                 </div>
-
-                {/* Direct 1-Click Quick Access Box */}
-                {!mfaChallenge && (
-                  <div className="mb-6 p-4 border border-[#d5cdc0] bg-[#ede7dd]/60 rounded-xs">
-                    <div className="text-[10px] font-mono font-bold tracking-widest uppercase text-[#7b6e54] mb-1">
-                      OPERATOR ACCESS // PRE-CONFIGURED
-                    </div>
-                    <p className="text-[12px] font-sans text-[#59544c] mb-3">
-                      Credentials are configured. Click below for instant administrative console access.
-                    </p>
-                    <button
-                      type="button"
-                      onClick={() => {
-                        const admin = authApi.directAdminLogin(rememberDevice);
-                        onAdminLoginSuccess(admin);
-                        onShowToast('DIRECT ADMIN ACCESS GRANTED // WELCOME');
-                      }}
-                      className="w-full py-3 bg-[#1a1816] text-[#f5efe6] font-mono text-[11px] font-bold tracking-[0.18em] uppercase hover:bg-[#35322e] transition-all flex items-center justify-center gap-2 cursor-pointer shadow-xs rounded-xs"
-                    >
-                      <span>⚡ 1-CLICK DIRECT ADMIN ACCESS</span>
-                      <ArrowRight className="w-3.5 h-3.5" />
-                    </button>
-                  </div>
-                )}
 
                 {/* Email Input */}
                 {!mfaChallenge && <>
