@@ -1,47 +1,228 @@
-# VANTA ARCHIVE
+<div align="center">
 
-## Local full-stack setup
+# 🏛️ VANTA ARCHIVE
+### *Tactile Brutalism. Zero Compromise.*
 
-Prerequisites: Node.js 20+, a PostgreSQL database, and Razorpay test credentials.
+**A monolithic luxury footwear & technical apparel e-commerce platform built for high-performance retail.**
 
-The `.env.example` also retains `GEMINI_API_KEY` and `APP_URL` for existing AI Studio runtime integrations.
+[![Vercel Deployment](https://img.shields.io/badge/Vercel-Deployed-000000?style=for-the-badge&logo=vercel&logoColor=white)](https://vanta-archive.vercel.app/)
+[![React 19](https://img.shields.io/badge/React_19-TypeScript-61DAFB?style=for-the-badge&logo=react&logoColor=black)](https://react.dev/)
+[![Tailwind CSS v4](https://img.shields.io/badge/Tailwind_CSS_v4-06B6D4?style=for-the-badge&logo=tailwindcss&logoColor=white)](https://tailwindcss.com/)
+[![Node.js & Express](https://img.shields.io/badge/Node.js-Express-339933?style=for-the-badge&logo=node.js&logoColor=white)](https://nodejs.org/)
+[![PostgreSQL](https://img.shields.io/badge/PostgreSQL-Neon_Cloud-4169E1?style=for-the-badge&logo=postgresql&logoColor=white)](https://neon.tech/)
+[![Prisma ORM](https://img.shields.io/badge/Prisma_ORM-6.19-2D3748?style=for-the-badge&logo=prisma&logoColor=white)](https://prisma.io/)
+[![Security](https://img.shields.io/badge/Security-Argon2id_%7C_TOTP_MFA-success?style=for-the-badge&logo=shield&logoColor=white)](#-security--authentication-architecture)
 
-1. Copy `.env.example` to `.env` and set `DATABASE_URL`, `DATABASE_URL_UNPOOLED`, both JWT secrets, and the payment-provider settings used by your environment.
-2. For local development, keep `VITE_API_URL` as `http://localhost:4000/api`; on Vercel, leave it unset to use the same-origin `/api` route, or point it to the same Vercel origin plus `/api`.
-3. Install dependencies: `npm install`.
-4. Create the schema: `npm run db:migrate -- --name init`.
-5. Seed the catalog, coupons, and drops: `npm run db:seed` (this does not create or modify admin accounts).
-6. Start the API in one terminal: `npm run server:dev`.
-7. Start Vite in another: `npm run dev`.
+[Explore Storefront](https://vanta-archive.vercel.app/) • [Admin Console](https://vanta-archive.vercel.app/admin/login) • [Features](#-key-features) • [Tech Stack](#-technical-stack) • [Installation](#-getting-started)
 
-The API health check is `http://localhost:4000/api/health`. The catalog seed does not create or modify admin accounts. To create or reset an admin, use the production provisioning instructions below; never commit real credentials.
+</div>
 
-To discover and append products from the authorized Superkicks and Campus public catalogs, start PostgreSQL and apply the migrations first, then run `npm run catalog:import` (default: up to 60 new products; `npm run catalog:import -- --limit=100` imports up to 100). The importer keeps the existing Prisma `Product` table and catalog JSON, skips duplicate brands/models/SKUs/source URLs, validates and downloads product images into `public/catalog-images`, and records source URLs and product metadata. It only imports products with available sizes, a consistent listed price, a description, and at least three valid images. Existing catalog products are not replaced. Product feeds report size availability rather than unit counts; imported stock is therefore an availability snapshot, not an exact quantity.
+---
 
-### Persisted records
+## 📌 Executive Summary
 
-PostgreSQL stores registered accounts (passwords are hashed), products, coupons, drops, saved addresses, carts, wishlists, orders and order items, refresh-token hashes, and return/exchange requests. Customer cart, address, wishlist, order, and return/exchange actions require sign-in. Card details are not stored. After pulling schema changes, apply migrations with `npx prisma migrate deploy`, then run `npm run db:seed` only when you need the initial catalog data; it does not modify admin accounts.
+**VANTA ARCHIVE** is a full-stack, enterprise-grade e-commerce application inspired by brutalist architecture and technical craftsmanship. Designed with modern web standards, it delivers an immersive shopping experience with dynamic currency conversion, UPI/card payment flows, real-time inventory management, and a zero-trust administrative enclave.
 
-Product catalog prices remain distinct and are stored in INR as the base price. At checkout, the selected shipping country determines its default currency; the server converts the cart total using the current INR exchange-rate feed and creates the Razorpay order in that currency. The rate and charged amount are saved on the order so signature checks, webhooks, and later order history use the same quote. INR is used for Indian addresses. Razorpay international payments must be activated on the merchant account, and currencies must be supported/enabled by that account. If the country or rate cannot be resolved, checkout reports an error instead of silently charging in INR. COD is limited to Indian addresses.
+---
 
-Listed product prices are treated as tax-inclusive, and no additional destination tax is calculated at checkout. Import duties or other destination charges may still be collected separately by customs or the carrier. Confirm your tax and import-duty obligations for each market before launch. The exchange-rate feed is `open.er-api.com`, cached for up to one hour (the source updates daily); replace it with a contracted FX provider if your production pricing needs an SLA or a specific margin.
+## ✨ Key Features
 
-Razorpay flow: the API creates a pending local order and a Razorpay order; Razorpay Checkout collects card, UPI, net-banking, or supported wallet details. The API verifies the checkout signature, fetches the payment from Razorpay, checks its order, amount, and currency, and captures authorized payments before confirming the local order. A valid `payment.captured` webhook provides a second confirmation path. The cart is cleared only after payment succeeds (or when a COD order is placed). Configure the webhook URL as `https://<api-host>/api/payments/razorpay/webhook`, subscribe to `payment.captured`, and set `RAZORPAY_WEBHOOK_SECRET` to the webhook secret configured in the Razorpay Dashboard. Keep all Razorpay secrets server-side; only the public key ID is sent to Checkout.
+### 🛍️ Client Storefront Experience
+* **Brutalist Design System:** Bespoke typography (`Bodoni Moda`, `Space Mono`), fluid micro-interactions, responsive drawer architecture, and editorial-grade photography.
+* **Dynamic Product Catalog:** Multi-angle 360° specimen inspect modal, real-time colorway switching, size availability mapping, and interactive size guide comparison.
+* **Multi-Currency Global Checkout:** Real-time exchange rate feed (`open.er-api.com`) supporting international currencies (USD, EUR, GBP, AED, SGD, JPY) anchored to INR base pricing.
+* **Universal Cart & Wishlist:** Persistent multi-device cart with real-time stock allocation and optimistic quantity updates.
+* **Order Tracking & Lifecycle Timeline:** 6-stage cryptographic order progress tracker (*Order Placed* $\rightarrow$ *Confirmed* $\rightarrow$ *Packed* $\rightarrow$ *Shipped* $\rightarrow$ *Out for Delivery* $\rightarrow$ *Delivered*) with estimated delivery calculators.
 
-For local testing, set `RAZORPAY_KEY_ID` and `RAZORPAY_KEY_SECRET` to your Razorpay **test-mode** keys and configure a test-mode webhook pointing to the API URL above. For production, replace them with live-mode keys and a live webhook. Payments require valid Razorpay account onboarding and enabled payment methods; local or preview environments must also be reachable by the Razorpay Checkout script.
+### 💳 Payments & Cryptographic Verification
+* **Hybrid UPI Gateway:** Dynamic on-screen UPI QR generation with deep-linking (`upi://pay`), 15-minute expiration countdowns, and manual/automated payment capture.
+* **Cashfree & Razorpay Integration:** Server-side HMAC-SHA256 webhook verification for automated, tamper-proof payment reconciliation.
+* **COD (Cash on Delivery):** Intelligent regional checkout rules with Indian PIN code verification.
 
-## Deployment
+### 🛡️ Operator Admin Enclave (`/admin`)
+* **Dedicated Dashboard:** Complete management of product dossiers, sneaker drops, promotional coupons, order status overrides, and customer return/exchange logistics.
+* **Stealth Access Protocol:** Secure stealth shortcut (`Ctrl + Shift + A` / `Cmd + Shift + A`) to toggle the admin gateway from anywhere in the store.
+* **Telemetry & Security Audits:** Real-time logging of administrative events, session state, IP tracking, and role enforcement.
 
-### Production deployment (Vercel + PostgreSQL)
+---
 
-This repository deploys the Vite client and Express API in the same Vercel project. `api/[...path].ts` exports the Express application as a catch-all Vercel Function so Express receives the original `/api/...` path. `vercel.json` serves `dist` and provides the SPA fallback. The configured build command is `npm run vercel-build`.
+## 🛠️ Technical Stack
 
-On production builds, `vercel-build` generates Prisma Client and applies checked-in migrations before building. It does not create or reset administrator accounts. The catalog seed is not part of deployment.
+```mermaid
+graph LR
+    subgraph Client ["Client Tier (Vite + React 19)"]
+        UI[Brutalist UI]
+        State[Zustand / React State]
+        Router[SPA Client Router]
+    end
 
-Configure `DATABASE_URL`, `DATABASE_URL_UNPOOLED`, `JWT_SECRET`, `JWT_REFRESH_SECRET`, `CLIENT_URL`, and the server-side payment-provider variables used by the API in Vercel Production. Leave `VITE_API_URL` unset to use same-origin `/api`; production browsers will ignore a configured localhost URL and use same-origin routing. Never put secrets in a `VITE_` variable. Provision or reset administrator accounts with the operator-run procedure in `DEPLOYMENT.md`, not through deployment variables.
+    subgraph Server ["Server Tier (Node.js + Express)"]
+        API["Express REST API (/api/*)"]
+        Auth[Argon2id + JWT Engine]
+        Payments[Payment Gateways / Webhooks]
+    end
 
-After deployment, check `/api/health`, the product API, and the admin login. If a migration fails, inspect the migration error before changing the database; do not reset or bypass migration state.
-# mySite
-# mySite
-# mySite
-# mySite
+    subgraph Storage ["Data Tier (PostgreSQL + Neon)"]
+        Prisma[Prisma ORM Client]
+        Neon[(Neon Cloud Lakebase)]
+    end
+
+    Client -->|HTTPS / REST| Server
+    Server -->|Connection Pooling| Storage
+```
+
+| Layer | Technologies |
+| :--- | :--- |
+| **Frontend** | React 19, TypeScript, Vite 6, Tailwind CSS v4, Motion (Framer Motion), Lucide Icons, QRcode |
+| **Backend** | Node.js 20+, Express 4, TypeScript, Zod Schema Validation, Helmet, Express Rate Limit |
+| **Database** | PostgreSQL on Neon (Serverless Lakebase), Prisma ORM 6.19 |
+| **Authentication** | Argon2id password hashing, Bcrypt backward compatibility, JWT Access/Refresh tokens, RFC 6238 TOTP 2FA |
+| **Payment Stack** | Cashfree Webhooks (HMAC-SHA256), Razorpay SDK, UPI Virtual Payment Addresses |
+| **Deployment** | Vercel Serverless Functions, Neon Database Branching |
+
+---
+
+## 🔒 Security & Authentication Architecture
+
+* **Zero-Trust Role Enforcement:** Strictly separates `CUSTOMER` and `ADMIN` privileges via cryptographic JWT validation middleware (`requireAuth`, `requireAdmin`).
+* **Argon2id Password Hashing:** Uses `@node-rs/argon2` with automated runtime migration from legacy Bcrypt hashes upon sign-in.
+* **Account Lockout Protection:** 5 consecutive failed login attempts trigger an automated 15-minute IP/account lockout.
+* **Two-Factor Authentication (MFA):** Authenticator app pairing via standard RFC 6238 TOTP with single-use hashed recovery backup codes.
+* **Security Headers:** Strict Content Security Policy (CSP), HTTP Strict Transport Security (HSTS), XSS protection, and frame denial via Helmet.
+
+---
+
+## 🚀 Getting Started
+
+### Prerequisites
+* **Node.js**: `v20.0.0` or higher
+* **npm**: `v10.0.0` or higher
+* **PostgreSQL Database**: Neon Cloud account or local PostgreSQL instance
+
+### 1. Clone & Install
+
+```bash
+git clone https://github.com/tanuj1075/mySite.git
+cd mySite
+npm install
+```
+
+### 2. Configure Environment Variables
+
+Create a `.env` file in the project root:
+
+```bash
+cp .env.example .env
+```
+
+Populate the required secrets:
+
+```env
+# Database Connections
+DATABASE_URL="postgresql://user:password@host/neondb?sslmode=require"
+DATABASE_URL_UNPOOLED="postgresql://user:password@host/neondb?sslmode=require"
+
+# JWT Secrets (Generate with: openssl rand -base64 48)
+JWT_SECRET="your_secure_access_secret_min_32_characters"
+JWT_REFRESH_SECRET="your_secure_refresh_secret_min_32_characters"
+
+# Application URLs
+CLIENT_URL="http://localhost:3000"
+VITE_API_URL="http://localhost:4000/api"
+PORT=4000
+```
+
+### 3. Initialize Database & Seed
+
+```bash
+# Push Prisma schema to your PostgreSQL database
+npx prisma db push
+
+# Generate Prisma Client
+npm run db:generate
+
+# Seed the initial catalog, drops, and coupons
+npm run db:seed
+```
+
+### 4. Start Development Servers
+
+```bash
+# Terminal 1: Start Express Backend (Port 4000)
+npm run server:dev
+
+# Terminal 2: Start Vite Frontend (Port 3000)
+npm run dev
+```
+
+Visit **`http://localhost:3000`** in your browser.
+
+---
+
+## 🔑 Administrative Provisioning
+
+Administrator accounts are never created by default or stored in code. To provision or reset an administrator account:
+
+```powershell
+# Set credentials securely in the environment
+$env:ADMIN_EMAIL = "admin@vanta.com"
+$env:ADMIN_PASSWORD = "YourSecurePassword123!"
+$env:ADMIN_EMAIL_VERIFIED = "true"
+$env:ADMIN_RESET_PASSWORD = "true"
+
+# Run the provisioning script
+npm run admin:provision
+```
+
+---
+
+## 📂 Project Structure
+
+```text
+mySite/
+├── api/                    # Vercel catch-all serverless function handlers
+│   ├── [...path].ts        # Direct Express API route dispatcher
+│   └── index.ts            # Entrypoint for Vercel Functions
+├── prisma/                 # Database models & migration history
+│   └── schema.prisma       # Prisma schema (User, Order, Product, etc.)
+├── public/                 # Static assets, fonts, product imagery
+├── scripts/                # Database migrations & administrative tools
+│   ├── provision-admin.ts  # Cryptographic admin provisioning tool
+│   └── reconcile-payments.ts # Background payment reconciliation worker
+├── server/                 # Express backend application
+│   ├── lib/                # Auth, TOTP, Prisma client, payment services
+│   ├── middleware/         # Auth verification & role guards
+│   ├── routes/             # REST API route controllers
+│   └── index.ts            # Primary Express server setup
+├── src/                    # React frontend application
+│   ├── components/         # Modular UI components & view modals
+│   │   ├── admin/          # Dedicated Admin Enclave sub-views
+│   │   ├── AdminLoginView.tsx # Protected administrator login portal
+│   │   └── AdminPanelView.tsx # Admin master management console
+│   ├── data/               # Product catalog specifications & mock data
+│   ├── lib/                # Client API SDK & session managers
+│   ├── types.ts            # Core TypeScript interfaces & domain models
+│   └── App.tsx             # Root application orchestrator
+├── tests/                  # Automated integration & unit test suites
+└── vercel.json             # Vercel deployment configuration & routing
+```
+
+---
+
+## 🧪 Automated Testing
+
+The project includes an end-to-end test suite covering API routing, security token issuance, order validation, and currency conversion:
+
+```bash
+npm test
+```
+
+---
+
+## 📄 License
+
+This project is licensed under the Apache 2.0 License.
+
+<div align="center">
+<sub>Crafted with precision by <b><a href="https://github.com/tanuj1075">tanuj1075</a></b></sub>
+</div>
