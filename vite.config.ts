@@ -2,15 +2,18 @@ import tailwindcss from '@tailwindcss/vite';
 import react from '@vitejs/plugin-react';
 import fs from 'node:fs';
 import path from 'path';
+import { fileURLToPath } from 'node:url';
 import { defineConfig, loadEnv } from 'vite';
+
+const projectRoot = path.dirname(fileURLToPath(import.meta.url));
 
 function copyStaticImagesPlugin() {
   return {
     name: 'copy-static-images',
     closeBundle() {
-      const srcImages = path.resolve(__dirname, 'src/assets/images');
-      const distSrcImages = path.resolve(__dirname, 'dist/src/assets/images');
-      const distAssetsImages = path.resolve(__dirname, 'dist/assets/images');
+      const srcImages = path.resolve(projectRoot, 'src/assets/images');
+      const distSrcImages = path.resolve(projectRoot, 'dist/src/assets/images');
+      const distAssetsImages = path.resolve(projectRoot, 'dist/assets/images');
       if (fs.existsSync(srcImages)) {
         fs.mkdirSync(distSrcImages, { recursive: true });
         fs.cpSync(srcImages, distSrcImages, { recursive: true });
@@ -42,7 +45,7 @@ export default defineConfig(({ mode }) => {
     plugins: [react(), tailwindcss(), copyStaticImagesPlugin()],
     resolve: {
       alias: {
-        '@': path.resolve(__dirname, '.'),
+          '@': projectRoot,
       },
     },
     build: {

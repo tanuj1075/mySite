@@ -1,6 +1,57 @@
 # VANTA E-COMMERCE — PRODUCTION DEPLOYMENT GUIDE
 
-This guide walks you through deploying the complete VANTA E-Commerce application with full UPI payment processing, automatic cryptographic verification, background reconciliation, and admin dashboards.
+## Vercel Deployment (this repository's current production architecture)
+
+Vercel serves the Vite build from `dist` and runs the Express application as a Node.js function. `api/[...path].ts` is the catch-all API function; API requests keep their original `/api/...` path so Express can match its registered routes. Do not add a rewrite from `/api/*` to `/api`, because that drops the route suffix. The Vercel production build runs `prisma migrate deploy`; it does not create or reset administrator accounts.
+
+Configure these variables in the Vercel project:
+
+| Variable | Used when | Notes |
+| --- | --- | --- |
+| `DATABASE_URL` | Build and runtime | Neon pooled connection for application queries. |
+| `DATABASE_URL_UNPOOLED` | Build / Prisma CLI | Neon direct connection used by Prisma migrations. |
+| `JWT_SECRET` | Runtime | Required; use a cryptographically random secret. |
+| `JWT_REFRESH_SECRET` | Runtime | Required; use a different cryptographically random secret. |
+| `CLIENT_URL` | Runtime | Production storefront origin; Vercel deployment origins are also allowed by the server. |
+| `NODE_ENV` | Build and runtime | Vercel sets production mode for production deployments. |
+| `VITE_API_URL` | Build time | Leave unset for same-origin `/api`. Do not set it to localhost in Vercel. |
+| Payment provider variables | Runtime | Configure only the provider used by the store; see the UPI sections below. |
+
+`ADMIN_EMAIL`, `ADMIN_PASSWORD`, `ADMIN_RESET_PASSWORD`, and `ADMIN_EMAIL_VERIFIED` are **not** Vercel deployment variables. Administrator creation or password reset is an operator-run action described below. No default administrator is created. Password recovery email delivery is not configured, so the login page directs administrators to the operator instead of claiming an email was sent.
+
+Production schema changes use the committed Prisma migrations through `prisma migrate deploy`. This applies pending migrations without resetting or dropping tables. Review a migration before merging it; do not use `prisma migrate reset` or `prisma db push` against production.
+
+### Operator-run administrator provisioning
+
+Run the script from a trusted operator workstation with the intended production `DATABASE_URL` and `DATABASE_URL_UNPOOLED` already configured. Independently verify mailbox ownership before setting `ADMIN_EMAIL_VERIFIED=true`. Use a secure prompt to put the initial password in the process environment, then remove those variables after the script exits. Do not commit credentials, put them in Vercel build settings, or paste them into deployment logs.
+
+PowerShell example:
+
+```powershell
+$adminEmail = Read-Host 'Verified administrator email'
+$securePassword = Read-Host 'Temporary administrator password' -AsSecureString
+$passwordPointer = [Runtime.InteropServices.Marshal]::SecureStringToBSTR($securePassword)
+try {
+  $env:ADMIN_EMAIL = $adminEmail
+  $env:ADMIN_PASSWORD = [Runtime.InteropServices.Marshal]::PtrToStringBSTR($passwordPointer)
+  $env:ADMIN_EMAIL_VERIFIED = 'true'
+  $env:ADMIN_RESET_PASSWORD = 'false'
+  npm run admin:provision
+} finally {
+  [Runtime.InteropServices.Marshal]::ZeroFreeBSTR($passwordPointer)
+  Remove-Item Env:ADMIN_EMAIL, Env:ADMIN_PASSWORD, Env:ADMIN_EMAIL_VERIFIED, Env:ADMIN_RESET_PASSWORD -ErrorAction SilentlyContinue
+}
+```
+
+The script creates an account only when the email is unused. It refuses to promote an existing customer. If an admin record already exists, it leaves that record and its password unchanged unless the operator deliberately sets `ADMIN_RESET_PASSWORD=true` for a one-time manual run. Do not leave that override set between deployments.
+
+Password reset through the admin UI is unavailable until a real email provider and public reset page are configured. For now, use the protected operator-run provisioning process to reset an existing admin account. MFA configuration is preserved, and a password reset revokes all stored refresh sessions for that admin.
+
+### Read-only production smoke checks
+
+After deployment, verify `GET /api/health` returns `{"status":"ok"}`. `GET /api/auth/admin/session`, `GET /api/admin/products`, and `GET /api/admin/orders` should reject requests without an admin bearer token. Test admin login with a controlled account, then verify its MFA challenge, session endpoint, dashboard reads, and logout from the browser. Never include real credentials or bearer tokens in a smoke-test transcript.
+
+This guide walks through deploying VANTA, including provider webhook verification and the available payment reconciliation command.
 
 ---
 
@@ -11,7 +62,7 @@ In production, VANTA runs as a unified, high-performance Node.js service:
 - **React Frontend**: Pre-compiled into static HTML, CSS, and JS chunks (`dist/`), served directly by Express.
 - **Database**: PostgreSQL with Prisma ORM connection pooling.
 - **Payment Engine**: Cashfree UPI Stack with dynamic QR generation and server-side webhook validation.
-- **Reconciliation Worker**: Background cron job that recovers unconfirmed or dropped UPI transactions automatically.
+- **Reconciliation**: A command is available for an external scheduler. The worker is not started inside Vercel Functions.
 
 ---
 
@@ -24,10 +75,11 @@ Ensure these variables are configured in your hosting platform's Environment Set
 | `NODE_ENV` | Application environment | `production` |
 | `PORT` | Listening port (assigned by host) | `4000` (or `10000` on Render) |
 | `DATABASE_URL` | PostgreSQL connection string | `postgresql://user:password@host:5432/vanta_archive?sslmode=require` |
+| `DATABASE_URL_UNPOOLED` | Direct PostgreSQL connection used for Prisma migrations | Neon direct (unpooled) connection string |
 | `JWT_SECRET` | 64+ char secret for auth access tokens | Use `openssl rand -base64 48` to generate |
 | `JWT_REFRESH_SECRET` | 64+ char secret for refresh tokens | Use `openssl rand -base64 48` to generate |
 | `CLIENT_URL` | Allowed origin(s) for CORS | `https://your-domain.com` (comma-separated for multiples) |
-| `VITE_API_URL` | Client API endpoint (baked at build time) | `https://your-domain.com/api` |
+| `VITE_API_URL` | Client API endpoint (baked at build time) | Leave unset on Vercel to use the same-origin `/api` function |
 | `CASHFREE_APP_ID` | Cashfree Merchant App ID | Found in Cashfree Dashboard under API Keys |
 | `CASHFREE_SECRET_KEY`| Cashfree Merchant Secret Key | Found in Cashfree Dashboard under API Keys |
 | `CASHFREE_ENV` | Gateway environment | `production` (use `sandbox` for testing) |
@@ -48,7 +100,7 @@ Ensure these variables are configured in your hosting platform's Environment Set
 5. Set the required environment variables (`CLIENT_URL`, `CASHFREE_APP_ID`, `CASHFREE_SECRET_KEY`, `CASHFREE_ENV="production"`).
 6. Render builds the project using:
    ```bash
-   npm install && npx prisma db push && npm run build
+   npm install && npx prisma migrate deploy && npm run build
    ```
    and starts it with:
    ```bash
@@ -90,7 +142,7 @@ Ensure these variables are configured in your hosting platform's Environment Set
    ```
 4. Run migrations and seed the footwear catalog:
    ```bash
-   docker compose exec app npx prisma db push
+   docker compose exec app npx prisma migrate deploy
    docker compose exec app npm run db:seed
    docker compose exec app npm run catalog:import
    ```
@@ -106,7 +158,7 @@ Ensure these variables are configured in your hosting platform's Environment Set
 2. Build the project:
    ```bash
    npm ci
-   npx prisma db push
+   npx prisma migrate deploy
    npm run build
    ```
 3. Start the server with PM2:
@@ -160,7 +212,7 @@ To enable automatic payment verification in production:
 
 ## 5. Background Reconciliation Setup
 
-The application automatically runs background reconciliation every 60 seconds when started in production.
+The persistent Node server starts background reconciliation every 60 seconds. Vercel Functions do not start that worker. For Vercel, schedule `npm run payments:reconcile` from a trusted external worker or scheduler with the production runtime variables configured.
 
 For additional resilience, you can also run the reconciliation worker via system cron every 5 minutes:
 ```bash

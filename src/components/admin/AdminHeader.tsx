@@ -9,6 +9,7 @@ interface AdminHeaderProps {
   onLogoutAdmin: () => void;
   onOpenAuditLog: () => void;
   adminName?: string;
+  adminEmail?: string;
   adminRole?: string;
   products?: ShoeProduct[];
   orders?: Order[];
@@ -23,8 +24,9 @@ export const AdminHeader: React.FC<AdminHeaderProps> = ({
   onNavigateStorefront,
   onLogoutAdmin,
   onOpenAuditLog,
-  adminName = 'A. Vance',
-  adminRole = 'SUPER',
+  adminName = 'Administrator',
+  adminEmail = '',
+  adminRole = 'ADMIN',
   products = [],
   orders = [],
   onSelectSection,
@@ -40,32 +42,9 @@ export const AdminHeader: React.FC<AdminHeaderProps> = ({
   // Notifications Popover
   const [isNotificationsOpen, setIsNotificationsOpen] = useState(false);
   const notificationsRef = useRef<HTMLDivElement>(null);
-  const [notifications, setNotifications] = useState([
-    {
-      id: 'notif-1',
-      title: 'CRITICAL LOW STOCK',
-      detail: 'Travertine Cream US 7.0 depleted in Milan Hub',
-      time: '12m ago',
-      read: false,
-      section: 'LOW_STOCK_RADAR' as AdminSection,
-    },
-    {
-      id: 'notif-2',
-      title: 'NEW ORDER #VNT-9821',
-      detail: '₹42,500 via Milan Malpensa Air Freight Hub',
-      time: '45m ago',
-      read: false,
-      section: 'ORDERS' as AdminSection,
-    },
-    {
-      id: 'notif-3',
-      title: 'EXCHANGE REQUEST LOGGED',
-      detail: 'Return #EX-8492 awaiting atelier QC review',
-      time: '2h ago',
-      read: false,
-      section: 'RETURNS_EXCHANGES' as AdminSection,
-    },
-  ]);
+  const [notifications, setNotifications] = useState<Array<{
+    id: string; title: string; detail: string; time: string; read: boolean; section: AdminSection;
+  }>>([]);
 
   // Profile Menu Popover & Settings Modal
   const [isProfileMenuOpen, setIsProfileMenuOpen] = useState(false);
@@ -73,10 +52,6 @@ export const AdminHeader: React.FC<AdminHeaderProps> = ({
   const [isSettingsModalOpen, setIsSettingsModalOpen] = useState(false);
 
   // Settings form states
-  const [twoFactorEnabled, setTwoFactorEnabled] = useState(true);
-  const [sessionTimeout, setSessionTimeout] = useState('30');
-  const [telemetryLevel, setTelemetryLevel] = useState('MAXIMUM');
-
   // Close dropdowns on outside click
   useEffect(() => {
     const handleClickOutside = (e: MouseEvent) => {
@@ -95,6 +70,7 @@ export const AdminHeader: React.FC<AdminHeaderProps> = ({
   }, []);
 
   const unreadNotificationsCount = notifications.filter((n) => !n.read).length;
+  const adminInitials = adminName.trim().split(/\s+/).map((part) => part[0]).join('').slice(0, 2).toUpperCase() || 'AD';
 
   const filteredProducts = searchQuery.trim()
     ? products
@@ -267,8 +243,7 @@ export const AdminHeader: React.FC<AdminHeaderProps> = ({
           {/* 360° Shield Status Indicator */}
           <div className="hidden sm:flex items-center gap-2 px-2.5 py-1 bg-[#ede7dd] border border-[#d5cdc0] text-[10px] tracking-wider text-[#1a1816]">
             <span className="w-2 h-2 rounded-full bg-[#16a34a] shadow-[0_0_6px_rgba(22,163,74,0.6)] animate-pulse"></span>
-            <span className="font-bold">360° SHIELD ACTIVE</span>
-            <span className="text-[#7b6e54]">// TLS 1.3 // 0 THREATS</span>
+            <span className="font-bold">ADMIN CONSOLE</span>
           </div>
 
           {/* Notifications Icon with Badge & Interactive Popover */}
@@ -361,7 +336,7 @@ export const AdminHeader: React.FC<AdminHeaderProps> = ({
               className="w-8 h-8 rounded-full bg-[#141312] text-[#f5efe6] flex items-center justify-center font-bold text-xs uppercase cursor-pointer hover:opacity-90"
               title={`${adminName} Profile Menu`}
             >
-              AV
+              {adminInitials}
             </button>
 
             {/* Profile Menu Dropdown */}
@@ -370,7 +345,7 @@ export const AdminHeader: React.FC<AdminHeaderProps> = ({
                 <div className="pb-2 border-b border-[#d5cdc0]">
                   <div className="text-[11px] font-bold text-[#1a1816] uppercase">{adminName}</div>
                   <div className="text-[9px] text-[#7b6e54]">ROLE: {adminRole} ADMINISTRATOR</div>
-                  <div className="text-[8px] text-[#16a34a] font-bold mt-0.5">ENCLAVE: VERIFIED LEVEL 4</div>
+                  <div className="text-[9px] text-[#7b6e54] mt-0.5">{adminEmail}</div>
                 </div>
 
                 <div className="space-y-1 text-[10px]">
@@ -473,55 +448,17 @@ export const AdminHeader: React.FC<AdminHeaderProps> = ({
                   <div className="font-bold text-[#1a1816]">TWO-FACTOR AUTHENTICATION</div>
                   <div className="text-[9px] text-[#7b6e54]">Cryptographic Argon2id TOTP required</div>
                 </div>
-                <button
-                  type="button"
-                  onClick={() => {
-                    setTwoFactorEnabled(!twoFactorEnabled);
-                    onShowToast(`2FA ENFORCEMENT: ${!twoFactorEnabled ? 'ENABLED' : 'DISABLED'}`);
-                  }}
-                  className={`px-3 py-1 font-bold text-[9px] uppercase cursor-pointer ${
-                    twoFactorEnabled ? 'bg-[#166534] text-white' : 'bg-[#991b1b] text-white'
-                  }`}
-                >
-                  {twoFactorEnabled ? 'ACTIVE' : 'DISABLED'}
-                </button>
+                <span className="px-3 py-1 bg-[#ede7dd] text-[#59544c] font-bold text-[9px] uppercase">Managed per account</span>
               </div>
 
               <div className="p-3 bg-[#faf7f2] border border-[#d5cdc0] space-y-1.5">
-                <label className="block text-[9px] font-bold uppercase text-[#1a1816]">
-                  INACTIVITY SESSION TIMEOUT (MINUTES)
-                </label>
-                <select
-                  value={sessionTimeout}
-                  onChange={(e) => {
-                    setSessionTimeout(e.target.value);
-                    onShowToast(`SESSION TIMEOUT CONFIGURED: ${e.target.value} MINS`);
-                  }}
-                  className="w-full bg-white border border-[#d5cdc0] p-1.5 text-[11px] font-mono outline-none font-bold"
-                >
-                  <option value="15">15 Minutes (High Security)</option>
-                  <option value="30">30 Minutes (Recommended)</option>
-                  <option value="60">60 Minutes</option>
-                  <option value="120">120 Minutes</option>
-                </select>
+                <div className="text-[9px] font-bold uppercase text-[#1a1816]">TOKEN LIFETIME</div>
+                <div className="text-[11px] text-[#59544c]">Access tokens: 15 minutes. Refresh tokens: 30 days.</div>
               </div>
 
               <div className="p-3 bg-[#faf7f2] border border-[#d5cdc0] space-y-1.5">
-                <label className="block text-[9px] font-bold uppercase text-[#1a1816]">
-                  AUDIT TELEMETRY LOG LEVEL
-                </label>
-                <select
-                  value={telemetryLevel}
-                  onChange={(e) => {
-                    setTelemetryLevel(e.target.value);
-                    onShowToast(`TELEMETRY LOG LEVEL: ${e.target.value}`);
-                  }}
-                  className="w-full bg-white border border-[#d5cdc0] p-1.5 text-[11px] font-mono outline-none font-bold"
-                >
-                  <option value="MAXIMUM">MAXIMUM (Record all mutations & access)</option>
-                  <option value="STANDARD">STANDARD (Record state alterations only)</option>
-                  <option value="MINIMAL">MINIMAL (Critical alerts only)</option>
-                </select>
+                <div className="text-[9px] font-bold uppercase text-[#1a1816]">SECURITY LOGGING</div>
+                <div className="text-[11px] text-[#59544c]">Events are written by server routes; log-level controls are not available here.</div>
               </div>
             </div>
 
@@ -529,11 +466,10 @@ export const AdminHeader: React.FC<AdminHeaderProps> = ({
               <button
                 onClick={() => {
                   setIsSettingsModalOpen(false);
-                  onShowToast('CONSOLE SETTINGS SAVED & APPLIED');
                 }}
                 className="px-4 py-2 bg-[#141312] text-[#f5efe6] font-bold uppercase text-[10px] hover:bg-[#35322e] cursor-pointer"
               >
-                APPLY &amp; CLOSE
+                CLOSE
               </button>
             </div>
           </div>

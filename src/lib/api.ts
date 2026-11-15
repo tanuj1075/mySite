@@ -30,6 +30,21 @@ type AuthResponse = {
   user: { id: string; name: string; email: string; role: string; memberId: string };
 };
 
+export class ApiRequestError extends Error {
+  constructor(
+    message: string,
+    readonly status: number,
+    readonly data: Record<string, unknown>,
+  ) {
+    super(message);
+    this.name = 'ApiRequestError';
+  }
+
+  get mfaRequired() {
+    return this.data.mfaRequired === true;
+  }
+}
+
 const ADMIN_ACCESS_KEY = 'vanta_admin_access_token';
 const ADMIN_REFRESH_KEY = 'vanta_admin_refresh_token';
 const CUSTOMER_ACCESS_KEY = 'vanta_access_token';
@@ -41,7 +56,13 @@ async function request<T>(path: string, init: RequestInit = {}): Promise<T> {
     headers: { 'Content-Type': 'application/json', ...(init.headers ?? {}) },
   });
   const body = await response.json().catch(() => ({}));
-  if (!response.ok) throw new Error(body.error ?? 'Request failed');
+  if (!response.ok) {
+    throw new ApiRequestError(
+      typeof body.error === 'string' ? body.error : 'Request failed',
+      response.status,
+      body as Record<string, unknown>,
+    );
+  }
   return body as T;
 }
 
@@ -76,10 +97,10 @@ export const authApi = {
       }
     }
   },
-  async adminLogin(email: string, password: string, rememberDevice = true, totpToken?: string) {
+  async adminLogin(email: string, password: string, rememberDevice = true, totpToken?: string, backupCode?: string) {
     const result = await request<AuthResponse>('/auth/admin/login', {
       method: 'POST',
-      body: JSON.stringify({ email, password, totpToken }),
+      body: JSON.stringify({ email, password, totpToken, backupCode }),
     });
     if (result.user.role !== 'ADMIN') throw new Error('Admin role required');
     saveAdminSession(result, rememberDevice);
@@ -268,10 +289,19 @@ export const adminApi = {
     return requestAdmin(`/admin/exchanges/${encodeURIComponent(id)}/status`, { method: 'PATCH', body: JSON.stringify({ status }) });
   },
   sessions() {
-    return requestAdmin<Array<{ id: string; createdAt: string; expiresAt: string; isCurrent: boolean; ip: string; environment: string }>>('/admin/security/sessions');
+    const refreshToken = getAdminRefreshToken();
+    return requestAdmin<Array<{ id: string; createdAt: string; expiresAt: string; isCurrent: boolean; ip: string; environment: string }>>(
+      '/admin/security/sessions',
+      { headers: refreshToken ? { 'X-Admin-Refresh-Token': refreshToken } : {} },
+    );
   },
   revokeAllSessions() {
-    return requestAdmin<{ revokedCount: number; message: string }>('/admin/security/sessions/revoke-all', { method: 'POST' });
+    const refreshToken = getAdminRefreshToken();
+    if (!refreshToken) throw new Error('Current admin refresh session is unavailable');
+    return requestAdmin<{ revokedCount: number; message: string }>('/admin/security/sessions/revoke-all', {
+      method: 'POST',
+      body: JSON.stringify({ refreshToken }),
+    });
   },
   securityLogs(params?: { page?: number; limit?: number; severity?: string; eventType?: string; search?: string }) {
     const search = new URLSearchParams();
@@ -305,7 +335,7 @@ export const adminApi = {
       criticalEvents: number;
       threatsBlocked24h: number;
       activeSessions: number;
-      mfaComplianceRate: number;
+      mfaComplianceRate: number | null;
       totalAdmins: number;
       mfaAdmins: number;
       lockedAccounts: number;

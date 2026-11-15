@@ -40,87 +40,6 @@ interface AdminOverviewViewProps {
   activeSection?: string;
 }
 
-const INITIAL_BANNERS: BannerItem[] = [
-  {
-    id: 'ban-1',
-    title: 'GLOBAL AIR FREIGHT PROTOCOL',
-    subtitle: 'Priority air courier dispatch active across 42 atelier metropolitan nodes.',
-    linkText: 'DISPATCH TELEMETRY',
-    linkUrl: '#orders',
-    isActive: true,
-    type: 'ANNOUNCEMENT',
-  },
-  {
-    id: 'ban-2',
-    title: 'ARCHIVAL CAPSULE 04 // MONOLITH SERIES',
-    subtitle: 'Limited allocations in raw travertine nubuck and carbon graphite.',
-    linkText: 'INSPECT DOSSIER',
-    linkUrl: '#catalog',
-    isActive: true,
-    type: 'HERO',
-  },
-  {
-    id: 'ban-3',
-    title: 'VIP CONCIERGE ACCESS GATED',
-    subtitle: 'Private appointments and bespoke size calibrations open for Tier 01 Patrons.',
-    linkText: 'PATRON PORTAL',
-    linkUrl: '#patrons',
-    isActive: false,
-    type: 'PROMO',
-  },
-];
-
-const INITIAL_NOTIFICATIONS: AdminNotification[] = [
-  {
-    id: 'notif-1',
-    type: 'ORDER',
-    title: 'PRIORITY AIR DISPATCH QUEUED',
-    detail: 'Order #VNT-9821 allocated to Milan Malpensa DHL air courier node.',
-    time: '4 MINS AGO',
-    read: false,
-    targetSection: 'ORDERS',
-    targetId: 'ord-9821',
-  },
-  {
-    id: 'notif-2',
-    type: 'STOCK',
-    title: 'CRITICAL INVENTORY RADAR TRIGGER',
-    detail: 'X-01 Core Runner Travertine (Size US 9) reached minimum threshold of 2 units.',
-    time: '18 MINS AGO',
-    read: false,
-    targetSection: 'PRODUCTS',
-    targetId: '1',
-  },
-  {
-    id: 'notif-3',
-    type: 'EXCHANGE',
-    title: 'EXCHANGE QC APPRAISAL COMPLETE',
-    detail: 'Optical scan passed for Case #EX-104; replacement ready for allocation.',
-    time: '42 MINS AGO',
-    read: false,
-    targetSection: 'RETURNS_EXCHANGES',
-    targetId: 'ex-104',
-  },
-  {
-    id: 'notif-4',
-    type: 'DROP',
-    title: 'CHRONO DROP REGISTRATION SPIKE',
-    detail: '640 patrons subscribed to the upcoming Monolith Derby Limited allocation.',
-    time: '2 HOURS AGO',
-    read: true,
-    targetSection: 'CHRONO_DROPS',
-  },
-  {
-    id: 'notif-5',
-    type: 'SECURITY',
-    title: 'IMMUTABLE AUDIT ENTRY LOGGED',
-    detail: 'TLS 1.3 handshake re-keyed; Argon2id root enclave verified at 100%.',
-    time: '3 HOURS AGO',
-    read: true,
-    targetSection: 'SECURITY_CLUSTER',
-  },
-];
-
 export const AdminOverviewView: React.FC<AdminOverviewViewProps> = ({
   drops,
   onAddNewDrop,
@@ -148,17 +67,14 @@ export const AdminOverviewView: React.FC<AdminOverviewViewProps> = ({
   const [couponMinOrder, setCouponMinOrder] = useState('25000');
 
   // Banner State
-  const [banners, setBanners] = useState<BannerItem[]>(INITIAL_BANNERS);
+  const [banners, setBanners] = useState<BannerItem[]>([]);
   const [showBannerModal, setShowBannerModal] = useState(false);
   const [newBannerTitle, setNewBannerTitle] = useState('');
   const [newBannerSub, setNewBannerSub] = useState('');
   const [newBannerType, setNewBannerType] = useState<'ANNOUNCEMENT' | 'HERO' | 'PROMO'>('ANNOUNCEMENT');
 
   // Notifications State
-  const [notifications, setNotifications] = useState<AdminNotification[]>(INITIAL_NOTIFICATIONS);
-
-  // Timeframe selector for chart
-  const [timeframe, setTimeframe] = useState<'7D' | '30D' | '90D'>('7D');
+  const [notifications, setNotifications] = useState<AdminNotification[]>([]);
 
   // Real ticking countdown timer
   const [now, setNow] = useState(Date.now());
@@ -179,9 +95,9 @@ export const AdminOverviewView: React.FC<AdminOverviewViewProps> = ({
   };
 
   // Calculate live volume and allocations
-  const grossDailyVolume = orders.reduce((sum, o) => sum + (o.total || 0), 0) || 548500;
-  const activeAllocationsCount = orders.length > 0 ? orders.length : 1428;
-  const totalMasterStyles = products.length > 0 ? products.length : 48;
+  const loadedOrderValue = orders.reduce((sum, o) => sum + (o.total || 0), 0);
+  const loadedOrderCount = orders.length;
+  const totalMasterStyles = products.length;
 
   // Find low stock specimens
   const lowStockItems: {
@@ -256,34 +172,19 @@ export const AdminOverviewView: React.FC<AdminOverviewViewProps> = ({
   };
 
   const handleToggleBanner = (id: string) => {
-    setBanners((prev) =>
-      prev.map((b) => (b.id === id ? { ...b, isActive: !b.isActive } : b))
-    );
-    onShowToast('BANNER STATUS UPDATED');
+    void id;
+    onShowToast('Banner publishing is not connected to persistent storage. No change was made.');
   };
 
   const handleCreateBanner = (e: React.FormEvent) => {
     e.preventDefault();
     if (!newBannerTitle) return;
-    const newB: BannerItem = {
-      id: `ban-${Date.now()}`,
-      title: newBannerTitle.toUpperCase(),
-      subtitle: newBannerSub,
-      linkText: 'DISCOVER MORE',
-      linkUrl: '#',
-      isActive: true,
-      type: newBannerType,
-    };
-    setBanners([newB, ...banners]);
-    setShowBannerModal(false);
-    setNewBannerTitle('');
-    setNewBannerSub('');
-    onShowToast(`BANNER CREATED: ${newB.title}`);
+    onShowToast('Banner publishing is not connected to persistent storage. No banner was created.');
   };
 
   const handleMarkAllRead = () => {
     setNotifications((prev) => prev.map((n) => ({ ...n, read: true })));
-    onShowToast('ALL NOTIFICATIONS MARKED AS READ');
+    if (notifications.length > 0) onShowToast('Notifications are not connected to a persistent feed.');
   };
 
   // SUBVIEW: BANNERS
@@ -306,7 +207,7 @@ export const AdminOverviewView: React.FC<AdminOverviewViewProps> = ({
               Announcements &amp; Editorial Banners
             </h1>
             <p className="font-sans text-[13px] text-[#59544c] mt-1">
-              Configure storefront notice ribbons, hero editorial spotlights, and gated VIP promos.
+              Banner publishing is unavailable because this application has no persistent banner API.
             </p>
           </div>
 
@@ -509,14 +410,7 @@ export const AdminOverviewView: React.FC<AdminOverviewViewProps> = ({
         });
       });
       return acc + count;
-    }, 0) || 342;
-
-    const fulfillmentHubs = [
-      { name: 'MILAN CENTRAL ATELIER (MXP)', code: 'HUB-01', allocation: Math.round(totalStockCount * 0.52), status: 'OPTIMAL CAPACITY', speed: 'Priority 10:30 Air' },
-      { name: 'PARIS ARCHIVAL VAULT (CDG)', code: 'HUB-02', allocation: Math.round(totalStockCount * 0.25), status: 'NORMAL FLOW', speed: 'EU Express Overnight' },
-      { name: 'TOKYO KINETIC NODE (NRT)', code: 'HUB-03', allocation: Math.round(totalStockCount * 0.15), status: 'EXPEDITE ACTIVE', speed: 'APAC Transit Hub' },
-      { name: 'NEW YORK METRO TERMINAL (JFK)', code: 'HUB-04', allocation: Math.round(totalStockCount * 0.08), status: 'ALLOCATION RESTOCKING', speed: 'Americas Courier' },
-    ];
+    }, 0);
 
     return (
       <div className="p-4 sm:p-8 font-sans space-y-8 bg-[#faf7f2] min-h-full">
@@ -533,10 +427,10 @@ export const AdminOverviewView: React.FC<AdminOverviewViewProps> = ({
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div>
             <h1 className="font-headline text-3xl sm:text-4xl text-[#1a1816] tracking-tight">
-              Stock Logistics &amp; Fulfillment Nodes
+              Product Inventory
             </h1>
             <p className="font-sans text-[13px] text-[#59544c] mt-1">
-              Global inventory distribution across 4 metropolitan air courier hubs and dimensional warehouse vaults.
+              This dashboard shows catalog stock quantities. Warehouse locations and dispatch service levels are not stored in the database.
             </p>
           </div>
 
@@ -563,12 +457,12 @@ export const AdminOverviewView: React.FC<AdminOverviewViewProps> = ({
           <div className="bg-[#ede7dd] border border-[#d5cdc0] p-4 shadow-2xs">
             <div className="text-[9px] text-[#7b6e54] uppercase tracking-wider font-bold">TOTAL CATALOG UNITS</div>
             <div className="text-2xl font-bold text-[#1a1816] mt-1">{totalStockCount} Units</div>
-            <div className="text-[9px] text-[#16a34a] font-bold mt-0.5">Across {products.length || 6} Specimen Silhouettes</div>
+            <div className="text-[9px] text-[#16a34a] font-bold mt-0.5">Loaded from the connected database</div>
           </div>
           <div className="bg-[#ede7dd] border border-[#d5cdc0] p-4 shadow-2xs">
-            <div className="text-[9px] text-[#7b6e54] uppercase tracking-wider font-bold">ACTIVE FULFILLMENT NODES</div>
-            <div className="text-2xl font-bold text-[#1a1816] mt-1">4 Metropolitan Hubs</div>
-            <div className="text-[9px] text-[#59544c] mt-0.5">Milan • Paris • Tokyo • New York</div>
+            <div className="text-[9px] text-[#7b6e54] uppercase tracking-wider font-bold">WAREHOUSE LOCATIONS</div>
+            <div className="text-2xl font-bold text-[#1a1816] mt-1">Not tracked</div>
+            <div className="text-[9px] text-[#59544c] mt-0.5">No location field in the current schema</div>
           </div>
           <div className="bg-[#ede7dd] border border-[#d5cdc0] p-4 shadow-2xs">
             <div className="text-[9px] text-[#7b6e54] uppercase tracking-wider font-bold">DEPLETION RISK SPECIMENS</div>
@@ -576,58 +470,14 @@ export const AdminOverviewView: React.FC<AdminOverviewViewProps> = ({
             <div className="text-[9px] text-[#7b6e54] mt-0.5">Stock threshold &le; 5 units</div>
           </div>
           <div className="bg-[#ede7dd] border border-[#d5cdc0] p-4 shadow-2xs">
-            <div className="text-[9px] text-[#7b6e54] uppercase tracking-wider font-bold">DISPATCH SLA TIME</div>
-            <div className="text-2xl font-bold text-[#16a34a] mt-1">&lt; 3.2 Hours</div>
-            <div className="text-[9px] text-[#7b6e54] mt-0.5">Atelier presentation packing</div>
+            <div className="text-[9px] text-[#7b6e54] uppercase tracking-wider font-bold">DISPATCH SLA</div>
+            <div className="text-2xl font-bold text-[#59544c] mt-1">Not tracked</div>
+            <div className="text-[9px] text-[#7b6e54] mt-0.5">No dispatch SLA data available</div>
           </div>
         </div>
 
-        {/* Fulfillment Nodes Distribution */}
-        <div className="space-y-4 font-mono text-[11px]">
-          <div className="text-[10px] text-[#7b6e54] font-bold uppercase tracking-wider">
-            METROPOLITAN VAULT DISTRIBUTION
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {fulfillmentHubs.map((hub) => (
-              <div key={hub.code} className="border border-[#d5cdc0] bg-[#ede7dd] p-4.5 space-y-3 rounded-xs shadow-xs">
-                <div className="flex items-center justify-between pb-2 border-b border-[#d5cdc0]">
-                  <div className="flex items-center gap-2">
-                    <Truck className="w-3.5 h-3.5 text-[#7b6e54]" />
-                    <span className="font-bold text-[#1a1816]">{hub.name}</span>
-                  </div>
-                  <span className="px-2 py-0.5 bg-[#141312] text-[#f5efe6] text-[9px] font-bold">{hub.code}</span>
-                </div>
-
-                <div className="grid grid-cols-3 gap-2 text-[10px]">
-                  <div>
-                    <div className="text-[9px] text-[#7b6e54]">STORED STOCK</div>
-                    <div className="font-bold text-[#1a1816] text-[13px]">{hub.allocation} Units</div>
-                  </div>
-                  <div>
-                    <div className="text-[9px] text-[#7b6e54]">FLOW STATUS</div>
-                    <div className="font-bold text-[#16a34a] text-[10px]">{hub.status}</div>
-                  </div>
-                  <div>
-                    <div className="text-[9px] text-[#7b6e54]">LOGISTICS COURIER</div>
-                    <div className="font-bold text-[#59544c] text-[10px]">{hub.speed}</div>
-                  </div>
-                </div>
-
-                <div className="pt-2 border-t border-[#d5cdc0]/70 flex items-center justify-between text-[9px]">
-                  <span className="text-[#7b6e54]">NFC QUALITY CONTROL INSPECTED</span>
-                  <button
-                    onClick={() => {
-                      onShowToast(`REALLOCATION TELEMETRY INITIATED FOR ${hub.code}`);
-                    }}
-                    className="font-bold text-[#1a1816] hover:underline cursor-pointer"
-                  >
-                    TRIGGER REBALANCE →
-                  </button>
-                </div>
-              </div>
-            ))}
-          </div>
+        <div className="border border-[#d5cdc0] bg-[#ede7dd] p-5 font-mono text-[11px] text-[#59544c]">
+          Stock is stored per product variant. The current database schema does not track warehouses, courier assignments, or inventory transfers.
         </div>
       </div>
     );
@@ -982,22 +832,22 @@ export const AdminOverviewView: React.FC<AdminOverviewViewProps> = ({
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 font-mono">
         <div className="bg-[#ede7dd] border border-[#d5cdc0] p-4 shadow-2xs">
           <div className="text-[9px] text-[#7b6e54] uppercase tracking-wider font-bold">
-            GROSS DAILY VOLUME
+            VALUE OF LOADED ORDERS
           </div>
           <div className="text-2xl font-bold text-[#1a1816] mt-1">
-            ₹{grossDailyVolume.toLocaleString()}
+            ₹{loadedOrderValue.toLocaleString()}
           </div>
-          <div className="text-[9px] text-[#16a34a] font-bold mt-0.5">+18.4% vs last run</div>
+          <div className="text-[9px] text-[#59544c] mt-0.5">Across currently loaded orders</div>
         </div>
 
         <div className="bg-[#ede7dd] border border-[#d5cdc0] p-4 shadow-2xs">
           <div className="text-[9px] text-[#7b6e54] uppercase tracking-wider font-bold">
-            ACTIVE ALLOCATIONS
+            LOADED ORDERS
           </div>
           <div className="text-2xl font-bold text-[#1a1816] mt-1">
-            {activeAllocationsCount} Orders
+            {loadedOrderCount} Orders
           </div>
-          <div className="text-[9px] text-[#59544c] mt-0.5">Air freight courier nodes live</div>
+          <div className="text-[9px] text-[#59544c] mt-0.5">From the connected database</div>
         </div>
 
         <div className="bg-[#ede7dd] border border-[#d5cdc0] p-4 shadow-2xs">
@@ -1014,70 +864,18 @@ export const AdminOverviewView: React.FC<AdminOverviewViewProps> = ({
           <div className="text-[9px] text-[#7b6e54] uppercase tracking-wider font-bold">
             SECURITY INTEGRITY
           </div>
-          <div className="text-2xl font-bold text-[#16a34a] mt-1">100% Verified</div>
-          <div className="text-[9px] text-[#7b6e54] mt-0.5">TLS 1.3 // Argon2id Enclave</div>
+          <div className="text-2xl font-bold text-[#59544c] mt-1">Not measured</div>
+          <div className="text-[9px] text-[#7b6e54] mt-0.5">See database security events</div>
         </div>
       </div>
 
-      {/* Volume & Fulfillment Analytics Graph */}
+      {/* Historical analytics are not currently backed by an API. */}
       <div className="border border-[#d5cdc0] bg-[#ede7dd] p-5 sm:p-6 space-y-4 rounded-xs shadow-xs font-mono">
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-[#d5cdc0]">
-          <div>
-            <div className="text-[9px] text-[#7b6e54] tracking-widest uppercase font-bold">
-              PROCUREMENT TELEMETRY
-            </div>
-            <h3 className="font-headline text-xl font-bold text-[#1a1816] tracking-tight">
-              Volume &amp; Order Velocity Telemetry
-            </h3>
-          </div>
-
-          <div className="flex items-center gap-1.5 text-[10px]">
-            {(['7D', '30D', '90D'] as const).map((tf) => (
-              <button
-                key={tf}
-                onClick={() => setTimeframe(tf)}
-                className={`px-2.5 py-1 border cursor-pointer font-bold uppercase transition-colors ${
-                  timeframe === tf
-                    ? 'bg-[#141312] text-[#f5efe6] border-[#141312]'
-                    : 'bg-[#faf7f2] border-[#d5cdc0] text-[#59544c] hover:bg-[#ded6c9]'
-                }`}
-              >
-                {tf}
-              </button>
-            ))}
-          </div>
+        <div className="pb-3 border-b border-[#d5cdc0]">
+          <div className="text-[9px] text-[#7b6e54] tracking-widest uppercase font-bold">ORDER ANALYTICS</div>
+          <h3 className="font-headline text-xl font-bold text-[#1a1816] tracking-tight">Historical volume</h3>
         </div>
-
-        {/* Minimalist Bar Graph */}
-        <div className="pt-2">
-          <div className="h-40 flex items-end gap-2 sm:gap-4 justify-between border-b border-[#d5cdc0] pb-2">
-            {[
-              { day: 'MON', val: 45, rev: '₹4.2L' },
-              { day: 'TUE', val: 68, rev: '₹5.8L' },
-              { day: 'WED', val: 52, rev: '₹4.6L' },
-              { day: 'THU', val: 84, rev: '₹7.1L' },
-              { day: 'FRI', val: 95, rev: '₹8.4L' },
-              { day: 'SAT', val: 110, rev: '₹9.8L' },
-              { day: 'SUN', val: 88, rev: '₹7.6L' },
-            ].map((col, idx) => (
-              <div key={idx} className="flex-1 flex flex-col items-center gap-1.5 group cursor-pointer">
-                <div className="text-[9px] text-[#7b6e54] opacity-0 group-hover:opacity-100 transition-opacity font-bold">
-                  {col.rev}
-                </div>
-                <div
-                  className="w-full bg-[#141312] hover:bg-[#35322e] transition-all rounded-2xs"
-                  style={{ height: `${col.val}%` }}
-                  title={`${col.day}: ${col.rev}`}
-                />
-                <div className="text-[9px] text-[#59544c] font-bold">{col.day}</div>
-              </div>
-            ))}
-          </div>
-          <div className="flex items-center justify-between text-[9px] text-[#7b6e54] mt-2">
-            <span>PEAK DEMAND: SATURDAY (110 ALLOCATIONS)</span>
-            <span>DATA SYNCHRONIZED ACROSS ALL 42 HUBS</span>
-          </div>
-        </div>
+        <p className="text-[12px] text-[#59544c]">Historical revenue and order velocity are not connected to this dashboard yet. The totals above use only the orders currently loaded from the database.</p>
       </div>
 
       {/* 2-Column Split: Chrono Drops & Coupons */}
@@ -1137,7 +935,7 @@ export const AdminOverviewView: React.FC<AdminOverviewViewProps> = ({
                         onClick={() => {
                           const newStatus = isLive ? 'Scheduled' : 'Active';
                           onUpdateDropStatus(drop.id, newStatus);
-                          onShowToast(`DROP STATUS UPDATED: ${drop.productName}`);
+                          onShowToast(`Drop status change requested for ${drop.productName}.`);
                         }}
                         className="p-1 hover:bg-[#ede7dd] text-[#1a1816] text-[9px] font-bold underline cursor-pointer"
                       >
@@ -1153,7 +951,7 @@ export const AdminOverviewView: React.FC<AdminOverviewViewProps> = ({
                     </div>
                     <button
                       onClick={() => {
-                        onShowToast(`TRANSMITTED DROP ALERT TO 640 SUBSCRIBERS FOR ${drop.productName}`);
+                        onShowToast('Drop subscriber notifications are not configured. No alert was sent.');
                       }}
                       className="text-[9px] font-bold text-[#7b6e54] hover:text-[#1a1816] uppercase underline cursor-pointer"
                     >

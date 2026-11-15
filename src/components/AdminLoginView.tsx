@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { ArrowRight, Eye, EyeOff, ExternalLink, ShieldCheck, Key } from 'lucide-react';
-import { authApi } from '../lib/api';
+import { ApiRequestError, authApi } from '../lib/api';
 
 interface AdminLoginViewProps {
   onAdminLoginSuccess: (admin: { email: string; name: string; role: string }) => void;
@@ -19,11 +19,14 @@ export const AdminLoginView: React.FC<AdminLoginViewProps> = ({
   const [rememberDevice, setRememberDevice] = useState(true);
   const [isAuthenticating, setIsAuthenticating] = useState(false);
   const [showForgotModal, setShowForgotModal] = useState(false);
+  const [mfaChallenge, setMfaChallenge] = useState(false);
+  const [mfaCode, setMfaCode] = useState('');
+  const [useRecoveryCode, setUseRecoveryCode] = useState(false);
 
   const handleAdminLogin = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (!email || !email.includes('@')) {
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim())) {
       onShowToast('ACCESS DENIED: VALID ADMINISTRATIVE IDENTITY REQUIRED');
       return;
     }
@@ -34,12 +37,30 @@ export const AdminLoginView: React.FC<AdminLoginViewProps> = ({
     }
     setIsAuthenticating(true);
     try {
-      const authenticatedAdmin = await authApi.adminLogin(email, password, rememberDevice);
+      if (mfaChallenge && !useRecoveryCode && !/^\d{6}$/.test(mfaCode.trim())) {
+        onShowToast('ENTER THE SIX-DIGIT AUTHENTICATOR CODE');
+        return;
+      }
+      if (mfaChallenge && useRecoveryCode && !mfaCode.trim()) {
+        onShowToast('ENTER A SINGLE-USE RECOVERY CODE');
+        return;
+      }
+      const authenticatedAdmin = await authApi.adminLogin(
+        email.trim(),
+        password,
+        rememberDevice,
+        mfaChallenge && !useRecoveryCode ? mfaCode.trim() : undefined,
+        mfaChallenge && useRecoveryCode ? mfaCode.trim() : undefined,
+      );
       onAdminLoginSuccess({ email: authenticatedAdmin.email, name: authenticatedAdmin.name, role: authenticatedAdmin.role });
       onShowToast(`ADMIN SESSION INITIALIZED: ${authenticatedAdmin.name} // PRIVILEGES UNLOCKED`);
     } catch (error) {
       const msg = error instanceof Error ? error.message : 'Admin authentication failed';
-      if (msg.toLowerCase().includes('failed to fetch') || msg.toLowerCase().includes('network')) {
+      if (error instanceof ApiRequestError && error.mfaRequired) {
+        setMfaChallenge(true);
+        setMfaCode('');
+        if (msg.toLowerCase().includes('invalid')) onShowToast(msg.toUpperCase());
+      } else if (msg.toLowerCase().includes('failed to fetch') || msg.toLowerCase().includes('network')) {
         const isLocalDevelopment =
           window.location.hostname === 'localhost' ||
           window.location.hostname === '127.0.0.1' ||
@@ -114,7 +135,7 @@ export const AdminLoginView: React.FC<AdminLoginViewProps> = ({
             <div>
               <div className="flex items-center justify-between font-mono text-[10px] text-[#59544c] tracking-[0.15em] uppercase">
                 <span>SECURE WORKSPACE NODE // 01</span>
-                <span>TLS 1.3 // AES-256</span>
+                <span>ADMIN API // HTTPS WHEN DEPLOYED</span>
               </div>
 
               {/* Branding Section */}
@@ -153,7 +174,7 @@ export const AdminLoginView: React.FC<AdminLoginViewProps> = ({
 
               <div className="mt-6 font-mono text-[10px] text-[#59544c] tracking-widest uppercase flex flex-wrap items-center gap-4 sm:gap-6">
                 <span>ROLE ENFORCEMENT: STRICT</span>
-                <span>MERKLE AUDIT: ACTIVE</span>
+                <span>DATABASE AUDIT EVENTS</span>
               </div>
             </div>
           </div>
@@ -168,20 +189,25 @@ export const AdminLoginView: React.FC<AdminLoginViewProps> = ({
                     <span className="w-2 h-2 rounded-full bg-[#1a1816]"></span>
                     <span>PRIVILEGED AUTHENTICATION</span>
                   </div>
-                  <span className="text-[#7b6e54] tracking-[0.18em]">STAGE 01 // CREDENTIALS</span>
+                  <span className="text-[#7b6e54] tracking-[0.18em]">
+                    {mfaChallenge ? 'STAGE 02 // MFA VERIFICATION' : 'STAGE 01 // CREDENTIALS'}
+                  </span>
                 </div>
 
                 {/* Main Heading */}
                 <div className="mt-8 mb-8">
                   <h1 className="font-headline text-3xl sm:text-4xl text-[#1a1816] tracking-tight">
-                    Welcome, Admin
+                    {mfaChallenge ? 'Verify your identity' : 'Welcome, Admin'}
                   </h1>
                   <p className="font-sans text-[13px] text-[#59544c] mt-2">
-                    Sign in to access the VANTA Admin Portal.
+                    {mfaChallenge
+                      ? 'Enter the six-digit code from your authenticator app or use a saved single-use recovery code.'
+                      : 'Sign in to access the VANTA Admin Portal.'}
                   </p>
                 </div>
 
                 {/* Email Input */}
+                {!mfaChallenge && <>
                 <div className="mb-5">
                   <label
                     htmlFor="admin-email"
@@ -231,9 +257,35 @@ export const AdminLoginView: React.FC<AdminLoginViewProps> = ({
                     </button>
                   </div>
                 </div>
+                </>}
+
+                {mfaChallenge && <div className="mb-5">
+                  <label htmlFor="admin-mfa-code" className="block font-mono text-[10px] tracking-widest uppercase text-[#1a1816] font-bold mb-2">
+                    {useRecoveryCode ? 'SINGLE-USE RECOVERY CODE *' : 'AUTHENTICATOR CODE *'}
+                  </label>
+                  <input
+                    id="admin-mfa-code"
+                    type="text"
+                    inputMode={useRecoveryCode ? 'text' : 'numeric'}
+                    autoComplete="one-time-code"
+                    required
+                    maxLength={useRecoveryCode ? 32 : 6}
+                    value={mfaCode}
+                    onChange={(e) => setMfaCode(e.target.value)}
+                    placeholder={useRecoveryCode ? 'XXXXX-XXXXX' : '000000'}
+                    className="w-full bg-white border border-[#d5cdc0] px-4 py-3.5 text-[13px] text-[#1a1816] font-mono tracking-[0.25em] focus:outline-none focus:border-[#1a1816] rounded-xs shadow-2xs transition-colors"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => { setUseRecoveryCode((value) => !value); setMfaCode(''); }}
+                    className="mt-3 font-mono text-[11px] text-[#59544c] hover:text-[#1a1816] underline"
+                  >
+                    {useRecoveryCode ? 'Use authenticator code' : 'Use a recovery code'}
+                  </button>
+                </div>}
 
                 {/* Remember and Forgot Row */}
-                <div className="flex items-center justify-between pt-1 pb-4">
+                {!mfaChallenge && <div className="flex items-center justify-between pt-1 pb-4">
                   <label className="flex items-center gap-2.5 cursor-pointer select-none">
                     <input
                       type="checkbox"
@@ -253,7 +305,11 @@ export const AdminLoginView: React.FC<AdminLoginViewProps> = ({
                   >
                     Forgot Admin Password?
                   </button>
-                </div>
+                </div>}
+
+                {mfaChallenge && <div className="pt-1 pb-4 font-mono text-[11px] text-[#59544c]">
+                  Verification for <span className="font-bold">{email.trim()}</span>. Your password and device preference are retained for this challenge.
+                </div>}
 
                 {/* Submit Button */}
                 <button
@@ -261,9 +317,12 @@ export const AdminLoginView: React.FC<AdminLoginViewProps> = ({
                   disabled={isAuthenticating}
                   className="w-full py-4 bg-[#141312] text-[#f5efe6] font-mono text-[11px] font-bold tracking-[0.2em] uppercase hover:bg-[#35322e] transition-all flex items-center justify-center gap-2 cursor-pointer shadow-sm active:scale-[0.99] rounded-xs mt-4"
                 >
-                  <span>{isAuthenticating ? 'VERIFYING CREDENTIALS...' : 'SIGN IN TO ADMIN'}</span>
+                  <span>{isAuthenticating ? 'VERIFYING...' : mfaChallenge ? 'VERIFY & SIGN IN' : 'SIGN IN TO ADMIN'}</span>
                   <ArrowRight className="w-3.5 h-3.5" />
                 </button>
+                {mfaChallenge && <button type="button" onClick={() => { setMfaChallenge(false); setMfaCode(''); setUseRecoveryCode(false); }} className="w-full mt-3 py-2 font-mono text-[10px] uppercase text-[#59544c] hover:text-[#1a1816] underline">
+                  Back to credentials
+                </button>}
 
               </div>
 
@@ -296,13 +355,13 @@ export const AdminLoginView: React.FC<AdminLoginViewProps> = ({
             PRIVACY DIRECTIVE
           </button>
           <button
-            onClick={() => onShowToast('SYSTEM INTEGRITY AUDIT: 100% MERKLE GREEN')}
+            onClick={() => onShowToast('SYSTEM AUDIT STATUS IS AVAILABLE AFTER ADMIN SIGN-IN')}
             className="hover:text-[#1a1816] cursor-pointer"
           >
             SYSTEM AUDIT
           </button>
           <button
-            onClick={() => onShowToast('SECURITY SPEC: ZERO-TRUST TLS 1.3 / AES-256 ENCRYPTED')}
+            onClick={() => onShowToast('SECURITY CONFIGURATION IS DOCUMENTED IN THE DEPLOYMENT CHECKLIST')}
             className="hover:text-[#1a1816] cursor-pointer"
           >
             SECURITY SPEC
@@ -321,16 +380,12 @@ export const AdminLoginView: React.FC<AdminLoginViewProps> = ({
               </span>
             </div>
             <p className="text-[#59544c] mb-6 leading-relaxed">
-              Administrative credentials require hardware key signing or enterprise direct reset. Contact your system owner to restore access.
+              Email delivery is not configured for this deployment. Contact the system operator to reset the administrator password with the protected provisioning command. This page will not claim that a reset email was sent.
             </p>
             <div className="bg-[#ede7dd] border border-[#d5cdc0] p-4 mb-6 space-y-1">
               <div>
                 <span className="text-[#7b6e54]">ACCOUNT: </span>
-                <span className="font-bold text-[#1a1816]">EXISTING ADMINISTRATOR</span>
-              </div>
-              <div>
-                <span className="text-[#7b6e54]">ROLE: </span>
-                <span className="text-[#1a1816]">SUPERADMIN // MERKLE ROOT 01</span>
+                <span className="font-bold text-[#1a1816]">OPERATOR-ASSISTED RECOVERY</span>
               </div>
             </div>
             <button

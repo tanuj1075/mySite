@@ -34,117 +34,6 @@ export interface AdminReviewItem {
   upvotes: number;
 }
 
-const INITIAL_REVIEWS: AdminReviewItem[] = [
-  {
-    id: 'rev-01',
-    reviewerName: 'Julian Mercer',
-    membershipTier: 'Verified Member // Tier 01',
-    specimenId: 'vnt-x01-core',
-    specimenName: 'X-01 CORE ARCHITECTURAL RUNNER',
-    shade: 'Travertine Cream',
-    size: 'US 9.0',
-    rating: 5,
-    date: 'OCT 24 // 14:30',
-    fitAssessment: 'TRUE TO SIZE',
-    headline: 'Structural perfection and sublime weight balance',
-    content:
-      'The carbon core chassis delivers unprecedented torsion stability without sacrificing barefoot heel cushioning. The Travertine nubuck finish patina develops with an architectural warmth that off-the-shelf luxury cannot replicate.',
-    status: 'PINNED',
-    verifiedPurchase: true,
-    upvotes: 28,
-  },
-  {
-    id: 'rev-02',
-    reviewerName: 'Hélène Moreau',
-    membershipTier: 'Verified Member // Tier 02',
-    specimenId: 'vnt-m04-derby',
-    specimenName: 'M-04 MONOLITHIC COMBAT DERBY',
-    shade: 'Obsidian Black',
-    size: 'US 8.0',
-    rating: 5,
-    date: 'OCT 23 // 18:12',
-    fitAssessment: 'TRUE TO SIZE',
-    headline: 'Sublime architectural proportions for high transit',
-    content:
-      'The Goodyear monolithic storm welt provides utter moisture resistance across Parisian cobblestone. Leather stiffness resolved after 3 hours of wear into a tailored, contoured mold.',
-    status: 'PUBLISHED',
-    verifiedPurchase: true,
-    upvotes: 19,
-  },
-  {
-    id: 'rev-03',
-    reviewerName: 'Caspar Lindqvist',
-    membershipTier: 'Patron Archival Circle',
-    specimenId: 'vnt-a09-trainer',
-    specimenName: 'A-09 KINETIC VELOCITY TRAINER',
-    shade: 'Raw Clay // Desert',
-    size: 'US 11.0',
-    rating: 4,
-    date: 'OCT 22 // 11:45',
-    fitAssessment: 'SLIGHTLY NARROW',
-    headline: 'Nitrogen foam response is breathtaking — slightly snug forefoot',
-    content:
-      'Unmatched rebound under cadence. Would advise half a size calibration if planning long urban traversal, but aesthetic silhouette is flawlessly streamlined.',
-    status: 'PUBLISHED',
-    verifiedPurchase: true,
-    upvotes: 12,
-  },
-  {
-    id: 'rev-04',
-    reviewerName: 'Siddharth Rao',
-    membershipTier: 'Verified Member // Tier 01',
-    specimenId: 'vnt-c01-chelsea',
-    specimenName: 'C-01 MINIMALIST CHELSEA BOOT',
-    shade: 'Nocciola Brown',
-    size: 'US 10.0',
-    rating: 5,
-    date: 'OCT 21 // 20:05',
-    fitAssessment: 'TRUE TO SIZE',
-    headline: 'Clean uninterrupted silhouette and cryptographic tag authenticity',
-    content:
-      'NFC verification connected instantly to the mobile provenance ledger. The single-piece leather construction has no superfluous seams.',
-    status: 'PUBLISHED',
-    verifiedPurchase: true,
-    upvotes: 15,
-  },
-  {
-    id: 'rev-05',
-    reviewerName: 'Elena Rostova',
-    membershipTier: 'Archive Patron',
-    specimenId: 'vnt-k02-coat',
-    specimenName: 'K-02 ARCHITECTURAL STORM COAT',
-    shade: 'Sandstone Membrane',
-    size: 'Size 2 (M)',
-    rating: 5,
-    date: 'OCT 20 // 09:22',
-    fitAssessment: 'TRUE TO SIZE',
-    headline: 'Technical bonding execution is surgical',
-    content:
-      'Taped internal seams withstand torrential alpine conditions with zero vapor buildup. The magnetic closure hardware clicks with mechanical satisfaction.',
-    status: 'PINNED',
-    verifiedPurchase: true,
-    upvotes: 34,
-  },
-  {
-    id: 'rev-06',
-    reviewerName: 'Marcus Aurel',
-    membershipTier: 'Verified Client',
-    specimenId: 'vnt-x01-core',
-    specimenName: 'X-01 CORE ARCHITECTURAL RUNNER',
-    shade: 'Obsidian Black',
-    size: 'US 10.0',
-    rating: 4,
-    date: 'OCT 19 // 16:40',
-    fitAssessment: 'SLIGHTLY ROOMY',
-    headline: 'Presentation box packaging set a new standard for luxury',
-    content:
-      'From the vacuum-sealed protective sleeve to the brushed brass shoe horn, VANTA has treated footwear as an enduring industrial artifact.',
-    status: 'PENDING',
-    verifiedPurchase: true,
-    upvotes: 6,
-  },
-];
-
 interface AdminReviewsViewProps {
   products?: ShoeProduct[];
   onShowToast: (msg: string) => void;
@@ -156,16 +45,18 @@ export const AdminReviewsView: React.FC<AdminReviewsViewProps> = ({
   onShowToast,
   onSelectSection,
 }) => {
-  const [reviews, setReviews] = useState<AdminReviewItem[]>(INITIAL_REVIEWS);
+  const [reviews, setReviews] = useState<AdminReviewItem[]>([]);
   const [searchQuery, setSearchQuery] = useState('');
   const [ratingFilter, setRatingFilter] = useState<number | 'ALL'>('ALL');
   const [statusFilter, setStatusFilter] = useState<'ALL' | 'PINNED' | 'PUBLISHED' | 'PENDING' | 'HIDDEN'>('ALL');
 
   // Compute metrics
   const totalReviews = reviews.length;
-  const avgRating = (reviews.reduce((sum, r) => sum + r.rating, 0) / totalReviews).toFixed(2);
+  const avgRating = totalReviews
+    ? (reviews.reduce((sum, r) => sum + r.rating, 0) / totalReviews).toFixed(2)
+    : '—';
   const fiveStarsCount = reviews.filter((r) => r.rating === 5).length;
-  const fiveStarsPct = Math.round((fiveStarsCount / totalReviews) * 100);
+  const fiveStarsPct = totalReviews ? Math.round((fiveStarsCount / totalReviews) * 100) : 0;
   const pendingCount = reviews.filter((r) => r.status === 'PENDING').length;
   const pinnedCount = reviews.filter((r) => r.status === 'PINNED').length;
 
@@ -283,7 +174,7 @@ export const AdminReviewsView: React.FC<AdminReviewsViewProps> = ({
             {totalReviews} Dossiers
           </div>
           <div className="text-[9px] text-[#59544c] mt-0.5">
-            100% Cryptographic Order Binding
+            Order linkage is not measured.
           </div>
         </div>
 
@@ -310,7 +201,7 @@ export const AdminReviewsView: React.FC<AdminReviewsViewProps> = ({
             </span>
           </div>
           <div className="text-[9px] text-[#7b6e54] mt-0.5">
-            Awaiting automated spam &amp; tone audit
+            Moderation service is not connected.
           </div>
         </div>
       </div>

@@ -1,5 +1,5 @@
 import 'dotenv/config';
-import bcrypt from 'bcryptjs';
+import { hashPassword } from '../server/lib/auth.js';
 import { prisma } from '../server/lib/prisma.js';
 
 async function main() {
@@ -21,6 +21,9 @@ async function main() {
   if (password.length < 12) {
     throw new Error('ADMIN_PASSWORD must be at least 12 characters.');
   }
+  if (process.env.ADMIN_EMAIL_VERIFIED?.trim().toLowerCase() !== 'true') {
+    throw new Error('Verify the target mailbox out of band, then set ADMIN_EMAIL_VERIFIED=true for this operator-run command.');
+  }
 
   const existing = await prisma.user.findUnique({ where: { email } });
   if (existing && existing.role !== 'ADMIN') {
@@ -33,13 +36,19 @@ async function main() {
     return;
   }
 
-  const passwordHash = await bcrypt.hash(password, 12);
+  const passwordHash = await hashPassword(password);
   if (existing) {
-    await prisma.user.update({
-      where: { id: existing.id },
-      data: { passwordHash, failedLoginAttempts: 0, lockedUntil: null },
+    await prisma.$transaction(async (transaction) => {
+      await transaction.user.update({
+        where: { id: existing.id },
+        data: { passwordHash, failedLoginAttempts: 0, lockedUntil: null },
+      });
+      await transaction.refreshToken.updateMany({
+        where: { userId: existing.id, revokedAt: null },
+        data: { revokedAt: new Date() },
+      });
     });
-    console.info(`Admin password reset for ${email}. Existing MFA settings were preserved.`);
+    console.info(`Admin password reset for ${email}. Existing MFA settings were preserved and refresh sessions were revoked.`);
     return;
   }
 
