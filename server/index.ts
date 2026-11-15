@@ -109,19 +109,19 @@ const authLimiter = rateLimit({
   message: { error: 'Too many authentication attempts. Please try again in 15 minutes.' },
 });
 
-app.get('/api/health', (_req, res) => res.json({ status: 'ok' }));
-app.use('/api/auth', authLimiter, authRoutes);
-app.use('/api/products', productRoutes);
-app.use('/api/admin', adminRoutes);
-app.use('/api/cart', cartRoutes);
-app.use('/api/addresses', addressRoutes);
-app.use('/api/coupons', couponRoutes);
-app.use('/api/orders', orderRoutes);
-app.use('/api/payments', paymentRoutes);
-app.use('/api/exchanges', exchangeRoutes);
-app.use('/api/wishlist', wishlistRoutes);
-app.use('/api/drops', dropRoutes);
-app.use('/api/delivery', deliveryRoutes);
+app.get(['/api/health', '/health'], (_req, res) => res.json({ status: 'ok' }));
+app.use(['/api/auth', '/auth'], authLimiter, authRoutes);
+app.use(['/api/products', '/products'], productRoutes);
+app.use(['/api/admin', '/admin'], adminRoutes);
+app.use(['/api/cart', '/cart'], cartRoutes);
+app.use(['/api/addresses', '/addresses'], addressRoutes);
+app.use(['/api/coupons', '/coupons'], couponRoutes);
+app.use(['/api/orders', '/orders'], orderRoutes);
+app.use(['/api/payments', '/payments'], paymentRoutes);
+app.use(['/api/exchanges', '/exchanges'], exchangeRoutes);
+app.use(['/api/wishlist', '/wishlist'], wishlistRoutes);
+app.use(['/api/drops', '/drops'], dropRoutes);
+app.use(['/api/delivery', '/delivery'], deliveryRoutes);
 
 // Serve static client build if present (Unified full-stack deployment)
 const distDir = path.resolve(process.cwd(), 'dist');
