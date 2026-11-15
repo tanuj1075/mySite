@@ -12,6 +12,7 @@ import { AdminPaymentsView } from './admin/AdminPaymentsView';
 
 interface AdminPanelViewProps {
   isOpen: boolean;
+  adminIdentity: { email: string; name: string; role: string } | null;
   onClose: () => void;
   onLogoutAdmin?: () => void;
   products: ShoeProduct[];
@@ -20,9 +21,9 @@ interface AdminPanelViewProps {
   onDeleteProduct?: (productId: string) => void;
   onUpdateProduct?: (product: ShoeProduct) => void;
   orders: Order[];
-  onUpdateOrderStatus: (orderId: string, newStatus: any) => void;
+  onUpdateOrderStatus: (orderId: string, newStatus: any) => Promise<boolean>;
   exchanges: ExchangeReturnRequest[];
-  onUpdateExchangeStatus: (exchangeId: string, status: 'Approved' | 'Rejected') => void;
+  onUpdateExchangeStatus: (exchangeId: string, status: 'Approved' | 'Rejected') => Promise<boolean>;
   drops: SneakerDrop[];
   onAddNewDrop: (drop: SneakerDrop) => void;
   onUpdateDropStatus: (dropId: string, status: any) => void;
@@ -33,6 +34,7 @@ interface AdminPanelViewProps {
 
 export const AdminPanelView: React.FC<AdminPanelViewProps> = ({
   isOpen,
+  adminIdentity,
   onClose,
   onLogoutAdmin,
   products,
@@ -80,8 +82,9 @@ export const AdminPanelView: React.FC<AdminPanelViewProps> = ({
           setActiveSection('SECURITY_CLUSTER');
           onShowToast('ROUTED TO IMMUTABLE AUDIT TRAIL // SYSTEM INTEGRITY');
         }}
-        adminName="A. Vance"
-        adminRole="SUPER"
+        adminName={adminIdentity?.name ?? 'Administrator'}
+        adminEmail={adminIdentity?.email ?? ''}
+        adminRole={adminIdentity?.role ?? 'ADMIN'}
         onShowToast={onShowToast}
       />
 

@@ -34,11 +34,11 @@ For local testing, set `RAZORPAY_KEY_ID` and `RAZORPAY_KEY_SECRET` to your Razor
 
 ### Production deployment (Vercel + PostgreSQL)
 
-This repository deploys the Vite client and Express API in the same Vercel project. `api/index.ts` exports the Express application as a Vercel Function; `vercel.json` routes `/api/*` to it, serves `dist`, and provides the SPA fallback. The configured build command is `npm run vercel-build`.
+This repository deploys the Vite client and Express API in the same Vercel project. `api/[...path].ts` exports the Express application as a catch-all Vercel Function so Express receives the original `/api/...` path. `vercel.json` serves `dist` and provides the SPA fallback. The configured build command is `npm run vercel-build`.
 
-On production builds, `vercel-build` generates Prisma Client and applies checked-in migrations before building. After migrations, it runs `admin:provision`: when `ADMIN_EMAIL` and `ADMIN_PASSWORD` are configured, it creates the specified admin if missing. It never promotes an existing customer account. For an existing admin, the password is unchanged unless `ADMIN_RESET_PASSWORD=true` is explicitly set. The catalog seed is not part of deployment.
+On production builds, `vercel-build` generates Prisma Client and applies checked-in migrations before building. It does not create or reset administrator accounts. The catalog seed is not part of deployment.
 
-Configure `DATABASE_URL`, `DATABASE_URL_UNPOOLED`, `JWT_SECRET`, `JWT_REFRESH_SECRET`, `CLIENT_URL`, and the server-side payment-provider variables used by the API in Vercel Production. The client defaults to same-origin `/api`; leave `VITE_API_URL` unset or point it to the same Vercel origin plus `/api`. Never put secrets in a `VITE_` variable. To provision the admin account, set `ADMIN_EMAIL` and a unique `ADMIN_PASSWORD` of at least 12 characters in Vercel Production, then redeploy. If the account already exists and its password must be reset, also set `ADMIN_RESET_PASSWORD=true` for that deployment; remove that flag after a successful deployment. Admin credentials remain server-side and are never sent to the client bundle.
+Configure `DATABASE_URL`, `DATABASE_URL_UNPOOLED`, `JWT_SECRET`, `JWT_REFRESH_SECRET`, `CLIENT_URL`, and the server-side payment-provider variables used by the API in Vercel Production. Leave `VITE_API_URL` unset to use same-origin `/api`; production browsers will ignore a configured localhost URL and use same-origin routing. Never put secrets in a `VITE_` variable. Provision or reset administrator accounts with the operator-run procedure in `DEPLOYMENT.md`, not through deployment variables.
 
 After deployment, check `/api/health`, the product API, and the admin login. If a migration fails, inspect the migration error before changing the database; do not reset or bypass migration state.
 # mySite

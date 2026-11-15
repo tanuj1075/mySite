@@ -171,7 +171,7 @@ export const AdminSidebar: React.FC<AdminSidebarProps> = ({
               SECURITY ENGINE
             </span>
             <span className="text-[11px] font-bold tracking-wider uppercase flex items-center gap-1.5">
-              <span>AES-256 CLUSTER</span>
+              <span>ADMIN SYSTEM</span>
             </span>
           </div>
           <ShieldCheck className="w-4 h-4 text-[#16a34a]" />

@@ -1,4 +1,5 @@
 import { Router } from 'express';
+import crypto from 'node:crypto';
 import type { Prisma } from '@prisma/client';
 import { z } from 'zod';
 import { prisma } from '../lib/prisma.js';
@@ -47,18 +48,22 @@ router.patch('/exchanges/:id/status', async (req, res, next) => { try { const st
 router.get('/security/sessions', async (req, res, next) => {
   try {
     const adminId = req.auth!.sub;
+    const currentRefreshToken = req.header('X-Admin-Refresh-Token');
+    const currentTokenHash = currentRefreshToken
+      ? crypto.createHash('sha256').update(currentRefreshToken).digest('hex')
+      : null;
     const tokens = await prisma.refreshToken.findMany({
       where: { userId: adminId, revokedAt: null, expiresAt: { gt: new Date() } },
-      select: { id: true, createdAt: true, expiresAt: true, ipAddress: true, userAgent: true },
+      select: { id: true, tokenHash: true, createdAt: true, expiresAt: true, ipAddress: true, userAgent: true },
       orderBy: { createdAt: 'desc' },
     });
-    res.json(tokens.map((t, idx) => ({
+    res.json(tokens.map((t) => ({
       id: `vnt_sess_${t.id.slice(-6)}`,
       createdAt: t.createdAt,
       expiresAt: t.expiresAt,
-      isCurrent: idx === 0,
-      ip: t.ipAddress || '127.0.0.1 (Local Verified)',
-      environment: t.userAgent || 'Admin Session (Authenticated Token)',
+      isCurrent: currentTokenHash !== null && t.tokenHash === currentTokenHash,
+      ip: t.ipAddress || 'Not recorded',
+      environment: t.userAgent || 'User agent not recorded',
     })));
   } catch (error) { next(error); }
 });
@@ -66,11 +71,18 @@ router.get('/security/sessions', async (req, res, next) => {
 router.post('/security/sessions/revoke-all', async (req, res, next) => {
   try {
     const adminId = req.auth!.sub;
+    const currentRefreshToken = z.string().min(1).parse(req.body.refreshToken);
+    const currentTokenHash = crypto.createHash('sha256').update(currentRefreshToken).digest('hex');
+    const currentSession = await prisma.refreshToken.findFirst({
+      where: { userId: adminId, tokenHash: currentTokenHash, revokedAt: null, expiresAt: { gt: new Date() } },
+      select: { id: true },
+    });
+    if (!currentSession) return res.status(401).json({ error: 'Current admin refresh session is invalid' });
     const result = await prisma.refreshToken.updateMany({
-      where: { userId: adminId, revokedAt: null },
+      where: { userId: adminId, revokedAt: null, tokenHash: { not: currentTokenHash } },
       data: { revokedAt: new Date() },
     });
-    res.json({ revokedCount: result.count, message: 'All remote administrator sessions revoked' });
+    res.json({ revokedCount: result.count, message: 'Other administrator sessions revoked' });
   } catch (error) { next(error); }
 });
 
@@ -138,7 +150,7 @@ router.get('/security/stats', async (_req, res, next) => {
         },
       }),
       prisma.refreshToken.count({
-        where: { revokedAt: null, expiresAt: { gt: new Date() } },
+        where: { revokedAt: null, expiresAt: { gt: new Date() }, user: { role: 'ADMIN' } },
       }),
       prisma.user.count({ where: { role: 'ADMIN' } }),
       prisma.user.count({ where: { role: 'ADMIN', mfaEnabled: true } }),
@@ -155,7 +167,7 @@ router.get('/security/stats', async (_req, res, next) => {
       criticalEvents: criticalLogsCount,
       threatsBlocked24h: failedLogins24h,
       activeSessions: activeSessionsCount,
-      mfaComplianceRate: totalAdmins > 0 ? Math.round((mfaAdmins / totalAdmins) * 100) : 100,
+      mfaComplianceRate: totalAdmins > 0 ? Math.round((mfaAdmins / totalAdmins) * 100) : null,
       totalAdmins,
       mfaAdmins,
       lockedAccounts,

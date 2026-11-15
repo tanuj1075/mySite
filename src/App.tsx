@@ -36,8 +36,6 @@ import { UpiPaymentModal } from './components/UpiPaymentModal';
 import { INITIAL_CART_ITEMS, INITIAL_ADDRESSES } from './data/mockData';
 import {
   INITIAL_FOOTWEAR_CATALOG,
-  INITIAL_ORDERS,
-  INITIAL_EXCHANGES,
   INITIAL_DROPS,
   INITIAL_COUPONS,
 } from './data/footwearCatalog';
@@ -252,9 +250,9 @@ export default function App() {
   const [compareList, setCompareList] = useState<ShoeProduct[]>([]);
 
   // Orders & Post-Purchase State
-  const [orders, setOrders] = useState<Order[]>(INITIAL_ORDERS);
-  const [currentOrder, setCurrentOrder] = useState<Order | null>(INITIAL_ORDERS[0]);
-  const [exchanges, setExchanges] = useState<ExchangeReturnRequest[]>(INITIAL_EXCHANGES);
+  const [orders, setOrders] = useState<Order[]>([]);
+  const [currentOrder, setCurrentOrder] = useState<Order | null>(null);
+  const [exchanges, setExchanges] = useState<ExchangeReturnRequest[]>([]);
   const [drops, setDrops] = useState<SneakerDrop[]>(INITIAL_DROPS);
   const [coupons, setCoupons] = useState<Coupon[]>(INITIAL_COUPONS);
 
@@ -990,7 +988,7 @@ export default function App() {
       await adminApi.updateOrderStatus(orderId, status);
     } catch (error) {
       showToast(error instanceof Error ? error.message : 'Order status could not be saved');
-      return;
+      return false;
     }
     setOrders((prev) =>
       prev.map((o) => {
@@ -1003,6 +1001,7 @@ export default function App() {
       })
     );
     showToast(`ORDER #${orderId} STATUS ADVANCED TO: ${newStatus.toUpperCase()}`);
+    return true;
   };
 
   // Update Exchange Status
@@ -1014,12 +1013,13 @@ export default function App() {
       await adminApi.updateExchangeStatus(exchangeId, status);
     } catch (error) {
       showToast(error instanceof Error ? error.message : 'Exchange status could not be saved');
-      return;
+      return false;
     }
     setExchanges((prev) =>
       prev.map((ex) => (ex.id === exchangeId ? { ...ex, status } : ex))
     );
     showToast(`EXCHANGE ${exchangeId} ${status.toUpperCase()}`);
+    return true;
   };
 
   // Add New Drop
@@ -1448,6 +1448,7 @@ export default function App() {
       {/* Admin Panel Console (Sections 29-35) - Strictly gated to authenticated admins */}
       <AdminPanelView
         isOpen={isAdminPanelOpen && isAdminAuthenticated}
+        adminIdentity={adminIdentity}
         onClose={() => {
           setIsAdminPanelOpen(false);
           if (adminRoute === 'panel') navigateAdminRoute('/', false);

@@ -91,19 +91,19 @@ export async function checkAccountLocked(userId: string): Promise<{ locked: bool
 }
 
 export async function recordFailedLogin(userId: string, ip: string, userAgent: string): Promise<void> {
-  const user = await prisma.user.findUnique({
+  const user = await prisma.user.update({
     where: { id: userId },
+    data: { failedLoginAttempts: { increment: 1 } },
     select: { failedLoginAttempts: true },
   });
-  const attempts = (user?.failedLoginAttempts ?? 0) + 1;
+  const attempts = user.failedLoginAttempts;
   const shouldLock = attempts >= MAX_FAILED_ATTEMPTS;
-  await prisma.user.update({
-    where: { id: userId },
-    data: {
-      failedLoginAttempts: attempts,
-      lockedUntil: shouldLock ? new Date(Date.now() + LOCKOUT_DURATION_MS) : undefined,
-    },
-  });
+  if (shouldLock) {
+    await prisma.user.update({
+      where: { id: userId },
+      data: { lockedUntil: new Date(Date.now() + LOCKOUT_DURATION_MS) },
+    });
+  }
   await logSecurityEvent({
     userId,
     eventType: shouldLock ? 'ACCOUNT_LOCKED' : 'LOGIN_FAILED',

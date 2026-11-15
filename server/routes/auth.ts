@@ -182,13 +182,36 @@ router.post('/admin/login', async (req, res, next) => {
     // MFA is required for admin logins if enabled
     if (user.mfaEnabled && user.mfaSecret) {
       const totpToken = z.string().regex(/^\d{6}$/).optional().parse(req.body.totpToken);
-      if (!totpToken) {
+      const backupCode = z.string().min(1).max(32).optional().parse(req.body.backupCode);
+      if (totpToken && backupCode) {
+        return res.status(400).json({ error: 'Provide either an authenticator code or a recovery code' });
+      }
+      if (!totpToken && !backupCode) {
         return res.status(401).json({ error: 'MFA code required for admin login', mfaRequired: true });
       }
-      if (!verifyTotpToken(totpToken, user.mfaSecret)) {
+      if (totpToken && !verifyTotpToken(totpToken, user.mfaSecret)) {
         await recordFailedLogin(user.id, ip, ua);
         await logSecurityEvent({ userId: user.id, eventType: 'ADMIN_MFA_FAILED', severity: 'CRITICAL', ipAddress: ip, userAgent: ua });
         return res.status(401).json({ error: 'Invalid MFA code', mfaRequired: true });
+      }
+      if (backupCode) {
+        const stored = user.mfaBackupCodes ?? [];
+        const result = verifyBackupCode(backupCode, stored);
+        if (!result.isValid) {
+          await recordFailedLogin(user.id, ip, ua);
+          await logSecurityEvent({ userId: user.id, eventType: 'ADMIN_MFA_FAILED', severity: 'CRITICAL', ipAddress: ip, userAgent: ua });
+          return res.status(401).json({ error: 'Invalid recovery code', mfaRequired: true });
+        }
+        // Compare the complete stored array so concurrent requests cannot consume
+        // the same single-use recovery code twice.
+        const consumed = await prisma.user.updateMany({
+          where: { id: user.id, mfaBackupCodes: { equals: stored } },
+          data: { mfaBackupCodes: result.remainingHashedCodes },
+        });
+        if (consumed.count !== 1) {
+          return res.status(401).json({ error: 'Recovery code has already been used', mfaRequired: true });
+        }
+        await logSecurityEvent({ userId: user.id, eventType: 'MFA_BACKUP_CODE_USED', severity: 'HIGH', ipAddress: ip, userAgent: ua });
       }
     }
 
@@ -344,34 +367,11 @@ router.post('/mfa/disable', requireAuth, async (req, res, next) => {
 // ─── PASSWORD RESET REQUEST ───────────────────────────────────────────────────
 router.post('/password-reset/request', async (req, res, next) => {
   try {
-    const { email } = z.object({ email: z.string().email() }).parse(req.body);
-    const ip = getClientIp(req);
-    const ua = req.headers['user-agent'] ?? 'unknown';
-
-    // Always respond 200 to prevent email enumeration
-    res.json({ message: 'If an account exists with that email, a reset link has been sent.' });
-
-    const user = await prisma.user.findUnique({ where: { email: email.toLowerCase() } });
-    if (!user) return;
-
-    const rawToken = crypto.randomBytes(32).toString('hex');
-    const tokenHash = crypto.createHash('sha256').update(rawToken).digest('hex');
-    const expiresAt = new Date(Date.now() + 60 * 60 * 1000); // 1 hour
-
-    await prisma.user.update({
-      where: { id: user.id },
-      data: { passwordResetToken: tokenHash, passwordResetExpires: expiresAt },
+    z.object({ email: z.string().email() }).parse(req.body);
+    return res.status(503).json({
+      error: 'Self-service password recovery is unavailable. Contact the system operator to reset the administrator password.',
+      code: 'PASSWORD_RECOVERY_UNAVAILABLE',
     });
-
-    await logSecurityEvent({ userId: user.id, eventType: 'PASSWORD_RESET_REQUESTED', severity: 'MEDIUM', ipAddress: ip, userAgent: ua });
-
-    // TODO: Send email with reset link containing rawToken
-    // Example: sendEmail(user.email, `Reset your password: https://yoursite.com/reset-password?token=${rawToken}`)
-    // SECURITY: Only log the reset token in development. In production, the token MUST be delivered
-    // exclusively via email to prevent account takeover via log access.
-    if (process.env.NODE_ENV !== 'production') {
-      console.info(`[DEV] Password reset token for ${user.email}: ${rawToken}`);
-    }
   } catch (error) { next(error); }
 });
 
