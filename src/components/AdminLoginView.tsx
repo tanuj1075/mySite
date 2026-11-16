@@ -55,12 +55,6 @@ export const AdminLoginView: React.FC<AdminLoginViewProps> = ({
       onAdminLoginSuccess({ email: authenticatedAdmin.email, name: authenticatedAdmin.name, role: authenticatedAdmin.role });
       onShowToast(`ADMIN SESSION INITIALIZED: ${authenticatedAdmin.name} // PRIVILEGES UNLOCKED`);
     } catch (error) {
-      if (email.trim().toLowerCase() === 'admin@vanta.com' && password === 'VantaAdmin2026!') {
-        const admin = authApi.directAdminLogin(rememberDevice);
-        onAdminLoginSuccess(admin);
-        onShowToast('ADMIN SESSION INITIALIZED: VANTA Administrator // PRIVILEGES UNLOCKED');
-        return;
-      }
       const msg = error instanceof Error ? error.message : 'Admin authentication failed';
       if (error instanceof ApiRequestError && error.mfaRequired) {
         setMfaChallenge(true);
