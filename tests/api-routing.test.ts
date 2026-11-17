@@ -19,12 +19,18 @@ after(async () => {
   await once(server, 'close');
 });
 
-test('Vercel uses a catch-all function and does not rewrite API paths to /api', () => {
+test('Vercel SPA fallback leaves API paths for the serverless function', () => {
   const vercel = JSON.parse(readFileSync(resolve('vercel.json'), 'utf8')) as {
     rewrites: Array<{ source: string; destination: string }>;
   };
   assert.equal(existsSync(resolve('api/[...path].ts')), true);
-  assert.equal(vercel.rewrites.some(({ source, destination }) => source.startsWith('/api') && destination === '/api'), false);
+  const spaFallback = vercel.rewrites.find(({ destination }) => destination === '/index.html');
+  assert.ok(spaFallback, 'SPA deep links should resolve to index.html');
+  const spaPattern = new RegExp('^' + spaFallback.source + '$');
+  for (const path of ['/api', '/api/health', '/api/auth/register']) {
+    assert.equal(spaPattern.test(path), false, path + ' must be handled by the API function');
+  }
+  assert.equal(spaPattern.test('/register'), true, 'SPA routes should still resolve to index.html');
 });
 
 test('Express receives the health and protected admin routes at their original paths', async () => {
