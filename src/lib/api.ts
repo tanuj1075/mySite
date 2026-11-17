@@ -55,12 +55,18 @@ async function request<T>(path: string, init: RequestInit = {}): Promise<T> {
     ...init,
     headers: { 'Content-Type': 'application/json', ...(init.headers ?? {}) },
   });
-  const body = await response.json().catch(() => ({}));
+  const responseText = await response.text().catch(() => '');
+  let body: Record<string, unknown> = {};
+  try {
+    body = responseText ? JSON.parse(responseText) as Record<string, unknown> : {};
+  } catch {
+    // Vercel can return an HTML error page when a function fails before Express responds.
+  }
   if (!response.ok) {
     throw new ApiRequestError(
-      typeof body.error === 'string' ? body.error : 'Request failed',
+      typeof body.error === 'string' ? body.error : `Request failed (HTTP ${response.status})`,
       response.status,
-      body as Record<string, unknown>,
+      body,
     );
   }
   return body as T;
