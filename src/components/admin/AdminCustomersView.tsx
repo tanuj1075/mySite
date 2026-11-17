@@ -20,9 +20,16 @@ export const AdminCustomersView: React.FC<AdminCustomersViewProps> = ({
   const [selectedTier, setSelectedTier] = useState('ALL TIERS');
   const [inspectingCustomer, setInspectingCustomer] = useState<CustomerItem | null>(null);
   const [customers, setCustomers] = useState<CustomerItem[]>([]);
+  const [customersError, setCustomersError] = useState('');
+  const [isLoadingCustomers, setIsLoadingCustomers] = useState(true);
+  const [customerLoadKey, setCustomerLoadKey] = useState(0);
 
   useEffect(() => {
+    let isCurrent = true;
+    setIsLoadingCustomers(true);
+    setCustomersError('');
     adminApi.customers().then((records) => {
+      if (!isCurrent) return;
       setCustomers(records.map((record) => {
         const customerOrders = Array.isArray(record.orders) ? record.orders as Array<{ total: string | number }> : [];
         const customerAddresses = Array.isArray(record.addresses) ? record.addresses as Array<{ city: string; country: string }> : [];
@@ -40,8 +47,13 @@ export const AdminCustomersView: React.FC<AdminCustomersViewProps> = ({
           memberSince: Number.isNaN(createdAt.getTime()) ? 'Unknown' : createdAt.toLocaleDateString(undefined, { month: 'short', year: 'numeric' }),
         };
       }));
-    }).catch(() => setCustomers([]));
-  }, []);
+    }).catch((error: unknown) => {
+      if (isCurrent) setCustomersError(error instanceof Error ? error.message : 'Could not load customer accounts.');
+    }).finally(() => {
+      if (isCurrent) setIsLoadingCustomers(false);
+    });
+    return () => { isCurrent = false; };
+  }, [customerLoadKey]);
 
   // Filter customers
   const filteredCustomers = customers.filter((c) => {
@@ -210,6 +222,26 @@ export const AdminCustomersView: React.FC<AdminCustomersViewProps> = ({
               </tr>
             </thead>
             <tbody className="divide-y divide-[#d5cdc0]/70">
+              {customersError && (
+                <tr>
+                  <td colSpan={7} className="py-6 px-4 text-center text-red-800" role="alert">
+                    {customersError}{' '}
+                    <button
+                      type="button"
+                      onClick={() => setCustomerLoadKey((key) => key + 1)}
+                      className="font-bold underline cursor-pointer"
+                    >
+                      Retry
+                    </button>
+                  </td>
+                </tr>
+              )}
+              {isLoadingCustomers && customers.length === 0 && (
+                <tr><td colSpan={7} className="py-6 px-4 text-center text-[#59544c]">Loading customer accounts...</td></tr>
+              )}
+              {!isLoadingCustomers && !customersError && filteredCustomers.length === 0 && (
+                <tr><td colSpan={7} className="py-6 px-4 text-center text-[#59544c]">No customer accounts found.</td></tr>
+              )}
               {filteredCustomers.map((c) => (
                 <tr
                   key={c.id}

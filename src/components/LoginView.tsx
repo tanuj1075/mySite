@@ -44,14 +44,14 @@ export const LoginView: React.FC<LoginViewProps> = ({
       onNavigate('ADMIN_LOGIN');
       return;
     }
-    if (!password || password.length < 6) {
-      onShowToast('ENTER AN ENCRYPTED KEYCODE OF AT LEAST 6 CHARACTERS');
+    if (!password || password.length < 8) {
+      onShowToast('PASSWORD MUST BE AT LEAST 8 CHARACTERS');
       return;
     }
 
     setIsSubmitting(true);
     try {
-      const authenticatedUser = await authApi.login(email, password);
+      const authenticatedUser = await authApi.login(email.trim(), password);
       onLoginSuccess(authenticatedUser);
       onShowToast(`WELCOME BACK, ${authenticatedUser.name}. SESSION SECURED.`);
       onNavigate('COLLECTIONS');
@@ -70,14 +70,14 @@ export const LoginView: React.FC<LoginViewProps> = ({
       onShowToast('PLEASE ENTER A VALID EMAIL PROTOCOL');
       return;
     }
-    if (!password || password.length < 6) {
-      onShowToast('PASSWORD MUST MEET 6-CHARACTER CRYPTOGRAPHIC STANDARD');
+    if (!password || password.length < 8) {
+      onShowToast('PASSWORD MUST BE AT LEAST 8 CHARACTERS');
       return;
     }
 
     setIsSubmitting(true);
     try {
-      const newUser = await authApi.register(name, email, password);
+      const newUser = await authApi.register(name.trim(), email.trim(), password);
       onLoginSuccess(newUser);
       onShowToast(`VAULT REGISTRY INITIALIZED: ${newUser.name}`);
       onNavigate('COLLECTIONS');
@@ -382,6 +382,7 @@ export const LoginView: React.FC<LoginViewProps> = ({
                         id="login-password"
                         type={showPassword ? 'text' : 'password'}
                         required
+                        minLength={8}
                         value={password}
                         onChange={(e) => setPassword(e.target.value)}
                         placeholder="Enter your password"
@@ -502,9 +503,10 @@ export const LoginView: React.FC<LoginViewProps> = ({
                     <input
                       type="password"
                       required
+                      minLength={8}
                       value={password}
                       onChange={(e) => setPassword(e.target.value)}
-                      placeholder="At least 6 characters"
+                      placeholder="At least 8 characters"
                       className="w-full bg-white border border-[#d5cdc0] px-4 py-3 text-[13px] text-[#1a1816] font-mono focus:outline-none focus:border-[#1a1816]"
                     />
                   </div>
