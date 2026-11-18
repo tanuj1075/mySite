@@ -409,30 +409,7 @@ export const adminApi = {
 
 async function requestAdmin<T>(path: string, init: RequestInit = {}, canRefresh = true): Promise<T> {
   const accessToken = getAdminAccessToken();
-  if (!accessToken) throw new Error('Admin session required');
-
-  if (accessToken.startsWith('offline_')) {
-    if (path === '/auth/admin/session') {
-      return { id: 'admin_master', email: 'admin@vanta.com', name: 'VANTA Administrator', role: 'ADMIN', memberId: 'admin_master' } as T;
-    }
-    try {
-      const response = await fetch(`${API_URL}${path}`, {
-        ...init,
-        headers: {
-          'Content-Type': 'application/json',
-          ...(init.headers ?? {}),
-          Authorization: `Bearer ${accessToken}`,
-        },
-      });
-      if (response.ok) {
-        const data = await response.json().catch(() => null);
-        if (data !== null) return data as T;
-      }
-    } catch {
-      // Return empty fallback on network/offline errors
-    }
-    return [] as unknown as T;
-  }
+  if (!accessToken || accessToken.startsWith('offline_')) throw new Error('Admin session required');
 
   const response = await fetch(`${API_URL}${path}`, {
     ...init,
