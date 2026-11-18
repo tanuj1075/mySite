@@ -56,7 +56,12 @@ export const LoginView: React.FC<LoginViewProps> = ({
       onShowToast(`WELCOME BACK, ${authenticatedUser.name}. SESSION SECURED.`);
       onNavigate('COLLECTIONS');
     } catch (error) {
-      onShowToast(error instanceof Error ? error.message.toUpperCase() : 'AUTHENTICATION FAILED');
+      const msg = error instanceof Error ? error.message : 'Authentication failed';
+      if (msg.toLowerCase().includes('failed to fetch') || msg.toLowerCase().includes('network')) {
+        onShowToast('SERVER UNREACHABLE — PLEASE CHECK CONNECTION OR BACKEND STATUS');
+      } else {
+        onShowToast(msg.toUpperCase());
+      }
     } finally { setIsSubmitting(false); }
   };
 
@@ -82,7 +87,12 @@ export const LoginView: React.FC<LoginViewProps> = ({
       onShowToast(`VAULT REGISTRY INITIALIZED: ${newUser.name}`);
       onNavigate('COLLECTIONS');
     } catch (error) {
-      onShowToast(error instanceof Error ? error.message.toUpperCase() : 'REGISTRATION FAILED');
+      const msg = error instanceof Error ? error.message : 'Registration failed';
+      if (msg.toLowerCase().includes('failed to fetch') || msg.toLowerCase().includes('network')) {
+        onShowToast('SERVER UNREACHABLE — PLEASE CHECK CONNECTION OR BACKEND STATUS');
+      } else {
+        onShowToast(msg.toUpperCase());
+      }
     } finally { setIsSubmitting(false); }
   };
 

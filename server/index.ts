@@ -147,7 +147,7 @@ app.use((error: unknown, _req: express.Request, res: express.Response, _next: ex
 });
 
 const port = Number(process.env.PORT ?? 4000);
-if (!process.env.VERCEL) {
+if (!process.env.VERCEL && process.env.NODE_ENV !== 'test') {
   app.listen(port, '0.0.0.0', () => {
     console.log(`VANTA API listening on :${port}`);
     if (process.env.NODE_ENV !== 'test') {
