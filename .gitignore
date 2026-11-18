@@ -8,6 +8,10 @@ coverage/
 .env*
 !.env.example
 
+# Scratch, logs and local tool caches
 jk.txt
+*.tmp
 .neon
 .vercel
+.agents/
+skills-lock.json
