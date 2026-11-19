@@ -100,23 +100,20 @@ export const ProductListingView: React.FC<ProductListingViewProps> = ({
   // Mobile filters drawer toggle
   const [mobileFiltersOpen, setMobileFiltersOpen] = useState(false);
 
-  // Toggle size filter
+  // Toggle helper for multi-selects
   const toggleSize = (size: string) => {
     setSelectedSizes((prev) =>
       prev.includes(size) ? prev.filter((s) => s !== size) : [...prev, size]
     );
   };
 
-  // Toggle color filter
-  const toggleColor = (color: string) => {
+  const toggleColor = (colorName: string) => {
     setSelectedColors((prev) =>
-      prev.includes(color) ? prev.filter((c) => c !== color) : [...prev, color]
+      prev.includes(colorName) ? prev.filter((c) => c !== colorName) : [...prev, colorName]
     );
   };
 
-  // Reset all filters
   const resetFilters = () => {
-    isCustomPriceRef.current = false;
     setSelectedCategory('ALL');
     setSelectedBrand('ALL');
     setSelectedGender('ALL');
@@ -125,78 +122,76 @@ export const ProductListingView: React.FC<ProductListingViewProps> = ({
     setSelectedSport('ALL');
     setMinRating(0);
     setOnlyInStock(false);
+    isCustomPriceRef.current = false;
     setMaxPrice(PRICE_CEILING);
-    setVisibleCount(24);
+    setSortBy('POPULAR');
+    onShowToast('CATALOG MATRIX RESET // DEFAULT CANON RESTORED');
   };
 
-  // Filtered and Sorted products
+  // Filter Computation
   const filteredProducts = useMemo(() => {
-    return products.filter((p) => {
-      // Category filter
-      if (selectedCategory !== 'ALL') {
-        if (selectedCategory === 'Men' || selectedCategory === 'Women' || selectedCategory === 'Kids') {
-          if (p.gender !== selectedCategory && p.gender !== 'Unisex') return false;
-        } else if (p.category !== selectedCategory) {
-          return false;
-        }
-      }
-
-      // Brand filter
-      if (selectedBrand !== 'ALL' && p.brand !== selectedBrand) {
+    return products.filter((product) => {
+      // 1. Category
+      if (selectedCategory !== 'ALL' && product.category !== selectedCategory) {
         return false;
       }
 
-      // Gender filter
-      if (selectedGender !== 'ALL' && p.gender !== selectedGender && p.gender !== 'Unisex') {
+      // 2. Brand
+      if (selectedBrand !== 'ALL' && product.brand.toUpperCase() !== selectedBrand.toUpperCase()) {
         return false;
       }
 
-      // Color filter
-      if (selectedColors.length > 0) {
-        const hasMatchingColor = p.colors?.some((c) =>
-          selectedColors.some(
-            (sc) =>
-              c.name.toLowerCase().includes(sc.toLowerCase()) ||
-              sc.toLowerCase().includes(c.name.toLowerCase())
-          )
-        );
-        if (!hasMatchingColor) return false;
-      }
-
-      // Sport filter
-      if (selectedSport !== 'ALL' && p.sport !== selectedSport) {
+      // 3. Gender
+      if (selectedGender !== 'ALL' && product.gender !== selectedGender && product.gender !== 'Unisex') {
         return false;
       }
 
-      // Rating filter
-      if (minRating > 0 && p.rating < minRating) {
+      // 4. Sport / Use
+      if (selectedSport !== 'ALL' && product.use !== selectedSport) {
         return false;
       }
 
-      // Max price
-      if (p.price > maxPrice) {
+      // 5. Price Max
+      if (product.price > maxPrice) {
         return false;
       }
 
-      // Size-level inventory filter!
-      // A product matches if ANY of its colors has stock > 0 for the selected size
+      // 6. Minimum Rating
+      if (minRating > 0 && product.rating < minRating) {
+        return false;
+      }
+
+      // 7. Size Availability Filter (checks inventory exact sizes)
       if (selectedSizes.length > 0) {
-        const inventoryArrays = Object.values(p.sizeInventory) as SizeStock[][];
-        const hasMatchingSizeInStock = selectedSizes.some((targetSize) => {
-          return inventoryArrays.some((sizeStocks) => {
-            const match = sizeStocks.find((s) => s.size === targetSize);
-            return match && match.stock > 0;
-          });
+        let hasSelectedSizeInStock = false;
+        Object.values(product.sizeInventory || {}).forEach((sizeList: any) => {
+          if (Array.isArray(sizeList)) {
+            sizeList.forEach((st: any) => {
+              if (selectedSizes.includes(st.size) && st.stock > 0) {
+                hasSelectedSizeInStock = true;
+              }
+            });
+          }
         });
-        if (!hasMatchingSizeInStock) return false;
+        if (!hasSelectedSizeInStock) return false;
       }
 
-      // In Stock filter
+      // 8. Colors Filter
+      if (selectedColors.length > 0) {
+        const matchesColor = product.colors.some((c) => selectedColors.includes(c.name));
+        if (!matchesColor) return false;
+      }
+
+      // 9. In Stock Only
       if (onlyInStock) {
-        const inventoryArrays = Object.values(p.sizeInventory) as SizeStock[][];
-        const totalStock = inventoryArrays
-          .flat()
-          .reduce((acc, curr) => acc + curr.stock, 0);
+        let totalStock = 0;
+        Object.values(product.sizeInventory || {}).forEach((sizeList: any) => {
+          if (Array.isArray(sizeList)) {
+            sizeList.forEach((st: any) => {
+              totalStock += st.stock;
+            });
+          }
+        });
         if (totalStock <= 0) return false;
       }
 
@@ -207,48 +202,57 @@ export const ProductListingView: React.FC<ProductListingViewProps> = ({
     selectedCategory,
     selectedBrand,
     selectedGender,
-    selectedColors,
     selectedSport,
-    minRating,
     maxPrice,
+    minRating,
     selectedSizes,
+    selectedColors,
     onlyInStock,
   ]);
 
-  // Sort
+  // Sort Computation
   const sortedProducts = useMemo(() => {
-    return [...filteredProducts].sort((a, b) => {
-      if (sortBy === 'PRICE_ASC') return a.price - b.price;
-      if (sortBy === 'PRICE_DESC') return b.price - a.price;
-      if (sortBy === 'RATING') return b.rating - a.rating;
-      if (sortBy === 'DISCOUNT') return b.discountPercent - a.discountPercent;
-      if (sortBy === 'NEWEST') return (b.isNewArrival ? 1 : 0) - (a.isNewArrival ? 1 : 0);
-      if (sortBy === 'TRENDING') return b.reviewsCount - a.reviewsCount;
-      return b.rating * b.reviewsCount - a.rating * a.reviewsCount; // POPULAR
-    });
+    const list = [...filteredProducts];
+    switch (sortBy) {
+      case 'PRICE_ASC':
+        return list.sort((a, b) => a.price - b.price);
+      case 'PRICE_DESC':
+        return list.sort((a, b) => b.price - a.price);
+      case 'RATING':
+        return list.sort((a, b) => b.rating - a.rating);
+      case 'DISCOUNT':
+        return list.sort((a, b) => b.discountPercent - a.discountPercent);
+      case 'NEWEST':
+        return list.sort((a, b) => (b.isNewArrival ? 1 : 0) - (a.isNewArrival ? 1 : 0));
+      case 'TRENDING':
+        return list.sort((a, b) => b.reviewsCount - a.reviewsCount);
+      case 'POPULAR':
+      default:
+        return list.sort((a, b) => b.reviewsCount * b.rating - a.reviewsCount * a.rating);
+    }
   }, [filteredProducts, sortBy]);
 
   return (
-    <div className="w-full bg-[#ede7dd] text-[#1a1816] font-mono pb-24">
+    <div className="w-full bg-[#09090b] text-[#f4f4f6] font-mono pb-24">
       <div className="max-w-[1440px] mx-auto px-4 sm:px-8 lg:px-12 pt-6">
         
         {/* Page Header */}
-        <div className="border-b border-[#d5cdc0] pb-8 mb-8">
-          <div className="flex items-center gap-2 text-[10px] text-[#7b6e54] uppercase tracking-[0.2em] mb-3 font-bold">
-            <span className="w-1.5 h-1.5 bg-[#1a1816] inline-block"></span>
+        <div className="border-b border-[#242429] pb-8 mb-8">
+          <div className="flex items-center gap-2 text-[10px] text-[#c9a96e] uppercase tracking-[0.2em] mb-3 font-bold">
+            <span className="w-1.5 h-1.5 bg-[#c9a96e] inline-block"></span>
             <span>VANTA CATALOG // SPECIFICATION REGISTRY</span>
           </div>
 
           <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-6">
             <div>
-              <h1 className="font-headline text-4xl sm:text-6xl font-bold tracking-tight uppercase text-[#1a1816] leading-none mb-3">
+              <h1 className="font-headline text-4xl sm:text-6xl font-bold tracking-tight uppercase text-[#f4f4f6] leading-none mb-3">
                 {selectedCategory === 'ALL'
                   ? selectedBrand === 'ALL'
                     ? 'ALL FOOTWEAR'
                     : `${selectedBrand} COLLECTION`
                   : `${selectedCategory.toUpperCase()} COLLECTION`}
               </h1>
-              <p className="font-mono text-xs text-[#59544c] max-w-xl">
+              <p className="font-mono text-xs text-[#8e8e98] max-w-xl">
                 Showing {Math.min(visibleCount, sortedProducts.length)} of {sortedProducts.length} products ({products.length} in catalog). Filtered by architectural
                 material, size-level inventory, and brand canon.
               </p>
@@ -258,18 +262,18 @@ export const ProductListingView: React.FC<ProductListingViewProps> = ({
             <div className="flex items-center gap-3">
               <button
                 onClick={() => setMobileFiltersOpen(!mobileFiltersOpen)}
-                className="lg:hidden flex items-center gap-2 bg-[#f5efe6] border border-[#d5cdc0] px-4 py-2 text-xs font-bold text-[#1a1816] uppercase"
+                className="lg:hidden flex items-center gap-2 bg-[#121215] border border-[#242429] px-4 py-2 text-xs font-bold text-[#f4f4f6] uppercase cursor-pointer"
               >
-                <Filter className="w-3.5 h-3.5" />
+                <Filter className="w-3.5 h-3.5 text-[#c9a96e]" />
                 <span>FILTERS ({selectedSizes.length > 0 ? selectedSizes.length : ''})</span>
               </button>
 
               <div className="flex items-center gap-2">
-                <span className="text-[10px] font-bold text-[#7b6e54] uppercase">SORT:</span>
+                <span className="text-[10px] font-bold text-[#c9a96e] uppercase">SORT:</span>
                 <select
                   value={sortBy}
                   onChange={(e) => setSortBy(e.target.value as any)}
-                  className="bg-[#f5efe6] border border-[#d5cdc0] text-[#1a1816] text-[11px] px-3 py-2 font-mono uppercase focus:outline-none focus:border-[#1a1816] cursor-pointer"
+                  className="bg-[#121215] border border-[#242429] text-[#f4f4f6] text-[11px] px-3 py-2 font-mono uppercase focus:outline-none focus:border-[#8e8e98] cursor-pointer"
                 >
                   <option value="POPULAR">POPULAR CANON</option>
                   <option value="NEWEST">NEWEST DROPS</option>
@@ -285,30 +289,30 @@ export const ProductListingView: React.FC<ProductListingViewProps> = ({
         </div>
 
         {/* Quick Category / Brand Shortcut Strip */}
-        <div className="flex flex-wrap items-center gap-2 mb-8 pb-4 border-b border-[#d5cdc0] text-[11px]">
-          <span className="text-[10px] text-[#7b6e54] font-bold uppercase mr-1">QUICK PILLS:</span>
+        <div className="flex flex-wrap items-center gap-2 mb-8 pb-4 border-b border-[#242429] text-[11px]">
+          <span className="text-[10px] text-[#c9a96e] font-bold uppercase mr-1">QUICK PILLS:</span>
           {['ALL', 'Sneakers', 'Running', 'Casual Shoes', 'Formal Shoes', 'Boots'].map((cat) => (
             <button
               key={cat}
               onClick={() => setSelectedCategory(cat)}
               className={`px-3 py-1.5 uppercase transition-all cursor-pointer border ${
                 selectedCategory === cat
-                  ? 'bg-[#1a1816] text-[#f5efe6] border-[#1a1816] font-bold'
-                  : 'bg-[#f5efe6] text-[#59544c] border-[#d5cdc0] hover:text-[#1a1816]'
+                  ? 'bg-[#f4f4f6] text-[#09090b] border-[#f4f4f6] font-bold'
+                  : 'bg-[#121215] text-[#8e8e98] border-[#242429] hover:text-[#f4f4f6] hover:border-[#3a3a42]'
               }`}
             >
               {cat}
             </button>
           ))}
-          <div className="h-4 w-[1px] bg-[#d5cdc0] mx-2 hidden sm:block" />
-          {['CAMPUS', 'NIKE', 'ADIDAS', 'PUMA', 'RED TAPE', 'NEW BALANCE'].map((br) => (
+          <div className="h-4 w-[1px] bg-[#242429] mx-2 hidden sm:block" />
+          {['VANTA ATELIER', 'CAMPUS', 'NIKE', 'ADIDAS', 'PUMA', 'RED TAPE', 'NEW BALANCE'].map((br) => (
             <button
               key={br}
               onClick={() => setSelectedBrand(selectedBrand === br ? 'ALL' : br)}
               className={`px-3 py-1.5 uppercase transition-all cursor-pointer border text-[10px] ${
                 selectedBrand === br
-                  ? 'bg-[#1a1816] text-[#f5efe6] border-[#1a1816] font-bold'
-                  : 'bg-[#f5efe6] text-[#59544c] border-[#d5cdc0] hover:text-[#1a1816]'
+                  ? 'bg-[#f4f4f6] text-[#09090b] border-[#f4f4f6] font-bold'
+                  : 'bg-[#121215] text-[#8e8e98] border-[#242429] hover:text-[#f4f4f6] hover:border-[#3a3a42]'
               }`}
             >
               {br}
@@ -321,18 +325,18 @@ export const ProductListingView: React.FC<ProductListingViewProps> = ({
           
           {/* LEFT SIDEBAR FILTERS */}
           <div
-            className={`lg:col-span-3 space-y-6 bg-[#f5efe6] border border-[#d5cdc0] p-5 ${
+            className={`lg:col-span-3 space-y-6 bg-[#121215] border border-[#242429] p-5 ${
               mobileFiltersOpen ? 'block' : 'hidden lg:block'
             }`}
           >
-            <div className="flex items-center justify-between border-b border-[#d5cdc0] pb-3">
-              <span className="text-xs font-bold text-[#1a1816] uppercase tracking-wider flex items-center gap-1.5">
-                <Filter className="w-3.5 h-3.5" />
+            <div className="flex items-center justify-between border-b border-[#242429] pb-3">
+              <span className="text-xs font-bold text-[#f4f4f6] uppercase tracking-wider flex items-center gap-1.5">
+                <Filter className="w-3.5 h-3.5 text-[#c9a96e]" />
                 FILTER MATRIX
               </span>
               <button
                 onClick={resetFilters}
-                className="text-[10px] text-[#7b6e54] hover:text-[#1a1816] flex items-center gap-1 underline cursor-pointer"
+                className="text-[10px] text-[#c9a96e] hover:text-[#f4f4f6] flex items-center gap-1 underline cursor-pointer transition-colors"
               >
                 <RotateCcw className="w-3 h-3" />
                 RESET ALL
@@ -340,16 +344,16 @@ export const ProductListingView: React.FC<ProductListingViewProps> = ({
             </div>
 
             {/* 1. SIZE-LEVEL INVENTORY FILTER */}
-            <div className="space-y-2 border-b border-[#d5cdc0] pb-4">
+            <div className="space-y-2 border-b border-[#242429] pb-4">
               <div className="flex items-center justify-between">
-                <span className="text-[11px] font-bold text-[#1a1816] uppercase">
-                  SIZE (US)
+                <span className="text-[11px] font-bold text-[#f4f4f6] uppercase">
+                  SIZE (US / EU)
                 </span>
-                <span className="text-[9px] text-[#7b6e54]">
+                <span className="text-[9px] text-[#c9a96e]">
                   {selectedSizes.length > 0 ? `${selectedSizes.length} selected` : 'Any Size'}
                 </span>
               </div>
-              <p className="text-[9px] text-[#59544c]">
+              <p className="text-[9px] text-[#8e8e98]">
                 Displays only shoes with verified stock in these exact sizes:
               </p>
               <div className="grid grid-cols-4 gap-1.5 pt-1">
@@ -359,101 +363,103 @@ export const ProductListingView: React.FC<ProductListingViewProps> = ({
                     <button
                       key={size}
                       onClick={() => toggleSize(size)}
-                      className={`py-2 text-xs font-bold border transition-colors cursor-pointer text-center ${
+                      className={`py-1.5 text-center text-xs border font-mono transition-colors cursor-pointer ${
                         isSelected
-                          ? 'bg-[#141312] text-[#f5efe6] border-[#141312]'
-                          : 'bg-[#ede7dd] text-[#1a1816] border-[#d5cdc0] hover:border-[#1a1816]'
+                          ? 'bg-[#f4f4f6] text-[#09090b] border-[#f4f4f6] font-bold'
+                          : 'bg-[#18181c] text-[#8e8e98] border-[#242429] hover:border-[#3a3a42] hover:text-[#f4f4f6]'
                       }`}
                     >
-                      US {size}
+                      {size}
                     </button>
                   );
                 })}
               </div>
             </div>
 
-            {/* 2. BRAND FILTER */}
-            <div className="space-y-2 border-b border-[#d5cdc0] pb-4">
-              <span className="text-[11px] font-bold text-[#1a1816] uppercase block">
-                BRAND
-              </span>
-              <div className="space-y-1 max-h-44 overflow-y-auto pr-1">
-                <label className="flex items-center gap-2 text-xs cursor-pointer hover:text-[#1a1816] text-[#59544c]">
-                  <input
-                    type="radio"
-                    name="brand"
-                    checked={selectedBrand === 'ALL'}
-                    onChange={() => setSelectedBrand('ALL')}
-                    className="accent-[#1a1816]"
-                  />
+            {/* 2. BRAND CANON */}
+            <div className="space-y-2 border-b border-[#242429] pb-4">
+              <div className="flex items-center justify-between">
+                <span className="text-[11px] font-bold text-[#f4f4f6] uppercase">BRAND CANON</span>
+                <span className="text-[9px] text-[#c9a96e]">{selectedBrand}</span>
+              </div>
+              <div className="max-h-48 overflow-y-auto space-y-1 pr-1">
+                <button
+                  onClick={() => setSelectedBrand('ALL')}
+                  className={`w-full text-left px-2 py-1 text-xs uppercase flex items-center justify-between border cursor-pointer ${
+                    selectedBrand === 'ALL'
+                      ? 'bg-[#18181c] border-[#f4f4f6] text-[#f4f4f6] font-bold'
+                      : 'border-transparent text-[#8e8e98] hover:text-[#f4f4f6]'
+                  }`}
+                >
                   <span>ALL BRANDS</span>
-                </label>
+                  {selectedBrand === 'ALL' && <Check className="w-3 h-3 text-[#c9a96e]" />}
+                </button>
                 {BRANDS.map((brand) => (
-                  <label
+                  <button
                     key={brand}
-                    className="flex items-center gap-2 text-xs cursor-pointer hover:text-[#1a1816] text-[#59544c]"
+                    onClick={() => setSelectedBrand(brand)}
+                    className={`w-full text-left px-2 py-1 text-xs uppercase flex items-center justify-between border cursor-pointer ${
+                      selectedBrand === brand
+                        ? 'bg-[#18181c] border-[#f4f4f6] text-[#f4f4f6] font-bold'
+                        : 'border-transparent text-[#8e8e98] hover:text-[#f4f4f6]'
+                    }`}
                   >
-                    <input
-                      type="radio"
-                      name="brand"
-                      checked={selectedBrand === brand}
-                      onChange={() => setSelectedBrand(brand)}
-                      className="accent-[#1a1816]"
-                    />
                     <span>{brand}</span>
-                  </label>
+                    {selectedBrand === brand && <Check className="w-3 h-3 text-[#c9a96e]" />}
+                  </button>
                 ))}
               </div>
             </div>
 
-            {/* 3. CATEGORY FILTER */}
-            <div className="space-y-2 border-b border-[#d5cdc0] pb-4">
-              <span className="text-[11px] font-bold text-[#1a1816] uppercase block">
-                CATEGORY
-              </span>
-              <div className="space-y-1 max-h-44 overflow-y-auto pr-1">
-                <label className="flex items-center gap-2 text-xs cursor-pointer hover:text-[#1a1816] text-[#59544c]">
-                  <input
-                    type="radio"
-                    name="cat"
-                    checked={selectedCategory === 'ALL'}
-                    onChange={() => setSelectedCategory('ALL')}
-                    className="accent-[#1a1816]"
-                  />
+            {/* 3. CATEGORY / SILHOUETTE */}
+            <div className="space-y-2 border-b border-[#242429] pb-4">
+              <div className="flex items-center justify-between">
+                <span className="text-[11px] font-bold text-[#f4f4f6] uppercase">CATEGORY</span>
+                <span className="text-[9px] text-[#c9a96e]">{selectedCategory}</span>
+              </div>
+              <div className="max-h-44 overflow-y-auto space-y-1 pr-1">
+                <button
+                  onClick={() => setSelectedCategory('ALL')}
+                  className={`w-full text-left px-2 py-1 text-xs uppercase flex items-center justify-between border cursor-pointer ${
+                    selectedCategory === 'ALL'
+                      ? 'bg-[#18181c] border-[#f4f4f6] text-[#f4f4f6] font-bold'
+                      : 'border-transparent text-[#8e8e98] hover:text-[#f4f4f6]'
+                  }`}
+                >
                   <span>ALL CATEGORIES</span>
-                </label>
+                  {selectedCategory === 'ALL' && <Check className="w-3 h-3 text-[#c9a96e]" />}
+                </button>
                 {CATEGORIES.map((cat) => (
-                  <label
+                  <button
                     key={cat}
-                    className="flex items-center gap-2 text-xs cursor-pointer hover:text-[#1a1816] text-[#59544c]"
+                    onClick={() => setSelectedCategory(cat)}
+                    className={`w-full text-left px-2 py-1 text-xs uppercase flex items-center justify-between border cursor-pointer ${
+                      selectedCategory === cat
+                        ? 'bg-[#18181c] border-[#f4f4f6] text-[#f4f4f6] font-bold'
+                        : 'border-transparent text-[#8e8e98] hover:text-[#f4f4f6]'
+                    }`}
                   >
-                    <input
-                      type="radio"
-                      name="cat"
-                      checked={selectedCategory === cat}
-                      onChange={() => setSelectedCategory(cat)}
-                      className="accent-[#1a1816]"
-                    />
                     <span>{cat}</span>
-                  </label>
+                    {selectedCategory === cat && <Check className="w-3 h-3 text-[#c9a96e]" />}
+                  </button>
                 ))}
               </div>
             </div>
 
             {/* 4. GENDER / DEMOGRAPHIC */}
-            <div className="space-y-2 border-b border-[#d5cdc0] pb-4">
-              <span className="text-[11px] font-bold text-[#1a1816] uppercase block">
-                DEPARTMENT
+            <div className="space-y-2 border-b border-[#242429] pb-4">
+              <span className="text-[11px] font-bold text-[#f4f4f6] uppercase block">
+                DEMOGRAPHIC
               </span>
               <div className="grid grid-cols-2 gap-1.5">
-                {['ALL', 'Men', 'Women', 'Kids'].map((g) => (
+                {['ALL', ...GENDERS].map((g) => (
                   <button
                     key={g}
                     onClick={() => setSelectedGender(g)}
-                    className={`py-1.5 px-2 text-[10px] uppercase font-bold border transition-colors cursor-pointer ${
+                    className={`py-1.5 px-2 text-center text-xs uppercase border transition-colors cursor-pointer ${
                       selectedGender === g
-                        ? 'bg-[#1a1816] text-[#f5efe6] border-[#1a1816]'
-                        : 'bg-[#ede7dd] text-[#59544c] border-[#d5cdc0] hover:text-[#1a1816]'
+                        ? 'bg-[#f4f4f6] text-[#09090b] border-[#f4f4f6] font-bold'
+                        : 'bg-[#18181c] text-[#8e8e98] border-[#242429] hover:border-[#3a3a42] hover:text-[#f4f4f6]'
                     }`}
                   >
                     {g}
@@ -462,43 +468,11 @@ export const ProductListingView: React.FC<ProductListingViewProps> = ({
               </div>
             </div>
 
-            {/* 5. COLORWAY FILTER */}
-            {availableColors.length > 0 && (
-              <div className="space-y-2 border-b border-[#d5cdc0] pb-4">
-                <div className="flex items-center justify-between">
-                  <span className="text-[11px] font-bold text-[#1a1816] uppercase">
-                    COLORWAY
-                  </span>
-                  <span className="text-[9px] text-[#7b6e54]">
-                    {selectedColors.length > 0 ? `${selectedColors.length} active` : 'All'}
-                  </span>
-                </div>
-                <div className="flex flex-wrap gap-1.5 pt-1">
-                  {availableColors.map((col) => {
-                    const isSelected = selectedColors.includes(col);
-                    return (
-                      <button
-                        key={col}
-                        onClick={() => toggleColor(col)}
-                        className={`py-1 px-2 text-[9px] uppercase font-bold border transition-colors cursor-pointer ${
-                          isSelected
-                            ? 'bg-[#141312] text-[#f5efe6] border-[#141312]'
-                            : 'bg-[#ede7dd] text-[#59544c] border-[#d5cdc0] hover:border-[#1a1816]'
-                        }`}
-                      >
-                        {col}
-                      </button>
-                    );
-                  })}
-                </div>
-              </div>
-            )}
-
-            {/* 6. PRICE RANGE SLIDER */}
-            <div className="space-y-2 border-b border-[#d5cdc0] pb-4">
-              <div className="flex items-center justify-between text-[11px]">
-                <span className="font-bold text-[#1a1816] uppercase">MAX PRICE</span>
-                <span className="font-bold text-[#1a1816]">{formatCurrency(maxPrice)}</span>
+            {/* 5. PRICE RANGE SLIDER */}
+            <div className="space-y-2 border-b border-[#242429] pb-4">
+              <div className="flex items-center justify-between text-xs">
+                <span className="font-bold text-[#f4f4f6] uppercase">MAX PRICE</span>
+                <span className="font-bold text-[#c9a96e]">{formatCurrency(maxPrice)}</span>
               </div>
               <input
                 type="range"
@@ -510,9 +484,9 @@ export const ProductListingView: React.FC<ProductListingViewProps> = ({
                   isCustomPriceRef.current = true;
                   setMaxPrice(Number(e.target.value));
                 }}
-                className="w-full accent-[#1a1816] cursor-pointer"
+                className="w-full accent-[#c9a96e] cursor-pointer"
               />
-              <div className="flex justify-between text-[9px] text-[#7b6e54]">
+              <div className="flex justify-between text-[9px] text-[#8e8e98]">
                 <span>{formatCurrency(0)}</span>
                 <span>{formatCurrency(PRICE_CEILING)}</span>
               </div>
@@ -520,18 +494,18 @@ export const ProductListingView: React.FC<ProductListingViewProps> = ({
 
             {/* 6. MINIMUM RATING & AVAILABILITY */}
             <div className="space-y-3">
-              <label className="flex items-center gap-2 text-xs cursor-pointer text-[#1a1816] font-bold">
+              <label className="flex items-center gap-2 text-xs cursor-pointer text-[#f4f4f6] font-bold">
                 <input
                   type="checkbox"
                   checked={onlyInStock}
                   onChange={(e) => setOnlyInStock(e.target.checked)}
-                  className="accent-[#1a1816]"
+                  className="accent-[#c9a96e]"
                 />
                 <span>IN STOCK ONLY</span>
               </label>
 
               <div className="space-y-1">
-                <span className="text-[10px] font-bold text-[#7b6e54] uppercase block">
+                <span className="text-[10px] font-bold text-[#c9a96e] uppercase block">
                   CUSTOMER RATING:
                 </span>
                 <div className="flex gap-1">
@@ -541,8 +515,8 @@ export const ProductListingView: React.FC<ProductListingViewProps> = ({
                       onClick={() => setMinRating(rt)}
                       className={`flex-1 py-1 text-[10px] border transition-colors cursor-pointer ${
                         minRating === rt
-                          ? 'bg-[#1a1816] text-[#f5efe6] border-[#1a1816] font-bold'
-                          : 'bg-[#ede7dd] text-[#59544c] border-[#d5cdc0]'
+                          ? 'bg-[#f4f4f6] text-[#09090b] border-[#f4f4f6] font-bold'
+                          : 'bg-[#18181c] text-[#8e8e98] border-[#242429] hover:border-[#3a3a42]'
                       }`}
                     >
                       {rt === 0 ? 'All' : `${rt}★+`}
@@ -556,17 +530,17 @@ export const ProductListingView: React.FC<ProductListingViewProps> = ({
           {/* RIGHT PRODUCT CARDS GRID */}
           <div className="lg:col-span-9">
             {sortedProducts.length === 0 ? (
-              <div className="bg-[#f5efe6] border border-[#d5cdc0] p-12 text-center space-y-4">
-                <h3 className="text-base font-bold uppercase text-[#1a1816]">
+              <div className="bg-[#121215] border border-[#242429] p-12 text-center space-y-4">
+                <h3 className="text-base font-bold uppercase text-[#f4f4f6]">
                   NO MATCHING FOOTWEAR SPECIFICATIONS FOUND
                 </h3>
-                <p className="text-xs text-[#59544c] max-w-md mx-auto">
+                <p className="text-xs text-[#8e8e98] max-w-md mx-auto">
                   Adjust your active filters or clear the size criteria to view available archival
                   allocations.
                 </p>
                 <button
                   onClick={resetFilters}
-                  className="bg-[#141312] text-[#f5efe6] px-5 py-2.5 text-xs font-bold uppercase tracking-wider hover:bg-[#35322e] transition-colors cursor-pointer"
+                  className="bg-[#f4f4f6] text-[#09090b] px-5 py-2.5 text-xs font-bold uppercase tracking-wider hover:bg-[#c9a96e] transition-colors cursor-pointer"
                 >
                   RESET ALL FILTERS
                 </button>
@@ -598,12 +572,12 @@ export const ProductListingView: React.FC<ProductListingViewProps> = ({
                   return (
                     <div
                       key={shoe.id}
-                      className="border border-[#d5cdc0] bg-[#f5efe6] flex flex-col justify-between group hover:border-[#1a1816] transition-all duration-300 hover:-translate-y-1 shadow-sm"
+                      className="border border-[#242429] bg-[#121215] flex flex-col justify-between group hover:border-[#3a3a42] transition-all duration-300 hover:-translate-y-1 shadow-xl"
                     >
                       <div className="p-5">
                         {/* Card Header: Brand, Code, Wishlist */}
                         <div className="flex items-center justify-between text-[10px] mb-3">
-                          <span className="text-[#7b6e54] font-bold tracking-wider uppercase">
+                          <span className="text-[#c9a96e] font-bold tracking-wider uppercase">
                             {shoe.brand} // {shoe.code}
                           </span>
                           <div className="flex items-center gap-1.5">
@@ -613,7 +587,7 @@ export const ProductListingView: React.FC<ProductListingViewProps> = ({
                                 onToggleWishlist(shoe);
                               }}
                               className={`p-1 transition-colors cursor-pointer ${
-                                isWish ? 'text-[#1a1816]' : 'text-[#8e8474] hover:text-[#1a1816]'
+                                isWish ? 'text-[#c9a96e]' : 'text-[#8e8e98] hover:text-[#f4f4f6]'
                               }`}
                               title={isWish ? 'Remove from Wishlist' : 'Add to Wishlist'}
                             >
@@ -625,7 +599,7 @@ export const ProductListingView: React.FC<ProductListingViewProps> = ({
                                 onToggleCompare(shoe);
                               }}
                               className={`p-1 transition-colors cursor-pointer ${
-                                isComp ? 'text-[#1a1816]' : 'text-[#8e8474] hover:text-[#1a1816]'
+                                isComp ? 'text-[#c9a96e]' : 'text-[#8e8e98] hover:text-[#f4f4f6]'
                               }`}
                               title="Add to comparison"
                             >
@@ -637,7 +611,7 @@ export const ProductListingView: React.FC<ProductListingViewProps> = ({
                         {/* Image Preview with Dual-Angle Hover Reveal */}
                         <div
                           onClick={() => onSelectProduct(shoe)}
-                          className="relative aspect-[4/3] bg-[#ede7dd] border border-[#d5cdc0] overflow-hidden mb-4 cursor-pointer"
+                          className="relative aspect-[4/3] bg-[#09090b] border border-[#242429] overflow-hidden mb-4 cursor-pointer"
                         >
                           {/* Primary Front Angle */}
                           <img
@@ -668,17 +642,17 @@ export const ProductListingView: React.FC<ProductListingViewProps> = ({
                           )}
 
                           {shoe.discountPercent > 0 && (
-                            <div className="absolute top-2 left-2 bg-[#141312] text-[#f5efe6] px-2 py-0.5 text-[9px] font-bold tracking-wider uppercase">
+                            <div className="absolute top-2 left-2 bg-[#f4f4f6] text-[#09090b] px-2 py-0.5 text-[9px] font-bold tracking-wider uppercase">
                               {shoe.discountPercent}% OFF
                             </div>
                           )}
                           {shoe.isLimitedDrop && (
-                            <div className="absolute bottom-2 left-2 bg-[#ede7dd]/90 border border-[#d5cdc0] px-2 py-0.5 text-[9px] font-bold text-[#1a1816]">
+                            <div className="absolute bottom-2 left-2 bg-[#121215]/90 border border-[#242429] px-2 py-0.5 text-[9px] font-bold text-[#c9a96e]">
                               LIMITED DROP
                             </div>
                           )}
                           {totalStock > 0 && totalStock <= 10 && (
-                            <div className="absolute top-2 right-2 bg-[#b83b3b] text-[#f5efe6] px-2 py-0.5 text-[8px] font-bold tracking-wider uppercase animate-pulse">
+                            <div className="absolute top-2 right-2 bg-red-950/80 border border-red-500/50 text-red-300 px-2 py-0.5 text-[8px] font-bold tracking-wider uppercase animate-pulse">
                               ONLY {totalStock} LEFT
                             </div>
                           )}
@@ -687,24 +661,24 @@ export const ProductListingView: React.FC<ProductListingViewProps> = ({
                         {/* Product Title & Rating */}
                         <div className="space-y-1 mb-3">
                           <div className="flex items-center justify-between">
-                            <span className="text-[10px] text-[#59544c] uppercase">
+                            <span className="text-[10px] text-[#8e8e98] uppercase">
                               {shoe.category} • {shoe.gender}
                             </span>
-                            <div className="flex items-center gap-1 text-[10px] font-bold text-[#1a1816]">
+                            <div className="flex items-center gap-1 text-[10px] font-bold text-[#f4f4f6]">
                               {shoe.reviewsCount > 0 ? (
                                 <>
-                                  <Star className="w-3 h-3 fill-[#1a1816]" />
+                                  <Star className="w-3 h-3 fill-[#c9a96e] text-[#c9a96e]" />
                                   <span>{shoe.rating}</span>
                                 </>
                               ) : (
-                                <span className="text-[#7b6e54]">Not rated</span>
+                                <span className="text-[#8e8e98]">Not rated</span>
                               )}
                             </div>
                           </div>
 
                           <h3
                             onClick={() => onSelectProduct(shoe)}
-                            className="font-headline text-lg font-bold uppercase text-[#1a1816] tracking-tight hover:underline cursor-pointer leading-snug"
+                            className="font-headline text-lg font-bold uppercase text-[#f4f4f6] tracking-tight hover:text-[#c9a96e] cursor-pointer leading-snug transition-colors"
                           >
                             {shoe.name}
                           </h3>
@@ -712,10 +686,10 @@ export const ProductListingView: React.FC<ProductListingViewProps> = ({
 
                         {/* Price & MRP */}
                         <div className="flex items-baseline gap-2 mb-3">
-                          <span className="text-base font-bold text-[#1a1816]">
+                          <span className="text-base font-bold text-[#f4f4f6]">
                             {formatCurrency(shoe.price)}
                           </span>
-                          <span className="text-xs text-[#8e8474] line-through">
+                          <span className="text-xs text-[#52525b] line-through">
                             {formatCurrency(shoe.mrp)}
                           </span>
                         </div>
@@ -723,14 +697,14 @@ export const ProductListingView: React.FC<ProductListingViewProps> = ({
                         {/* Colorway Swatches Preview */}
                         {shoe.colors && shoe.colors.length > 1 && (
                           <div className="flex items-center gap-1.5 mb-3">
-                            <span className="text-[8px] uppercase tracking-wider text-[#7b6e54] font-bold mr-1">
+                            <span className="text-[8px] uppercase tracking-wider text-[#c9a96e] font-bold mr-1">
                               {shoe.colors.length} TONES:
                             </span>
                             {shoe.colors.map((c) => (
                               <span
                                 key={c.name}
                                 title={c.name}
-                                className="w-2.5 h-2.5 rounded-full border border-[#d5cdc0]"
+                                className="w-2.5 h-2.5 rounded-full border border-[#3a3a42]"
                                 style={{ backgroundColor: c.hex }}
                               />
                             ))}
@@ -738,15 +712,15 @@ export const ProductListingView: React.FC<ProductListingViewProps> = ({
                         )}
 
                         {/* Available Sizes List */}
-                        <div className="space-y-1 pt-2 border-t border-[#d5cdc0]">
-                          <span className="text-[9px] font-bold text-[#7b6e54] uppercase block">
+                        <div className="space-y-1 pt-2 border-t border-[#242429]">
+                          <span className="text-[9px] font-bold text-[#c9a96e] uppercase block">
                             AVAILABLE SIZES:
                           </span>
                           <div className="flex flex-wrap gap-1">
                             {allSizesInStock.map((sz) => (
                               <span
                                 key={sz}
-                                className="px-1.5 py-0.5 bg-[#ede7dd] border border-[#d5cdc0] text-[9px] text-[#1a1816] font-bold"
+                                className="px-1.5 py-0.5 bg-[#18181c] border border-[#242429] text-[9px] text-[#8e8e98] font-bold"
                               >
                                 {sz}
                               </span>
@@ -759,14 +733,14 @@ export const ProductListingView: React.FC<ProductListingViewProps> = ({
                       <div className="grid grid-cols-2 gap-2 p-4 pt-0">
                         <button
                           onClick={() => onSelectProduct(shoe)}
-                          className="btn-tactile py-2 bg-[#ede7dd] hover:bg-[#ded6c9] text-[#1a1816] border border-[#d5cdc0] hover:border-[#1a1816] text-[10px] font-bold uppercase tracking-wider flex items-center justify-center gap-1 cursor-pointer transition-colors"
+                          className="btn-tactile py-2 bg-[#18181c] hover:bg-[#242429] text-[#f4f4f6] border border-[#242429] hover:border-[#8e8e98] text-[10px] font-bold uppercase tracking-wider flex items-center justify-center gap-1 cursor-pointer transition-colors"
                         >
                           <Eye className="w-3.5 h-3.5" />
                           <span>DETAILS</span>
                         </button>
                         <button
                           onClick={() => onSelectProduct(shoe)}
-                          className="btn-tactile py-2 bg-[#141312] hover:bg-[#35322e] text-[#f5efe6] text-[10px] font-bold uppercase tracking-wider flex items-center justify-center gap-1 cursor-pointer transition-colors"
+                          className="btn-tactile py-2 bg-[#f4f4f6] hover:bg-[#c9a96e] text-[#09090b] text-[10px] font-bold uppercase tracking-wider flex items-center justify-center gap-1 cursor-pointer transition-colors"
                         >
                           <ShoppingBag className="w-3.5 h-3.5" />
                           <span>SELECT SIZE</span>
@@ -780,12 +754,12 @@ export const ProductListingView: React.FC<ProductListingViewProps> = ({
                 {/* Pagination / Load more */}
                 {visibleCount < sortedProducts.length && (
                   <div className="mt-10 flex flex-col items-center justify-center gap-3">
-                    <p className="text-xs text-[#59544c] font-mono">
+                    <p className="text-xs text-[#8e8e98] font-mono">
                       Showing {Math.min(visibleCount, sortedProducts.length)} of {sortedProducts.length} products
                     </p>
                     <button
                       onClick={() => setVisibleCount((prev) => prev + 24)}
-                      className="px-8 py-3 bg-[#1a1816] hover:bg-[#35322e] text-[#f5efe6] text-xs font-bold uppercase tracking-widest border border-[#1a1816] transition-colors cursor-pointer"
+                      className="px-8 py-3 bg-[#f4f4f6] hover:bg-[#c9a96e] text-[#09090b] text-xs font-bold uppercase tracking-widest border border-[#f4f4f6] transition-colors cursor-pointer shadow-lg"
                     >
                       LOAD MORE (+24)
                     </button>

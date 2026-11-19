@@ -98,167 +98,189 @@ export const ProductDetailsView: React.FC<ProductDetailsViewProps> = ({
       setActiveAngle((prev) => {
         const available = angleKeys.filter((k) => !!activeColor.images[k]);
         if (available.length <= 1) return prev;
-        const curIdx = available.indexOf(prev);
-        const nextIdx = (curIdx + 1) % available.length;
+        const currentIdx = available.indexOf(prev);
+        const nextIdx = (currentIdx + 1) % available.length;
         return available[nextIdx];
       });
-    }, 2000);
+    }, 1800);
     return () => clearInterval(interval);
   }, [isAutoRotating, activeColor]);
 
-  const handleNextAngle = () => {
-    const available = angleKeys.filter((k) => !!activeColor.images[k]);
-    if (available.length <= 1) return;
-    const curIdx = available.indexOf(activeAngle);
-    const nextIdx = (curIdx + 1) % available.length;
-    setActiveAngle(available[nextIdx]);
+  // Color change resets size selection and active angle
+  const handleColorChange = (index: number) => {
+    setSelectedColorIndex(index);
+    setSelectedSize(null);
+    setSizeError(false);
+    setActiveAngle('front');
+    setIsAutoRotating(false);
+    onShowToast(`SPECIFICATION COLORWAY SET: ${product.colors[index].name.toUpperCase()}`);
   };
 
+  // 360 scrubber steps
   const handlePrevAngle = () => {
+    setIsAutoRotating(false);
     const available = angleKeys.filter((k) => !!activeColor.images[k]);
     if (available.length <= 1) return;
-    const curIdx = available.indexOf(activeAngle);
-    const prevIdx = (curIdx - 1 + available.length) % available.length;
+    const currentIdx = available.indexOf(activeAngle);
+    const prevIdx = (currentIdx - 1 + available.length) % available.length;
     setActiveAngle(available[prevIdx]);
   };
 
-  // Get sizes and stocks for current selected color
-  const sizeStockList = product.sizeInventory[activeColor.name] || [
-    { size: '7', stock: 5, sku: `${product.sku}-07` },
-    { size: '8', stock: 10, sku: `${product.sku}-08` },
-    { size: '9', stock: 0, sku: `${product.sku}-09` },
-    { size: '10', stock: 8, sku: `${product.sku}-10` },
-    { size: '11', stock: 4, sku: `${product.sku}-11` },
-  ];
-
-  // Current selected size stock
-  const currentSizeObj = sizeStockList.find((s) => s.size === selectedSize);
-  const isSelectedSizeOutOfStock = currentSizeObj ? currentSizeObj.stock <= 0 : false;
-
-  const handleColorChange = (index: number) => {
-    setSelectedColorIndex(index);
-    // If selected size is not available in new color, keep or reset
-    setSizeError(false);
+  const handleNextAngle = () => {
+    setIsAutoRotating(false);
+    const available = angleKeys.filter((k) => !!activeColor.images[k]);
+    if (available.length <= 1) return;
+    const currentIdx = available.indexOf(activeAngle);
+    const nextIdx = (currentIdx + 1) % available.length;
+    setActiveAngle(available[nextIdx]);
   };
+
+  // Inventory for current active color
+  const sizeStockList = product.sizeInventory[activeColor.name] || [];
 
   const handleSizeSelect = (size: string) => {
     setSelectedSize(size);
     setSizeError(false);
   };
 
-  const handlePincodeCheck = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (pincode.length >= 4) {
-      setPincodeStatus(`✓ Delivery available in 3–5 business days to ${pincode}`);
-      onShowToast(`DISPATCH VERIFIED FOR PINCODE: ${pincode}`);
-    } else {
-      setPincodeStatus('✕ Invalid pincode specification');
-    }
-  };
+  // Check out of stock condition
+  const selectedSizeInfo = sizeStockList.find((s) => s.size === selectedSize);
+  const isSelectedSizeOutOfStock = selectedSizeInfo ? selectedSizeInfo.stock <= 0 : false;
 
-  const prepareCartItem = (): CartItem | null => {
+  // Add to Bag validation
+  const handleAddToCartClick = () => {
     if (!selectedSize) {
       setSizeError(true);
-      onShowToast('PLEASE SELECT A SIZE BEFORE PROCEEDING');
-      return null;
+      onShowToast('MANDATORY ATTRIBUTE: SELECT SIZE SPECIFICATION');
+      return;
     }
 
     if (isSelectedSizeOutOfStock) {
-      onShowToast(`SIZE ${selectedSize} IS CURRENTLY OUT OF STOCK`);
-      onOpenNotifyMe(product.name, selectedSize, activeColor.name);
-      return null;
+      onShowToast(`SPECIFICATION SIZE ${selectedSize} IS DEPLETED // VAULT RESERVATION REQUIRED`);
+      return;
     }
 
-    return {
-      id: `${product.id}-${activeColor.name.toLowerCase().replace(/\s+/g, '-')}-${selectedSize}`,
+    const cartItem: CartItem = {
+      id: `${product.id}-${activeColor.name}-${selectedSize}`,
+      productId: product.id,
       code: product.code,
       name: product.name,
-      edition: `${product.brand} // ${activeColor.name}`,
+      edition: `${product.brand} // ${activeColor.name.toUpperCase()}`,
       price: product.price,
-      mrp: product.mrp,
-      discountPercent: product.discountPercent,
-      brand: product.brand,
-      image: activeColor.images[activeAngle] || activeColor.images.front,
+      image: activeColor.images.front,
       colorway: activeColor.name,
-      specification: `Size ${sizeLabel} ${selectedSize}`,
+      specification: `${sizeLabel} ${selectedSize}`,
       availableSizes: sizeStockList.map((s) => `${sizeLabel} ${s.size}`),
-      allocationStatus: `Allocated // ${sizeLabel} ${selectedSize}`,
+      allocationStatus: 'Vault Allocation Secured',
       quantity: 1,
-      productId: product.id,
       selectedColor: activeColor.name,
       selectedSize: selectedSize,
     };
+
+    onAddToCart(cartItem);
+    onShowToast(`ALLOCATED: ${product.name} [${sizeLabel} ${selectedSize}]`);
   };
 
-  const handleAddToCartClick = () => {
-    const item = prepareCartItem();
-    if (item) {
-      onAddToCart(item);
-      onShowToast(`ADDED TO BAG: ${product.name} (${sizeLabel} ${selectedSize})`);
-    }
-  };
-
+  // Buy Now validation
   const handleBuyNowClick = () => {
-    const item = prepareCartItem();
-    if (item) {
-      onBuyNow(item);
+    if (!selectedSize) {
+      setSizeError(true);
+      onShowToast('MANDATORY ATTRIBUTE: SELECT SIZE SPECIFICATION');
+      return;
+    }
+
+    if (isSelectedSizeOutOfStock) {
+      onShowToast(`SPECIFICATION SIZE ${selectedSize} IS DEPLETED // VAULT RESERVATION REQUIRED`);
+      return;
+    }
+
+    const cartItem: CartItem = {
+      id: `${product.id}-${activeColor.name}-${selectedSize}`,
+      productId: product.id,
+      code: product.code,
+      name: product.name,
+      edition: `${product.brand} // ${activeColor.name.toUpperCase()}`,
+      price: product.price,
+      image: activeColor.images.front,
+      colorway: activeColor.name,
+      specification: `${sizeLabel} ${selectedSize}`,
+      availableSizes: sizeStockList.map((s) => `${sizeLabel} ${s.size}`),
+      allocationStatus: 'Immediate Protocol Checkout',
+      quantity: 1,
+      selectedColor: activeColor.name,
+      selectedSize: selectedSize,
+    };
+
+    onBuyNow(cartItem);
+  };
+
+  // Pincode validation handler
+  const handlePincodeCheck = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (pincode.length >= 5) {
+      setPincodeStatus(`✓ Dispatches via Armored Freight to Postal Zone ${pincode} in 2–4 days`);
+      onShowToast(`LOGISTICS VERIFIED // TRANSIT ZONE ${pincode} ACTIVE`);
+    } else {
+      setPincodeStatus('Invalid code format. Enter at least 5 digits.');
     }
   };
 
+  // Submit new review
   const handleAddReview = (e: React.FormEvent) => {
     e.preventDefault();
     if (!newReviewAuthor.trim() || !newReviewComment.trim()) return;
 
-    const rev: ReviewItem = {
+    const newRev: ReviewItem = {
       id: `rev-${Date.now()}`,
       productId: product.id,
-      author: `${newReviewAuthor.trim()} // Verified Client`,
+      author: newReviewAuthor.trim(),
       rating: newReviewRating,
-      verifiedBuyer: true,
-      date: 'Just now',
-      title: 'Architectural Client Assessment',
+      date: new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }),
+      title: 'Architectural Performance Review',
       comment: newReviewComment.trim(),
       fitFeedback: newReviewFit,
-      comfortRating: 5,
-      fitRating: 5,
-      qualityRating: 5,
-      designRating: 5,
-      helpfulCount: 1,
+      comfortRating: newReviewRating,
+      fitRating: newReviewRating,
+      qualityRating: newReviewRating,
+      designRating: newReviewRating,
+      helpfulCount: 0,
+      verifiedBuyer: true,
     };
 
-    setReviews([rev, ...reviews]);
+    setReviews([newRev, ...reviews]);
     setShowReviewForm(false);
     setNewReviewAuthor('');
     setNewReviewComment('');
-    onShowToast('CLIENT SPECIFICATION REVIEW SUBMITTED');
+    onShowToast('DOSSIER RECORDED // THANK YOU FOR YOUR ATELIER FEEDBACK');
   };
 
   return (
-    <div className="w-full bg-[#ede7dd] text-[#1a1816] font-mono pb-24">
+    <div className="w-full bg-[#09090b] text-[#f4f4f6] font-mono pb-24">
       <div className="max-w-[1440px] mx-auto px-4 sm:px-8 lg:px-12 pt-6">
-        {/* Breadcrumb Navigation */}
-        <div className="flex items-center gap-2 text-[10px] text-[#7b6e54] uppercase tracking-wider mb-6 pb-3 border-b border-[#d5cdc0]">
+        
+        {/* Breadcrumb Path */}
+        <div className="flex items-center gap-2 text-[10px] text-[#c9a96e] uppercase tracking-wider mb-6 pb-3 border-b border-[#242429]">
           <button
             onClick={onBackToCatalog}
-            className="hover:text-[#1a1816] underline cursor-pointer"
+            className="hover:text-[#f4f4f6] underline cursor-pointer transition-colors"
           >
             CATALOG
           </button>
-          <ChevronRight className="w-3 h-3 text-[#b8ad9c]" />
+          <ChevronRight className="w-3 h-3 text-[#52525b]" />
           <span>{product.brand}</span>
-          <ChevronRight className="w-3 h-3 text-[#b8ad9c]" />
+          <ChevronRight className="w-3 h-3 text-[#52525b]" />
           <span>{product.category}</span>
-          <ChevronRight className="w-3 h-3 text-[#b8ad9c]" />
-          <span className="text-[#1a1816] font-bold">{product.name}</span>
+          <ChevronRight className="w-3 h-3 text-[#52525b]" />
+          <span className="text-[#f4f4f6] font-bold">{product.name}</span>
         </div>
 
         {/* Top Product Layout: Left Gallery (7 cols) + Right Details (5 cols) */}
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-14 items-start pb-16 border-b border-[#d5cdc0]">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-14 items-start pb-16 border-b border-[#242429]">
           
           {/* LEFT: Multi-Angle Interactive Product Gallery (VANTA 360° LAB) */}
           <div className="lg:col-span-7 space-y-4">
             {/* Main Stage Display */}
-            <div className="relative aspect-[4/3] bg-[#f5efe6] border border-[#d5cdc0] overflow-hidden group">
+            <div className="relative aspect-[4/3] bg-[#121215] border border-[#242429] overflow-hidden group shadow-2xl">
               <img
                 src={activeColor.images[activeAngle] || activeColor.images.front}
                 alt={`${product.name} - ${activeAngle} view`}
@@ -273,8 +295,8 @@ export const ProductDetailsView: React.FC<ProductDetailsViewProps> = ({
 
               {/* Angle Tag Badge & 360 Indicator */}
               <div className="absolute top-4 left-4 flex items-center gap-2">
-                <div className="bg-[#ede7dd]/95 backdrop-blur-sm border border-[#d5cdc0] px-3 py-1 text-[10px] font-bold uppercase tracking-wider text-[#1a1816] flex items-center gap-1.5">
-                  <span className={`w-1.5 h-1.5 rounded-full ${isAutoRotating ? 'bg-emerald-500 animate-ping' : 'bg-[#1a1816]'}`}></span>
+                <div className="bg-[#18181c]/95 backdrop-blur-sm border border-[#242429] px-3 py-1 text-[10px] font-bold uppercase tracking-wider text-[#f4f4f6] flex items-center gap-1.5 shadow-md">
+                  <span className={`w-1.5 h-1.5 rounded-full ${isAutoRotating ? 'bg-emerald-400 animate-ping' : 'bg-[#c9a96e]'}`}></span>
                   <span>VANTA 360° LAB // {activeAngle.toUpperCase()}</span>
                 </div>
               </div>
@@ -285,8 +307,8 @@ export const ProductDetailsView: React.FC<ProductDetailsViewProps> = ({
                   onClick={() => onToggleWishlist(product)}
                   className={`w-9 h-9 border flex items-center justify-center transition-colors cursor-pointer ${
                     isWishlisted
-                      ? 'bg-[#1a1816] text-[#ede7dd] border-[#1a1816]'
-                      : 'bg-[#ede7dd]/90 backdrop-blur-sm text-[#1a1816] border-[#d5cdc0] hover:border-[#1a1816]'
+                      ? 'bg-[#c9a96e] text-[#09090b] border-[#c9a96e]'
+                      : 'bg-[#18181c]/90 backdrop-blur-sm text-[#f4f4f6] border-[#242429] hover:border-[#8e8e98]'
                   }`}
                   title={isWishlisted ? 'Remove from Wishlist' : 'Add to Wishlist'}
                 >
@@ -296,8 +318,8 @@ export const ProductDetailsView: React.FC<ProductDetailsViewProps> = ({
                   onClick={() => onOpenCompare(product)}
                   className={`w-9 h-9 border flex items-center justify-center transition-colors cursor-pointer ${
                     isCompared
-                      ? 'bg-[#1a1816] text-[#ede7dd] border-[#1a1816]'
-                      : 'bg-[#ede7dd]/90 backdrop-blur-sm text-[#1a1816] border-[#d5cdc0] hover:border-[#1a1816]'
+                      ? 'bg-[#c9a96e] text-[#09090b] border-[#c9a96e]'
+                      : 'bg-[#18181c]/90 backdrop-blur-sm text-[#f4f4f6] border-[#242429] hover:border-[#8e8e98]'
                   }`}
                   title="Compare with another shoe"
                 >
@@ -308,7 +330,7 @@ export const ProductDetailsView: React.FC<ProductDetailsViewProps> = ({
               {/* Interactive Left / Right 360 Scrubber Overlay Arrows */}
               <button
                 onClick={handlePrevAngle}
-                className="absolute left-3 top-1/2 -translate-y-1/2 w-8 h-8 bg-[#ede7dd]/85 hover:bg-[#ede7dd] border border-[#d5cdc0] text-[#1a1816] flex items-center justify-center transition-all opacity-0 group-hover:opacity-100 cursor-pointer shadow-sm"
+                className="absolute left-3 top-1/2 -translate-y-1/2 w-8 h-8 bg-[#18181c]/85 hover:bg-[#242429] border border-[#242429] text-[#f4f4f6] flex items-center justify-center transition-all opacity-0 group-hover:opacity-100 cursor-pointer shadow-md"
                 title="Rotate to previous angle"
                 aria-label="Previous angle"
               >
@@ -316,7 +338,7 @@ export const ProductDetailsView: React.FC<ProductDetailsViewProps> = ({
               </button>
               <button
                 onClick={handleNextAngle}
-                className="absolute right-3 top-1/2 -translate-y-1/2 w-8 h-8 bg-[#ede7dd]/85 hover:bg-[#ede7dd] border border-[#d5cdc0] text-[#1a1816] flex items-center justify-center transition-all opacity-0 group-hover:opacity-100 cursor-pointer shadow-sm"
+                className="absolute right-3 top-1/2 -translate-y-1/2 w-8 h-8 bg-[#18181c]/85 hover:bg-[#242429] border border-[#242429] text-[#f4f4f6] flex items-center justify-center transition-all opacity-0 group-hover:opacity-100 cursor-pointer shadow-md"
                 title="Rotate to next angle"
                 aria-label="Next angle"
               >
@@ -325,13 +347,13 @@ export const ProductDetailsView: React.FC<ProductDetailsViewProps> = ({
 
               {/* Bottom 360 Controls & Resolution Tag */}
               <div className="absolute bottom-4 left-4 right-4 flex items-center justify-between pointer-events-none">
-                <div className="bg-[#ede7dd]/90 backdrop-blur-sm border border-[#d5cdc0] px-2.5 py-1 text-[9px] text-[#7b6e54] pointer-events-auto">
+                <div className="bg-[#18181c]/90 backdrop-blur-sm border border-[#242429] px-2.5 py-1 text-[9px] text-[#c9a96e] pointer-events-auto">
                   ARCHIVAL RESOLUTION // ATELIER VERIFIED
                 </div>
 
                 <button
                   onClick={() => setIsAutoRotating(!isAutoRotating)}
-                  className="pointer-events-auto bg-[#141312] hover:bg-[#35322e] text-[#f5efe6] border border-[#141312] px-3 py-1 font-mono text-[9px] font-bold tracking-wider uppercase flex items-center gap-1.5 transition-colors cursor-pointer"
+                  className="pointer-events-auto bg-[#f4f4f6] hover:bg-[#c9a96e] text-[#09090b] border border-[#f4f4f6] px-3 py-1 font-mono text-[9px] font-bold tracking-wider uppercase flex items-center gap-1.5 transition-colors cursor-pointer shadow-lg"
                 >
                   {isAutoRotating ? (
                     <>
@@ -361,16 +383,16 @@ export const ProductDetailsView: React.FC<ProductDetailsViewProps> = ({
                       setIsAutoRotating(false);
                       setActiveAngle(ang);
                     }}
-                    className={`border p-1 bg-[#f5efe6] transition-all cursor-pointer flex flex-col items-center gap-1 ${
+                    className={`border p-1 bg-[#121215] transition-all cursor-pointer flex flex-col items-center gap-1 ${
                       isCurrent
-                        ? 'border-[#1a1816] ring-1 ring-[#1a1816]'
-                        : 'border-[#d5cdc0] hover:border-[#8e8474]'
+                        ? 'border-[#f4f4f6] ring-1 ring-[#f4f4f6]'
+                        : 'border-[#242429] hover:border-[#8e8e98]'
                     }`}
                   >
-                    <div className="aspect-[4/3] w-full overflow-hidden bg-[#ede7dd]">
+                    <div className="aspect-[4/3] w-full overflow-hidden bg-[#09090b]">
                       <img src={imgUrl} alt={ang} className="w-full h-full object-cover" />
                     </div>
-                    <span className="text-[9px] uppercase font-bold text-[#59544c] tracking-wider">
+                    <span className="text-[9px] uppercase font-bold text-[#8e8e98] tracking-wider">
                       {ang}
                     </span>
                   </button>
@@ -382,50 +404,50 @@ export const ProductDetailsView: React.FC<ProductDetailsViewProps> = ({
           {/* RIGHT: Product Purchasing Protocol, Color, Size, Specs */}
           <div className="lg:col-span-5 space-y-6">
             {/* Header / Brand & Rating */}
-            <div className="space-y-2 border-b border-[#d5cdc0] pb-5">
+            <div className="space-y-2 border-b border-[#242429] pb-5">
               <div className="flex items-center justify-between text-[11px]">
-                <span className="text-[#7b6e54] font-bold tracking-[0.2em] uppercase">
+                <span className="text-[#c9a96e] font-bold tracking-[0.2em] uppercase">
                   {product.brand} // {product.code}
                 </span>
-                <div className="flex items-center gap-1 text-[11px] font-bold text-[#1a1816]">
+                <div className="flex items-center gap-1 text-[11px] font-bold text-[#f4f4f6]">
                   {product.reviewsCount > 0 ? (
                     <>
-                      <Star className="w-3.5 h-3.5 fill-[#1a1816] text-[#1a1816]" />
+                      <Star className="w-3.5 h-3.5 fill-[#c9a96e] text-[#c9a96e]" />
                       <span>{product.rating}</span>
-                      <span className="text-[#7b6e54] font-normal">
+                      <span className="text-[#8e8e98] font-normal">
                         ({product.reviewsCount} reviews)
                       </span>
                     </>
                   ) : (
-                    <span className="text-[#7b6e54] font-normal">No ratings yet</span>
+                    <span className="text-[#8e8e98] font-normal">No ratings yet</span>
                   )}
                 </div>
               </div>
 
-              <h1 className="font-headline text-3xl sm:text-4xl lg:text-5xl font-bold uppercase tracking-tight text-[#1a1816] leading-none">
+              <h1 className="font-headline text-3xl sm:text-4xl lg:text-5xl font-bold uppercase tracking-tight text-[#f4f4f6] leading-none">
                 {product.name}
               </h1>
 
               <div className="flex items-baseline gap-3 pt-2">
-                <span className="text-2xl sm:text-3xl font-bold text-[#1a1816]">
+                <span className="text-2xl sm:text-3xl font-bold text-[#f4f4f6]">
                   {formatCurrency(product.price)}
                 </span>
-                <span className="text-sm text-[#8e8474] line-through font-normal">
+                <span className="text-sm text-[#52525b] line-through font-normal">
                   {formatCurrency(product.mrp)}
                 </span>
-                <span className="text-xs bg-[#141312] text-[#f5efe6] px-2 py-0.5 font-bold tracking-wider">
+                <span className="text-xs bg-[#f4f4f6] text-[#09090b] px-2 py-0.5 font-bold tracking-wider uppercase">
                   {product.discountPercent}% OFF
                 </span>
               </div>
             </div>
 
             {/* COLOR SELECTION */}
-            <div className="space-y-3 border-b border-[#d5cdc0] pb-5">
+            <div className="space-y-3 border-b border-[#242429] pb-5">
               <div className="flex items-center justify-between text-xs">
-                <span className="font-bold text-[#1a1816] uppercase">
-                  COLORWAY: <strong className="font-normal text-[#7b6e54]">{activeColor.name}</strong>
+                <span className="font-bold text-[#f4f4f6] uppercase">
+                  COLORWAY: <strong className="font-normal text-[#c9a96e]">{activeColor.name}</strong>
                 </span>
-                <span className="text-[10px] text-[#59544c]">
+                <span className="text-[10px] text-[#8e8e98]">
                   {product.colors.length} COLOR VARIANTS
                 </span>
               </div>
@@ -437,8 +459,8 @@ export const ProductDetailsView: React.FC<ProductDetailsViewProps> = ({
                     onClick={() => handleColorChange(idx)}
                     className={`relative w-9 h-9 border p-0.5 transition-all cursor-pointer ${
                       selectedColorIndex === idx
-                        ? 'border-[#1a1816] scale-105 ring-1 ring-[#1a1816]'
-                        : 'border-[#d5cdc0] hover:border-[#8e8474]'
+                        ? 'border-[#f4f4f6] scale-105 ring-1 ring-[#f4f4f6]'
+                        : 'border-[#242429] hover:border-[#8e8e98]'
                     }`}
                     title={c.name}
                   >
@@ -455,20 +477,20 @@ export const ProductDetailsView: React.FC<ProductDetailsViewProps> = ({
             </div>
 
             {/* SIZE SELECTION & SIZE GUIDE */}
-            <div className="space-y-3 border-b border-[#d5cdc0] pb-5">
+            <div className="space-y-3 border-b border-[#242429] pb-5">
               <div className="flex items-center justify-between text-xs">
                 <div className="flex items-center gap-2">
-                  <span className="font-bold text-[#1a1816] uppercase">
-                    SELECT SIZE (US):
+                  <span className="font-bold text-[#f4f4f6] uppercase">
+                    SELECT SIZE (US / EU):
                   </span>
                   {selectedSize && (
-                    <span className="text-[#1a1816] font-bold">US {selectedSize}</span>
+                    <span className="text-[#c9a96e] font-bold">{sizeLabel} {selectedSize}</span>
                   )}
                 </div>
                 <button
                   type="button"
                   onClick={onOpenSizeGuide}
-                  className="text-[10px] text-[#7b6e54] hover:text-[#1a1816] font-bold uppercase flex items-center gap-1 cursor-pointer underline"
+                  className="text-[10px] text-[#c9a96e] hover:text-[#f4f4f6] font-bold uppercase flex items-center gap-1 cursor-pointer underline transition-colors"
                 >
                   <Ruler className="w-3 h-3" />
                   <span>SIZE GUIDE & FIT CHART</span>
@@ -486,10 +508,10 @@ export const ProductDetailsView: React.FC<ProductDetailsViewProps> = ({
                       onClick={() => handleSizeSelect(s.size)}
                       className={`relative py-3 px-2 text-xs font-bold text-center border transition-all cursor-pointer flex flex-col items-center justify-center gap-0.5 ${
                         isChosen
-                          ? 'bg-[#141312] text-[#f5efe6] border-[#141312]'
+                          ? 'bg-[#f4f4f6] text-[#09090b] border-[#f4f4f6]'
                           : isAvailable
-                          ? 'bg-[#f5efe6] text-[#1a1816] border-[#d5cdc0] hover:border-[#1a1816]'
-                          : 'bg-[#ede7dd] text-[#8e8474] border-[#d5cdc0]/50 opacity-60'
+                          ? 'bg-[#18181c] text-[#f4f4f6] border-[#242429] hover:border-[#8e8e98]'
+                          : 'bg-[#121215] text-[#52525b] border-[#242429]/40 opacity-40'
                       }`}
                     >
                       <span>{sizeLabel} {s.size}</span>
@@ -505,7 +527,7 @@ export const ProductDetailsView: React.FC<ProductDetailsViewProps> = ({
 
               {/* Compulsory Size Validation Error */}
               {sizeError && (
-                <div className="p-3 bg-[#fce8e6] border border-[#d93025] text-[#d93025] text-[11px] font-bold flex items-center gap-2">
+                <div className="p-3 bg-red-950/40 border border-red-500/50 text-red-300 text-[11px] font-bold flex items-center gap-2">
                   <AlertCircle className="w-4 h-4 flex-shrink-0" />
                   <span>PLEASE SELECT A SIZE. SIZE SELECTION IS COMPULSORY FOR FOOTWEAR.</span>
                 </div>
@@ -513,14 +535,14 @@ export const ProductDetailsView: React.FC<ProductDetailsViewProps> = ({
 
               {/* Out of Stock Alert for selected size with Notify Me */}
               {selectedSize && isSelectedSizeOutOfStock && (
-                <div className="p-3 bg-[#ede7dd] border border-[#b8ad9c] text-xs space-y-2">
-                  <div className="text-[#b83b3b] font-bold flex items-center gap-1.5">
+                <div className="p-3 bg-[#18181c] border border-[#3a3a42] text-xs space-y-2">
+                  <div className="text-red-400 font-bold flex items-center gap-1.5">
                     <AlertCircle className="w-4 h-4" />
                     <span>Size {sizeLabel} {selectedSize} is currently out of stock.</span>
                   </div>
                   <button
                     onClick={() => onOpenNotifyMe(product.name, selectedSize, activeColor.name)}
-                    className="bg-[#141312] text-[#f5efe6] px-3 py-1.5 text-[10px] font-bold uppercase tracking-wider flex items-center gap-1.5 hover:bg-[#35322e] transition-colors cursor-pointer"
+                    className="bg-[#f4f4f6] text-[#09090b] px-3 py-1.5 text-[10px] font-bold uppercase tracking-wider flex items-center gap-1.5 hover:bg-[#c9a96e] transition-colors cursor-pointer"
                   >
                     <Bell className="w-3.5 h-3.5" />
                     <span>NOTIFY ME WHEN AVAILABLE</span>
@@ -534,44 +556,44 @@ export const ProductDetailsView: React.FC<ProductDetailsViewProps> = ({
               <div className="grid grid-cols-2 gap-3">
                 <button
                   onClick={handleAddToCartClick}
-                  className="btn-tactile w-full py-4 bg-[#ede7dd] hover:bg-[#ded6c9] text-[#1a1816] border border-[#141312] text-xs font-bold uppercase tracking-[0.15em] flex items-center justify-center gap-2 cursor-pointer transition-colors"
+                  className="btn-tactile w-full py-4 bg-[#18181c] hover:bg-[#242429] text-[#f4f4f6] border border-[#242429] hover:border-[#8e8e98] text-xs font-bold uppercase tracking-[0.15em] flex items-center justify-center gap-2 cursor-pointer transition-colors"
                 >
                   <ShoppingBag className="w-4 h-4" />
                   <span>ADD TO BAG</span>
                 </button>
                 <button
                   onClick={handleBuyNowClick}
-                  className="btn-tactile w-full py-4 bg-[#141312] hover:bg-[#35322e] text-[#f5efe6] text-xs font-bold uppercase tracking-[0.15em] flex items-center justify-center gap-2 cursor-pointer transition-colors"
+                  className="btn-tactile w-full py-4 bg-[#f4f4f6] hover:bg-[#c9a96e] text-[#09090b] text-xs font-bold uppercase tracking-[0.15em] flex items-center justify-center gap-2 cursor-pointer transition-colors shadow-lg"
                 >
                   <span>BUY NOW</span>
                   <ArrowRight className="w-4 h-4" />
                 </button>
               </div>
 
-              <div className="grid grid-cols-3 gap-2 text-[10px] text-[#59544c] pt-2 text-center">
-                <div className="flex flex-col items-center gap-1 p-2 bg-[#f5efe6] border border-[#d5cdc0]">
-                  <Truck className="w-4 h-4 text-[#1a1816]" />
-                  <span className="font-bold text-[#1a1816]">EXPRESS COURIER</span>
+              <div className="grid grid-cols-3 gap-2 text-[10px] text-[#8e8e98] pt-2 text-center">
+                <div className="flex flex-col items-center gap-1 p-2 bg-[#121215] border border-[#242429]">
+                  <Truck className="w-4 h-4 text-[#c9a96e]" />
+                  <span className="font-bold text-[#f4f4f6]">EXPRESS COURIER</span>
                   <span>Dispatches in 24h</span>
                 </div>
-                <div className="flex flex-col items-center gap-1 p-2 bg-[#f5efe6] border border-[#d5cdc0]">
-                  <RotateCcw className="w-4 h-4 text-[#1a1816]" />
-                  <span className="font-bold text-[#1a1816]">SIZE EXCHANGE</span>
+                <div className="flex flex-col items-center gap-1 p-2 bg-[#121215] border border-[#242429]">
+                  <RotateCcw className="w-4 h-4 text-[#c9a96e]" />
+                  <span className="font-bold text-[#f4f4f6]">SIZE EXCHANGE</span>
                   <span>14-day replacement</span>
                 </div>
-                <div className="flex flex-col items-center gap-1 p-2 bg-[#f5efe6] border border-[#d5cdc0]">
-                  <Shield className="w-4 h-4 text-[#1a1816]" />
-                  <span className="font-bold text-[#1a1816]">AUTHENTICITY</span>
+                <div className="flex flex-col items-center gap-1 p-2 bg-[#121215] border border-[#242429]">
+                  <Shield className="w-4 h-4 text-[#c9a96e]" />
+                  <span className="font-bold text-[#f4f4f6]">AUTHENTICITY</span>
                   <span>Verified NFC Chip</span>
                 </div>
               </div>
             </div>
 
             {/* PINCODE ESTIMATOR */}
-            <div className="bg-[#f5efe6] border border-[#d5cdc0] p-4 space-y-2">
+            <div className="bg-[#121215] border border-[#242429] p-4 space-y-2">
               <div className="flex items-center justify-between text-[11px]">
-                <span className="font-bold text-[#1a1816] uppercase flex items-center gap-1.5">
-                  <MapPin className="w-3.5 h-3.5 text-[#7b6e54]" />
+                <span className="font-bold text-[#f4f4f6] uppercase flex items-center gap-1.5">
+                  <MapPin className="w-3.5 h-3.5 text-[#c9a96e]" />
                   ESTIMATE DELIVERY PINCODE
                 </span>
               </div>
@@ -581,37 +603,37 @@ export const ProductDetailsView: React.FC<ProductDetailsViewProps> = ({
                   placeholder="Enter postal pincode"
                   value={pincode}
                   onChange={(e) => setPincode(e.target.value)}
-                  className="bg-[#ede7dd] border border-[#d5cdc0] px-3 py-1.5 text-xs text-[#1a1816] w-44 focus:outline-none focus:border-[#1a1816]"
+                  className="bg-[#18181c] border border-[#242429] px-3 py-1.5 text-xs text-[#f4f4f6] placeholder:text-[#52525b] w-44 focus:outline-none focus:border-[#8e8e98] transition-colors"
                 />
                 <button
                   type="submit"
-                  className="bg-[#141312] text-[#f5efe6] px-4 py-1.5 text-[10px] font-bold uppercase tracking-wider hover:bg-[#35322e] transition-colors cursor-pointer"
+                  className="bg-[#f4f4f6] text-[#09090b] px-4 py-1.5 text-[10px] font-bold uppercase tracking-wider hover:bg-[#c9a96e] transition-colors cursor-pointer"
                 >
                   CHECK
                 </button>
               </form>
               {pincodeStatus && (
-                <div className="text-[11px] font-semibold text-[#1a1816]">{pincodeStatus}</div>
+                <div className="text-[11px] font-semibold text-[#c9a96e]">{pincodeStatus}</div>
               )}
             </div>
 
             {/* FIT INFORMATION SECTION */}
-            <div className="bg-[#ede7dd] border border-[#d5cdc0] p-5 space-y-4">
-              <div className="text-xs font-bold uppercase text-[#1a1816] border-b border-[#d5cdc0] pb-2">
+            <div className="bg-[#121215] border border-[#242429] p-5 space-y-4">
+              <div className="text-xs font-bold uppercase text-[#f4f4f6] border-b border-[#242429] pb-2">
                 FIT & ANATOMICAL BEHAVIOR
               </div>
               <div className="grid grid-cols-3 gap-2 text-center text-[11px]">
-                <div className="p-2 bg-[#f5efe6] border border-[#d5cdc0]">
-                  <span className="text-[9px] text-[#7b6e54] block uppercase">LAST FIT</span>
-                  <strong className="text-[#1a1816]">{product.fitType}</strong>
+                <div className="p-2 bg-[#18181c] border border-[#242429]">
+                  <span className="text-[9px] text-[#c9a96e] block uppercase">LAST FIT</span>
+                  <strong className="text-[#f4f4f6]">{product.fitType}</strong>
                 </div>
-                <div className="p-2 bg-[#f5efe6] border border-[#d5cdc0]">
-                  <span className="text-[9px] text-[#7b6e54] block uppercase">WIDTH</span>
-                  <strong className="text-[#1a1816]">{product.width}</strong>
+                <div className="p-2 bg-[#18181c] border border-[#242429]">
+                  <span className="text-[9px] text-[#c9a96e] block uppercase">WIDTH</span>
+                  <strong className="text-[#f4f4f6]">{product.width}</strong>
                 </div>
-                <div className="p-2 bg-[#f5efe6] border border-[#d5cdc0]">
-                  <span className="text-[9px] text-[#7b6e54] block uppercase">COMFORT</span>
-                  <strong className="text-[#1a1816]">
+                <div className="p-2 bg-[#18181c] border border-[#242429]">
+                  <span className="text-[9px] text-[#c9a96e] block uppercase">COMFORT</span>
+                  <strong className="text-[#f4f4f6]">
                     {product.comfortScore === null ? 'Not rated' : `⭐ ${product.comfortScore} / 5.0`}
                   </strong>
                 </div>
@@ -619,19 +641,19 @@ export const ProductDetailsView: React.FC<ProductDetailsViewProps> = ({
 
               {/* Review-Based Fit Indicator Bar */}
               {product.fitIndicator === 'Not specified' ? (
-                <div className="text-[10px] text-[#59544c] text-center pt-1">
+                <div className="text-[10px] text-[#8e8e98] text-center pt-1">
                   Fit information not available.
                 </div>
               ) : (
               <div className="space-y-1.5 pt-1">
-                <div className="flex justify-between text-[10px] text-[#59544c] uppercase font-bold">
+                <div className="flex justify-between text-[10px] text-[#8e8e98] uppercase font-bold">
                   <span>Runs Small</span>
-                  <span className="text-[#1a1816]">True to Size</span>
+                  <span className="text-[#f4f4f6]">True to Size</span>
                   <span>Runs Large</span>
                 </div>
-                <div className="w-full bg-[#d5cdc0] h-2 relative">
+                <div className="w-full bg-[#18181c] border border-[#242429] h-2 relative">
                   <div
-                    className={`absolute top-0 bottom-0 w-8 bg-[#141312] ${
+                    className={`absolute top-0 bottom-0 w-8 bg-[#c9a96e] ${
                       product.fitIndicator === 'Runs Small'
                         ? 'left-4'
                         : product.fitIndicator === 'Runs Large'
@@ -640,8 +662,8 @@ export const ProductDetailsView: React.FC<ProductDetailsViewProps> = ({
                     }`}
                   />
                 </div>
-                <div className="text-[10px] text-[#59544c] text-center pt-1">
-                  Recommendation: <strong className="text-[#1a1816]">{product.recommended}</strong>
+                <div className="text-[10px] text-[#8e8e98] text-center pt-1">
+                  Recommendation: <strong className="text-[#f4f4f6]">{product.recommended}</strong>
                 </div>
               </div>
               )}
@@ -654,124 +676,124 @@ export const ProductDetailsView: React.FC<ProductDetailsViewProps> = ({
           
           {/* TECHNICAL SPECIFICATIONS (6 Cols) */}
           <div className="lg:col-span-6 space-y-6">
-            <div className="border-b border-[#d5cdc0] pb-4">
-              <span className="text-[10px] text-[#7b6e54] uppercase tracking-wider font-bold block mb-1">
+            <div className="border-b border-[#242429] pb-4">
+              <span className="text-[10px] text-[#c9a96e] uppercase tracking-wider font-bold block mb-1">
                 ARCHITECTURAL BREAKDOWN
               </span>
-              <h3 className="text-2xl font-bold uppercase text-[#1a1816]">
+              <h3 className="text-2xl font-bold uppercase text-[#f4f4f6]">
                 TECHNICAL SPECIFICATIONS
               </h3>
             </div>
 
-            <div className="bg-[#f5efe6] border border-[#d5cdc0] divide-y divide-[#d5cdc0] text-xs">
+            <div className="bg-[#121215] border border-[#242429] divide-y divide-[#242429] text-xs shadow-xl">
               <div className="p-3.5 flex justify-between">
-                <span className="text-[#7b6e54] uppercase font-bold">UPPER</span>
-                <span className="text-[#1a1816] font-semibold text-right max-w-xs">
+                <span className="text-[#c9a96e] uppercase font-bold">UPPER</span>
+                <span className="text-[#f4f4f6] font-semibold text-right max-w-xs">
                   {product.upper}
                 </span>
               </div>
               <div className="p-3.5 flex justify-between">
-                <span className="text-[#7b6e54] uppercase font-bold">SOLE & CHASSIS</span>
-                <span className="text-[#1a1816] font-semibold text-right max-w-xs">
+                <span className="text-[#c9a96e] uppercase font-bold">SOLE & CHASSIS</span>
+                <span className="text-[#f4f4f6] font-semibold text-right max-w-xs">
                   {product.sole}
                 </span>
               </div>
               <div className="p-3.5 flex justify-between">
-                <span className="text-[#7b6e54] uppercase font-bold">CLOSURE</span>
-                <span className="text-[#1a1816] font-semibold">{product.closure}</span>
+                <span className="text-[#c9a96e] uppercase font-bold">CLOSURE</span>
+                <span className="text-[#f4f4f6] font-semibold">{product.closure}</span>
               </div>
               <div className="p-3.5 flex justify-between">
-                <span className="text-[#7b6e54] uppercase font-bold">PRIMARY USE</span>
-                <span className="text-[#1a1816] font-semibold">{product.use}</span>
+                <span className="text-[#c9a96e] uppercase font-bold">PRIMARY USE</span>
+                <span className="text-[#f4f4f6] font-semibold">{product.use}</span>
               </div>
               <div className="p-3.5 flex justify-between">
-                <span className="text-[#7b6e54] uppercase font-bold">WEIGHT</span>
-                <span className="text-[#1a1816] font-semibold">{product.weight} per half-pair</span>
+                <span className="text-[#c9a96e] uppercase font-bold">WEIGHT</span>
+                <span className="text-[#f4f4f6] font-semibold">{product.weight} per half-pair</span>
               </div>
               <div className="p-3.5 flex justify-between">
-                <span className="text-[#7b6e54] uppercase font-bold">WATER RESISTANCE</span>
-                <span className="text-[#1a1816] font-semibold">{product.waterResistance}</span>
+                <span className="text-[#c9a96e] uppercase font-bold">WATER RESISTANCE</span>
+                <span className="text-[#f4f4f6] font-semibold">{product.waterResistance}</span>
               </div>
               <div className="p-3.5 flex justify-between">
-                <span className="text-[#7b6e54] uppercase font-bold">PROVENANCE</span>
-                <span className="text-[#1a1816] font-semibold">{product.countryOfOrigin}</span>
+                <span className="text-[#c9a96e] uppercase font-bold">PROVENANCE</span>
+                <span className="text-[#f4f4f6] font-semibold">{product.countryOfOrigin}</span>
               </div>
               <div className="p-3.5 flex justify-between">
-                <span className="text-[#7b6e54] uppercase font-bold">WARRANTY</span>
-                <span className="text-[#1a1816] font-semibold">{product.warranty}</span>
+                <span className="text-[#c9a96e] uppercase font-bold">WARRANTY</span>
+                <span className="text-[#f4f4f6] font-semibold">{product.warranty}</span>
               </div>
             </div>
 
-            <div className="p-5 bg-[#ede7dd] border border-[#d5cdc0] space-y-2">
-              <span className="text-[10px] text-[#7b6e54] uppercase font-bold block">
+            <div className="p-5 bg-[#121215] border border-[#242429] space-y-2">
+              <span className="text-[10px] text-[#c9a96e] uppercase font-bold block">
                 ATELIER MANIFESTO STATEMENT
               </span>
-              <p className="text-xs text-[#59544c] leading-relaxed">{product.description}</p>
+              <p className="text-xs text-[#8e8e98] leading-relaxed">{product.description}</p>
             </div>
           </div>
 
           {/* CUSTOMER REVIEWS & PHOTOS (6 Cols) */}
           <div className="lg:col-span-6 space-y-6">
-            <div className="flex items-end justify-between border-b border-[#d5cdc0] pb-4">
+            <div className="flex items-end justify-between border-b border-[#242429] pb-4">
               <div>
-                <span className="text-[10px] text-[#7b6e54] uppercase tracking-wider font-bold block mb-1">
+                <span className="text-[10px] text-[#c9a96e] uppercase tracking-wider font-bold block mb-1">
                   VERIFIED CLIENT DOSSIERS
                 </span>
-                <h3 className="text-2xl font-bold uppercase text-[#1a1816]">
+                <h3 className="text-2xl font-bold uppercase text-[#f4f4f6]">
                   CUSTOMER REVIEWS ({reviews.length})
                 </h3>
               </div>
               <button
                 onClick={() => setShowReviewForm(!showReviewForm)}
-                className="bg-[#141312] text-[#f5efe6] px-4 py-2 text-[10px] font-bold uppercase tracking-wider hover:bg-[#35322e] transition-colors cursor-pointer"
+                className="bg-[#f4f4f6] text-[#09090b] px-4 py-2 text-[10px] font-bold uppercase tracking-wider hover:bg-[#c9a96e] transition-colors cursor-pointer"
               >
                 {showReviewForm ? 'CANCEL' : 'WRITE A REVIEW'}
               </button>
             </div>
 
             {/* Review Breakdown Scores */}
-            <div className="grid grid-cols-4 gap-2 bg-[#f5efe6] border border-[#d5cdc0] p-4 text-center text-[10px]">
+            <div className="grid grid-cols-4 gap-2 bg-[#121215] border border-[#242429] p-4 text-center text-[10px]">
               <div>
-                <span className="text-[#7b6e54] block">COMFORT</span>
-                <strong className="text-sm text-[#1a1816] block">5.0 / 5.0</strong>
+                <span className="text-[#c9a96e] block">COMFORT</span>
+                <strong className="text-sm text-[#f4f4f6] block">5.0 / 5.0</strong>
               </div>
               <div>
-                <span className="text-[#7b6e54] block">FIT ACCURACY</span>
-                <strong className="text-sm text-[#1a1816] block">4.9 / 5.0</strong>
+                <span className="text-[#c9a96e] block">FIT ACCURACY</span>
+                <strong className="text-sm text-[#f4f4f6] block">4.9 / 5.0</strong>
               </div>
               <div>
-                <span className="text-[#7b6e54] block">MATERIAL QUALITY</span>
-                <strong className="text-sm text-[#1a1816] block">5.0 / 5.0</strong>
+                <span className="text-[#c9a96e] block">MATERIAL QUALITY</span>
+                <strong className="text-sm text-[#f4f4f6] block">5.0 / 5.0</strong>
               </div>
               <div>
-                <span className="text-[#7b6e54] block">DESIGN PRECISION</span>
-                <strong className="text-sm text-[#1a1816] block">5.0 / 5.0</strong>
+                <span className="text-[#c9a96e] block">DESIGN PRECISION</span>
+                <strong className="text-sm text-[#f4f4f6] block">5.0 / 5.0</strong>
               </div>
             </div>
 
             {/* Write Review Form */}
             {showReviewForm && (
-              <form onSubmit={handleAddReview} className="bg-[#ede7dd] border border-[#d5cdc0] p-5 space-y-4 text-xs">
-                <div className="font-bold text-[#1a1816] uppercase">SUBMIT ARCHITECTURAL REVIEW</div>
+              <form onSubmit={handleAddReview} className="bg-[#121215] border border-[#242429] p-5 space-y-4 text-xs">
+                <div className="font-bold text-[#f4f4f6] uppercase">SUBMIT ARCHITECTURAL REVIEW</div>
                 <div className="space-y-1">
-                  <label className="text-[10px] font-bold text-[#59544c] uppercase">YOUR NAME / TITLE:</label>
+                  <label className="text-[10px] font-bold text-[#8e8e98] uppercase">YOUR NAME / TITLE:</label>
                   <input
                     type="text"
                     required
                     placeholder="e.g. Liam T. // Designer"
                     value={newReviewAuthor}
                     onChange={(e) => setNewReviewAuthor(e.target.value)}
-                    className="w-full bg-[#f5efe6] border border-[#d5cdc0] px-3 py-2 text-[#1a1816] focus:outline-none focus:border-[#1a1816]"
+                    className="w-full bg-[#18181c] border border-[#242429] px-3 py-2 text-[#f4f4f6] placeholder:text-[#52525b] focus:outline-none focus:border-[#8e8e98] transition-colors"
                   />
                 </div>
 
                 <div className="grid grid-cols-2 gap-3">
                   <div className="space-y-1">
-                    <label className="text-[10px] font-bold text-[#59544c] uppercase">OVERALL RATING:</label>
+                    <label className="text-[10px] font-bold text-[#8e8e98] uppercase">OVERALL RATING:</label>
                     <select
                       value={newReviewRating}
                       onChange={(e) => setNewReviewRating(Number(e.target.value))}
-                      className="w-full bg-[#f5efe6] border border-[#d5cdc0] px-3 py-2 text-[#1a1816] focus:outline-none cursor-pointer"
+                      className="w-full bg-[#18181c] border border-[#242429] px-3 py-2 text-[#f4f4f6] focus:outline-none cursor-pointer"
                     >
                       <option value={5}>⭐⭐⭐⭐⭐ (5 - Exceptional)</option>
                       <option value={4}>⭐⭐⭐⭐ (4 - Very Good)</option>
@@ -779,11 +801,11 @@ export const ProductDetailsView: React.FC<ProductDetailsViewProps> = ({
                     </select>
                   </div>
                   <div className="space-y-1">
-                    <label className="text-[10px] font-bold text-[#59544c] uppercase">FIT FEEDBACK:</label>
+                    <label className="text-[10px] font-bold text-[#8e8e98] uppercase">FIT FEEDBACK:</label>
                     <select
                       value={newReviewFit}
                       onChange={(e) => setNewReviewFit(e.target.value as any)}
-                      className="w-full bg-[#f5efe6] border border-[#d5cdc0] px-3 py-2 text-[#1a1816] focus:outline-none cursor-pointer"
+                      className="w-full bg-[#18181c] border border-[#242429] px-3 py-2 text-[#f4f4f6] focus:outline-none cursor-pointer"
                     >
                       <option value="True to Size">True to Size</option>
                       <option value="Runs Small">Runs Small</option>
@@ -793,20 +815,20 @@ export const ProductDetailsView: React.FC<ProductDetailsViewProps> = ({
                 </div>
 
                 <div className="space-y-1">
-                  <label className="text-[10px] font-bold text-[#59544c] uppercase">ASSESSMENT COMMENTS:</label>
+                  <label className="text-[10px] font-bold text-[#8e8e98] uppercase">ASSESSMENT COMMENTS:</label>
                   <textarea
                     required
                     rows={3}
                     placeholder="Share feedback on leather contouring, cushioning, and durability..."
                     value={newReviewComment}
                     onChange={(e) => setNewReviewComment(e.target.value)}
-                    className="w-full bg-[#f5efe6] border border-[#d5cdc0] px-3 py-2 text-[#1a1816] focus:outline-none focus:border-[#1a1816]"
+                    className="w-full bg-[#18181c] border border-[#242429] px-3 py-2 text-[#f4f4f6] placeholder:text-[#52525b] focus:outline-none focus:border-[#8e8e98] transition-colors"
                   />
                 </div>
 
                 <button
                   type="submit"
-                  className="bg-[#141312] text-[#f5efe6] px-5 py-2.5 font-bold uppercase tracking-wider hover:bg-[#35322e] transition-colors cursor-pointer"
+                  className="bg-[#f4f4f6] text-[#09090b] px-5 py-2.5 font-bold uppercase tracking-wider hover:bg-[#c9a96e] transition-colors cursor-pointer"
                 >
                   PUBLISH REVIEW
                 </button>
@@ -818,38 +840,38 @@ export const ProductDetailsView: React.FC<ProductDetailsViewProps> = ({
               {reviews.map((r) => (
                 <div
                   key={r.id}
-                  className="bg-[#f5efe6] border border-[#d5cdc0] p-5 space-y-3"
+                  className="bg-[#121215] border border-[#242429] p-5 space-y-3"
                 >
                   <div className="flex items-center justify-between text-[10px]">
                     <div className="flex items-center gap-2">
-                      <span className="font-bold text-[#1a1816] uppercase">{r.author}</span>
+                      <span className="font-bold text-[#f4f4f6] uppercase">{r.author}</span>
                       {r.verifiedBuyer && (
-                        <span className="bg-[#ede7dd] border border-[#d5cdc0] px-1.5 py-0.5 text-[#7b6e54] font-bold">
+                        <span className="bg-[#18181c] border border-[#242429] px-1.5 py-0.5 text-[#c9a96e] font-bold">
                           ✓ VERIFIED CLIENT
                         </span>
                       )}
                     </div>
-                    <span className="text-[#8e8474]">{r.date}</span>
+                    <span className="text-[#8e8e98]">{r.date}</span>
                   </div>
 
-                  <div className="flex items-center gap-1 text-[11px] text-[#1a1816]">
+                  <div className="flex items-center gap-1 text-[11px] text-[#f4f4f6]">
                     {[...Array(r.rating)].map((_, i) => (
-                      <Star key={i} className="w-3.5 h-3.5 fill-[#1a1816]" />
+                      <Star key={i} className="w-3.5 h-3.5 fill-[#c9a96e] text-[#c9a96e]" />
                     ))}
-                    <span className="text-[10px] text-[#7b6e54] ml-2">
+                    <span className="text-[10px] text-[#c9a96e] ml-2">
                       FIT: {r.fitFeedback.toUpperCase()}
                     </span>
                   </div>
 
-                  <h5 className="font-bold text-xs uppercase text-[#1a1816]">{r.title}</h5>
-                  <p className="text-xs text-[#59544c] leading-relaxed">{r.comment}</p>
+                  <h5 className="font-bold text-xs uppercase text-[#f4f4f6]">{r.title}</h5>
+                  <p className="text-xs text-[#8e8e98] leading-relaxed">{r.comment}</p>
 
                   {r.photos && r.photos.length > 0 && (
                     <div className="flex gap-2 pt-1">
                       {r.photos.map((ph, idx) => (
                         <div
                           key={idx}
-                          className="w-16 h-16 border border-[#d5cdc0] overflow-hidden bg-[#ede7dd]"
+                          className="w-16 h-16 border border-[#242429] overflow-hidden bg-[#09090b]"
                         >
                           <img
                             src={ph}
@@ -861,8 +883,8 @@ export const ProductDetailsView: React.FC<ProductDetailsViewProps> = ({
                     </div>
                   )}
 
-                  <div className="flex items-center gap-2 pt-2 text-[10px] text-[#8e8474]">
-                    <button className="flex items-center gap-1 hover:text-[#1a1816] cursor-pointer">
+                  <div className="flex items-center gap-2 pt-2 text-[10px] text-[#8e8e98]">
+                    <button className="flex items-center gap-1 hover:text-[#f4f4f6] cursor-pointer transition-colors">
                       <ThumbsUp className="w-3 h-3" />
                       <span>Helpful ({r.helpfulCount})</span>
                     </button>

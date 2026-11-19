@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { X, RotateCcw, CheckCircle2, AlertCircle, ArrowRight } from 'lucide-react';
+import { X, RotateCcw, CheckCircle2 } from 'lucide-react';
 import { Order, OrderItem, ExchangeReturnRequest } from '../types';
 
 interface ReturnsExchangeModalProps {
@@ -76,29 +76,29 @@ export const ReturnsExchangeModal: React.FC<ReturnsExchangeModalProps> = ({
 
   return (
     <div
-      className="fixed inset-0 z-50 bg-[#1a1816]/70 backdrop-blur-sm flex items-center justify-center p-4 overflow-y-auto font-mono"
+      className="fixed inset-0 z-50 bg-[#09090b]/80 backdrop-blur-md flex items-center justify-center p-4 overflow-y-auto font-mono"
       role="dialog"
       aria-modal="true"
     >
-      <div className="bg-[#f5efe6] border border-[#d5cdc0] max-w-xl w-full p-6 sm:p-8 flex flex-col gap-6 shadow-2xl">
+      <div className="bg-[#121215] border border-[#242429] max-w-xl w-full p-6 sm:p-8 flex flex-col gap-6 shadow-2xl animate-fade-in">
         {/* Header */}
-        <div className="flex items-center justify-between border-b border-[#d5cdc0] pb-4">
+        <div className="flex items-center justify-between border-b border-[#242429] pb-4">
           <div className="flex items-center gap-2.5">
-            <div className="w-8 h-8 bg-[#141312] text-[#f5efe6] flex items-center justify-center">
+            <div className="w-8 h-8 bg-[#18181c] border border-[#242429] text-[#c9a96e] flex items-center justify-center">
               <RotateCcw className="w-4 h-4" />
             </div>
             <div>
-              <span className="text-[12px] font-bold text-[#1a1816] uppercase tracking-wider block">
-                RETURNS & SIZE EXCHANGE PROTOCOL
+              <span className="text-[12px] font-bold text-[#f4f4f6] uppercase tracking-wider block">
+                RETURNS &amp; SIZE EXCHANGE PROTOCOL
               </span>
-              <span className="text-[9px] text-[#7b6e54]">
+              <span className="text-[9px] text-[#c9a96e]">
                 ORDER #{order.id} // COMPLIMENTARY REPLACEMENT
               </span>
             </div>
           </div>
           <button
             onClick={onClose}
-            className="text-[#59544c] hover:text-[#1a1816] p-1 cursor-pointer transition-colors"
+            className="text-[#8e8e98] hover:text-[#f4f4f6] p-1 cursor-pointer transition-colors"
           >
             <X className="w-5 h-5" />
           </button>
@@ -106,18 +106,18 @@ export const ReturnsExchangeModal: React.FC<ReturnsExchangeModalProps> = ({
 
         {isSuccess ? (
           <div className="py-8 text-center space-y-3">
-            <CheckCircle2 className="w-12 h-12 text-[#1a1816] mx-auto" />
-            <h4 className="text-base font-bold uppercase text-[#1a1816]">
+            <CheckCircle2 className="w-12 h-12 text-[#c9a96e] mx-auto" />
+            <h4 className="text-base font-bold uppercase text-[#f4f4f6]">
               {requestType} PROTOCOL INITIALIZED
             </h4>
-            <p className="text-xs text-[#59544c] max-w-sm mx-auto leading-relaxed">
-              Your request for <strong className="text-[#1a1816]">{targetItem.name}</strong>{' '}
+            <p className="text-xs text-[#8e8e98] max-w-sm mx-auto leading-relaxed">
+              Your request for <strong className="text-[#f4f4f6]">{targetItem.name}</strong>{' '}
               {requestType === 'EXCHANGE' ? `(Size ${targetItem.size} → Size ${requestedSize})` : ''} has been logged in the archive console. An armored courier pickup has been scheduled.
             </p>
           </div>
         ) : (
           <form onSubmit={handleSubmit} className="space-y-5 text-xs">
-            {submissionError && <p role="alert" className="text-red-700">{submissionError}</p>}
+            {submissionError && <p role="alert" className="text-red-400 font-bold">{submissionError}</p>}
             {/* Request Type Toggle */}
             <div className="grid grid-cols-2 gap-2">
               <button
@@ -125,8 +125,8 @@ export const ReturnsExchangeModal: React.FC<ReturnsExchangeModalProps> = ({
                 onClick={() => setRequestType('EXCHANGE')}
                 className={`py-2.5 px-3 font-bold uppercase tracking-wider border transition-colors cursor-pointer text-center ${
                   requestType === 'EXCHANGE'
-                    ? 'bg-[#141312] text-[#f5efe6] border-[#141312]'
-                    : 'bg-[#ede7dd] text-[#59544c] border-[#d5cdc0]'
+                    ? 'bg-[#f4f4f6] text-[#09090b] border-[#f4f4f6]'
+                    : 'bg-[#18181c] text-[#8e8e98] border-[#242429] hover:text-[#f4f4f6]'
                 }`}
               >
                 SIZE EXCHANGE (RECOMMENDED)
@@ -136,8 +136,8 @@ export const ReturnsExchangeModal: React.FC<ReturnsExchangeModalProps> = ({
                 onClick={() => setRequestType('RETURN')}
                 className={`py-2.5 px-3 font-bold uppercase tracking-wider border transition-colors cursor-pointer text-center ${
                   requestType === 'RETURN'
-                    ? 'bg-[#141312] text-[#f5efe6] border-[#141312]'
-                    : 'bg-[#ede7dd] text-[#59544c] border-[#d5cdc0]'
+                    ? 'bg-[#f4f4f6] text-[#09090b] border-[#f4f4f6]'
+                    : 'bg-[#18181c] text-[#8e8e98] border-[#242429] hover:text-[#f4f4f6]'
                 }`}
               >
                 RETURN FOR REFUND
@@ -145,18 +145,18 @@ export const ReturnsExchangeModal: React.FC<ReturnsExchangeModalProps> = ({
             </div>
 
             {/* Target Specimen Selector */}
-            <div className="bg-[#ede7dd] border border-[#d5cdc0] p-4 space-y-2">
-              <span className="text-[10px] text-[#7b6e54] font-bold uppercase block">
+            <div className="bg-[#18181c] border border-[#242429] p-4 space-y-2">
+              <span className="text-[10px] text-[#c9a96e] font-bold uppercase block">
                 SELECT ITEM FROM ORDER:
               </span>
               <div className="flex items-center gap-3">
-                <div className="w-12 h-12 bg-[#f5efe6] border border-[#d5cdc0] overflow-hidden flex-shrink-0">
+                <div className="w-12 h-12 bg-[#121215] border border-[#242429] overflow-hidden flex-shrink-0">
                   <img src={targetItem.image} alt={targetItem.name} className="w-full h-full object-cover" />
                 </div>
                 <div>
-                  <div className="font-bold text-xs uppercase text-[#1a1816]">{targetItem.name}</div>
-                  <div className="text-[10px] text-[#59544c]">
-                    Current Size: <strong className="text-[#1a1816]">US {targetItem.size}</strong> • Color: {targetItem.color}
+                  <div className="font-bold text-xs uppercase text-[#f4f4f6]">{targetItem.name}</div>
+                  <div className="text-[10px] text-[#8e8e98]">
+                    Current Size: <strong className="text-[#f4f4f6]">US {targetItem.size}</strong> • Color: {targetItem.color}
                   </div>
                 </div>
               </div>
@@ -166,10 +166,10 @@ export const ReturnsExchangeModal: React.FC<ReturnsExchangeModalProps> = ({
             {requestType === 'EXCHANGE' && (
               <div className="space-y-2">
                 <div className="flex items-center justify-between">
-                  <label className="text-[11px] font-bold text-[#1a1816] uppercase block">
+                  <label className="text-[11px] font-bold text-[#f4f4f6] uppercase block">
                     EXCHANGE TO NEW SIZE:
                   </label>
-                  <span className="text-[10px] text-[#7b6e54]">
+                  <span className="text-[10px] text-[#c9a96e]">
                     Current: US {targetItem.size}
                   </span>
                 </div>
@@ -185,10 +185,10 @@ export const ReturnsExchangeModal: React.FC<ReturnsExchangeModalProps> = ({
                         onClick={() => setRequestedSize(sz)}
                         className={`py-2 text-xs font-bold border transition-colors cursor-pointer ${
                           isSelected
-                            ? 'bg-[#141312] text-[#f5efe6] border-[#141312]'
+                            ? 'bg-[#f4f4f6] text-[#09090b] border-[#f4f4f6]'
                             : isCurrent
-                            ? 'bg-[#ded6c9] text-[#8e8474] opacity-50 cursor-not-allowed border-[#d5cdc0]'
-                            : 'bg-[#ede7dd] text-[#1a1816] border-[#d5cdc0] hover:border-[#1a1816]'
+                            ? 'bg-[#18181c] text-[#52525b] opacity-40 cursor-not-allowed border-[#242429]'
+                            : 'bg-[#18181c] text-[#f4f4f6] border-[#242429] hover:border-[#3a3a42]'
                         }`}
                       >
                         US {sz}
@@ -201,16 +201,16 @@ export const ReturnsExchangeModal: React.FC<ReturnsExchangeModalProps> = ({
 
             {/* Select Reason */}
             <div className="space-y-1.5">
-              <label className="text-[11px] font-bold text-[#1a1816] uppercase block">
+              <label className="text-[11px] font-bold text-[#f4f4f6] uppercase block">
                 PRIMARY REASON FOR {requestType}:
               </label>
               <select
                 value={reason}
                 onChange={(e) => setReason(e.target.value)}
-                className="w-full bg-[#ede7dd] border border-[#d5cdc0] px-3 py-2 text-[#1a1816] focus:outline-none cursor-pointer"
+                className="w-full bg-[#18181c] border border-[#242429] px-3 py-2 text-[#f4f4f6] focus:outline-none focus:border-[#c9a96e] cursor-pointer"
               >
                 {EXCHANGE_REASONS.map((r) => (
-                  <option key={r} value={r}>
+                  <option key={r} value={r} className="bg-[#121215] text-[#f4f4f6]">
                     {r}
                   </option>
                 ))}
@@ -219,7 +219,7 @@ export const ReturnsExchangeModal: React.FC<ReturnsExchangeModalProps> = ({
 
             {/* Additional Details */}
             <div className="space-y-1.5">
-              <label className="text-[11px] font-bold text-[#1a1816] uppercase block">
+              <label className="text-[11px] font-bold text-[#f4f4f6] uppercase block">
                 ADDITIONAL ATELIER NOTES (OPTIONAL):
               </label>
               <textarea
@@ -227,30 +227,30 @@ export const ReturnsExchangeModal: React.FC<ReturnsExchangeModalProps> = ({
                 value={notes}
                 onChange={(e) => setNotes(e.target.value)}
                 placeholder="Describe your fit feedback or pickup address instructions..."
-                className="w-full bg-[#ede7dd] border border-[#d5cdc0] px-3 py-2 text-[#1a1816] focus:outline-none"
+                className="w-full bg-[#18181c] border border-[#242429] px-3 py-2 text-[#f4f4f6] focus:outline-none focus:border-[#c9a96e]"
               />
             </div>
 
             {/* Pickup policy note */}
-            <div className="p-3 bg-[#ede7dd] border border-[#d5cdc0] text-[10px] text-[#59544c] space-y-1">
-              <div className="font-bold text-[#1a1816] uppercase">PICKUP & REPLACEMENT POLICY:</div>
+            <div className="p-3 bg-[#18181c] border border-[#242429] text-[10px] text-[#8e8e98] space-y-1">
+              <div className="font-bold text-[#c9a96e] uppercase">PICKUP &amp; REPLACEMENT POLICY:</div>
               <div>• Free courier pickup from your delivery destination within 48 hours.</div>
               <div>• Replacement specimen dispatches immediately upon verification.</div>
             </div>
 
             {/* CTAs */}
-            <div className="flex gap-3 pt-2 border-t border-[#d5cdc0]">
+            <div className="flex gap-3 pt-2 border-t border-[#242429]">
               <button
                 type="button"
                 onClick={onClose}
-                className="w-1/2 py-2.5 border border-[#d5cdc0] text-[#59544c] hover:bg-[#ede7dd] uppercase tracking-wider font-bold transition-colors cursor-pointer"
+                className="w-1/2 py-2.5 border border-[#242429] text-[#8e8e98] hover:text-[#f4f4f6] hover:border-[#3a3a42] uppercase tracking-wider font-bold transition-colors cursor-pointer"
               >
                 CANCEL
               </button>
               <button
                 type="submit"
                 disabled={isSubmitting}
-                className="w-1/2 py-2.5 bg-[#141312] text-[#f5efe6] font-bold uppercase tracking-wider hover:bg-[#35322e] transition-colors cursor-pointer"
+                className="w-1/2 py-2.5 bg-[#f4f4f6] text-[#09090b] font-bold uppercase tracking-wider hover:bg-[#c9a96e] transition-colors cursor-pointer"
               >
                 {isSubmitting ? 'SAVING REQUEST...' : 'SUBMIT REQUEST'}
               </button>

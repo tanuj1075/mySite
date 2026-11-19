@@ -35,36 +35,36 @@ export const ReservationBanner: React.FC<ReservationBannerProps> = ({
   return (
     <div
       id="reservation-status-banner"
-      className="w-full bg-[#e4ddcf] border-b border-[#d5cdc0] px-5 md:px-16 py-3"
+      className="w-full bg-[#121215] border-b border-[#242429] px-5 md:px-16 py-3"
     >
       <div className="max-w-[1440px] mx-auto flex flex-wrap items-center justify-between gap-4">
         {/* Urgent Allocation Status with Pulsing Indicator */}
         <div className="flex items-center gap-3">
           <span className="relative flex h-2 w-2">
-            <span className="animate-ping absolute inline-flex h-full w-full rounded-none bg-[#1a1816] opacity-75"></span>
-            <span className="relative inline-flex rounded-none h-2 w-2 bg-[#1a1816]"></span>
+            <span className="animate-ping absolute inline-flex h-full w-full rounded-none bg-[#c9a96e] opacity-75"></span>
+            <span className="relative inline-flex rounded-none h-2 w-2 bg-[#c9a96e]"></span>
           </span>
-          <span className="font-mono text-[10px] text-[#1a1816] uppercase tracking-[0.18em] font-bold">
+          <span className="font-mono text-[10px] text-[#f4f4f6] uppercase tracking-[0.18em] font-bold">
             HIGH DEMAND ALLOCATION ACTIVE // ARCHIVE ITEMS RESERVED
           </span>
         </div>
 
         {/* Live Reservation Timer */}
-        <div className="flex items-center gap-2 bg-[#ede7dd] px-3 py-1 border border-[#d5cdc0]">
-          <Timer className="w-3.5 h-3.5 text-[#7b6e54]" />
-          <span className="font-mono text-[10px] text-[#59544c] uppercase tracking-wider">
+        <div className="flex items-center gap-2 bg-[#18181c] px-3 py-1 border border-[#242429]">
+          <Timer className="w-3.5 h-3.5 text-[#c9a96e]" />
+          <span className="font-mono text-[10px] text-[#8e8e98] uppercase tracking-wider">
             HOLD TIME REMAINING:
           </span>
           <span
             id="reservation-timer"
-            className="font-mono text-[10px] text-[#1a1816] font-bold tracking-widest min-w-[36px]"
+            className="font-mono text-[10px] text-[#f4f4f6] font-bold tracking-widest min-w-[36px]"
           >
             {formattedTime}
           </span>
           <button
             id="extend-hold-btn"
             onClick={extendHold}
-            className="ml-2 text-[#59544c] hover:text-[#1a1816] transition-colors p-0.5 cursor-pointer"
+            className="ml-2 text-[#8e8e98] hover:text-[#c9a96e] transition-colors p-0.5 cursor-pointer"
             title="Extend Allocation Lock +15:00"
             aria-label="Extend Allocation Lock"
           >

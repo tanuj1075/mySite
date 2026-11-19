@@ -190,12 +190,12 @@ export const AdminOverviewView: React.FC<AdminOverviewViewProps> = ({
   // SUBVIEW: BANNERS
   if (activeSection === 'BANNERS') {
     return (
-      <div className="p-4 sm:p-8 font-sans space-y-8 bg-[#faf7f2] min-h-full">
-        <div className="flex items-center justify-between font-mono text-[10px] text-[#7b6e54] tracking-[0.2em] uppercase mb-1">
+      <div className="p-4 sm:p-8 font-sans space-y-8 bg-[#09090b] min-h-full">
+        <div className="flex items-center justify-between font-mono text-[10px] text-[#c9a96e] tracking-[0.2em] uppercase mb-1">
           <span>MARKETING ENGINE // ATELIER BANNERS</span>
           <button
             onClick={() => onSelectSection('OVERVIEW')}
-            className="text-[#1a1816] font-bold hover:underline cursor-pointer"
+            className="text-[#f4f4f6] font-bold hover:underline cursor-pointer"
           >
             ← BACK TO OVERVIEW
           </button>
@@ -203,17 +203,17 @@ export const AdminOverviewView: React.FC<AdminOverviewViewProps> = ({
 
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div>
-            <h1 className="font-headline text-3xl sm:text-4xl text-[#1a1816] tracking-tight">
+            <h1 className="font-headline text-3xl sm:text-4xl text-[#f4f4f6] tracking-tight">
               Announcements &amp; Editorial Banners
             </h1>
-            <p className="font-sans text-[13px] text-[#59544c] mt-1">
+            <p className="font-sans text-[13px] text-[#8e8e98] mt-1">
               Banner publishing is unavailable because this application has no persistent banner API.
             </p>
           </div>
 
           <button
             onClick={() => setShowBannerModal(true)}
-            className="px-4 py-2.5 bg-[#141312] text-[#f5efe6] font-mono text-[11px] font-bold uppercase tracking-wider hover:bg-[#35322e] flex items-center gap-2 cursor-pointer shadow-xs"
+            className="px-4 py-2.5 bg-[#141312] text-[#18181c] font-mono text-[11px] font-bold uppercase tracking-wider hover:bg-[#35322e] flex items-center gap-2 cursor-pointer shadow-xs"
           >
             <Plus className="w-3.5 h-3.5" />
             <span>CREATE NEW BANNER</span>
@@ -226,16 +226,16 @@ export const AdminOverviewView: React.FC<AdminOverviewViewProps> = ({
               key={ban.id}
               className={`p-5 border transition-all ${
                 ban.isActive
-                  ? 'bg-[#ede7dd] border-[#d5cdc0]'
-                  : 'bg-[#ede7dd]/50 border-[#d5cdc0]/50 opacity-60'
+                  ? 'bg-[#121215] border-[#242429]'
+                  : 'bg-[#121215]/50 border-[#242429]/50 opacity-60'
               }`}
             >
-              <div className="flex flex-wrap items-center justify-between gap-3 pb-3 border-b border-[#d5cdc0]">
+              <div className="flex flex-wrap items-center justify-between gap-3 pb-3 border-b border-[#242429]">
                 <div className="flex items-center gap-3">
-                  <span className="px-2 py-0.5 bg-[#141312] text-[#f5efe6] text-[9px] font-bold uppercase">
+                  <span className="px-2 py-0.5 bg-[#141312] text-[#18181c] text-[9px] font-bold uppercase">
                     {ban.type}
                   </span>
-                  <span className="font-bold text-[#1a1816] text-[12px]">{ban.title}</span>
+                  <span className="font-bold text-[#f4f4f6] text-[12px]">{ban.title}</span>
                 </div>
                 <div className="flex items-center gap-3">
                   <span
@@ -247,14 +247,14 @@ export const AdminOverviewView: React.FC<AdminOverviewViewProps> = ({
                   </span>
                   <button
                     onClick={() => handleToggleBanner(ban.id)}
-                    className="px-3 py-1 bg-[#faf7f2] border border-[#d5cdc0] text-[#1a1816] text-[10px] font-bold uppercase hover:bg-[#e4ddcf] cursor-pointer"
+                    className="px-3 py-1 bg-[#09090b] border border-[#242429] text-[#f4f4f6] text-[10px] font-bold uppercase hover:bg-[#1e1e24] cursor-pointer"
                   >
                     {ban.isActive ? 'DEACTIVATE' : 'ACTIVATE'}
                   </button>
                 </div>
               </div>
-              <p className="font-sans text-[12px] text-[#59544c] mt-3">{ban.subtitle}</p>
-              <div className="mt-2 text-[10px] text-[#7b6e54] flex items-center gap-2">
+              <p className="font-sans text-[12px] text-[#8e8e98] mt-3">{ban.subtitle}</p>
+              <div className="mt-2 text-[10px] text-[#c9a96e] flex items-center gap-2">
                 <span>ACTION BUTTON: "{ban.linkText}"</span>
                 <span>•</span>
                 <span>DESTINATION: {ban.linkUrl}</span>
@@ -265,20 +265,20 @@ export const AdminOverviewView: React.FC<AdminOverviewViewProps> = ({
 
         {/* Create Banner Modal */}
         {showBannerModal && (
-          <div className="fixed inset-0 z-50 bg-[#1a1816]/75 backdrop-blur-xs flex items-center justify-center p-4">
-            <div className="bg-[#faf7f2] border border-[#d5cdc0] max-w-md w-full p-6 font-mono text-xs shadow-2xl space-y-4">
-              <h3 className="font-headline text-xl font-bold text-[#1a1816]">
+          <div className="fixed inset-0 z-50 bg-[#f4f4f6]/75 backdrop-blur-xs flex items-center justify-center p-4">
+            <div className="bg-[#09090b] border border-[#242429] max-w-md w-full p-6 font-mono text-xs shadow-2xl space-y-4">
+              <h3 className="font-headline text-xl font-bold text-[#f4f4f6]">
                 Create Editorial Banner
               </h3>
               <form onSubmit={handleCreateBanner} className="space-y-3">
                 <div>
-                  <label className="block text-[9px] font-bold uppercase text-[#1a1816] mb-1">
+                  <label className="block text-[9px] font-bold uppercase text-[#f4f4f6] mb-1">
                     BANNER TYPE
                   </label>
                   <select
                     value={newBannerType}
                     onChange={(e) => setNewBannerType(e.target.value as any)}
-                    className="w-full bg-white border border-[#d5cdc0] p-2 text-[11px] font-mono outline-none"
+                    className="w-full bg-[#18181c] border border-[#242429] p-2 text-[11px] font-mono outline-none"
                   >
                     <option value="ANNOUNCEMENT">ANNOUNCEMENT TOP BAR</option>
                     <option value="HERO">HERO EDITORIAL SPOTLIGHT</option>
@@ -286,7 +286,7 @@ export const AdminOverviewView: React.FC<AdminOverviewViewProps> = ({
                   </select>
                 </div>
                 <div>
-                  <label className="block text-[9px] font-bold uppercase text-[#1a1816] mb-1">
+                  <label className="block text-[9px] font-bold uppercase text-[#f4f4f6] mb-1">
                     HEADLINE / TITLE *
                   </label>
                   <input
@@ -295,11 +295,11 @@ export const AdminOverviewView: React.FC<AdminOverviewViewProps> = ({
                     value={newBannerTitle}
                     onChange={(e) => setNewBannerTitle(e.target.value)}
                     placeholder="e.g. COMPLIMENTARY COURIER PROTOCOL"
-                    className="w-full bg-white border border-[#d5cdc0] p-2 text-[11px] font-mono outline-none uppercase"
+                    className="w-full bg-[#18181c] border border-[#242429] p-2 text-[11px] font-mono outline-none uppercase"
                   />
                 </div>
                 <div>
-                  <label className="block text-[9px] font-bold uppercase text-[#1a1816] mb-1">
+                  <label className="block text-[9px] font-bold uppercase text-[#f4f4f6] mb-1">
                     SUBTITLE / COPY
                   </label>
                   <textarea
@@ -307,20 +307,20 @@ export const AdminOverviewView: React.FC<AdminOverviewViewProps> = ({
                     value={newBannerSub}
                     onChange={(e) => setNewBannerSub(e.target.value)}
                     placeholder="Brief description of the promotion or announcement"
-                    className="w-full bg-white border border-[#d5cdc0] p-2 text-[11px] font-mono outline-none"
+                    className="w-full bg-[#18181c] border border-[#242429] p-2 text-[11px] font-mono outline-none"
                   />
                 </div>
-                <div className="pt-3 flex justify-end gap-2 border-t border-[#d5cdc0]">
+                <div className="pt-3 flex justify-end gap-2 border-t border-[#242429]">
                   <button
                     type="button"
                     onClick={() => setShowBannerModal(false)}
-                    className="px-3 py-1.5 uppercase font-bold text-[10px] text-[#59544c] cursor-pointer"
+                    className="px-3 py-1.5 uppercase font-bold text-[10px] text-[#8e8e98] cursor-pointer"
                   >
                     CANCEL
                   </button>
                   <button
                     type="submit"
-                    className="px-4 py-1.5 bg-[#141312] text-[#f5efe6] uppercase font-bold text-[10px] cursor-pointer"
+                    className="px-4 py-1.5 bg-[#141312] text-[#18181c] uppercase font-bold text-[10px] cursor-pointer"
                   >
                     PUBLISH BANNER
                   </button>
@@ -336,12 +336,12 @@ export const AdminOverviewView: React.FC<AdminOverviewViewProps> = ({
   // SUBVIEW: NOTIFICATIONS
   if (activeSection === 'NOTIFICATIONS') {
     return (
-      <div className="p-4 sm:p-8 font-sans space-y-8 bg-[#faf7f2] min-h-full">
-        <div className="flex items-center justify-between font-mono text-[10px] text-[#7b6e54] tracking-[0.2em] uppercase mb-1">
+      <div className="p-4 sm:p-8 font-sans space-y-8 bg-[#09090b] min-h-full">
+        <div className="flex items-center justify-between font-mono text-[10px] text-[#c9a96e] tracking-[0.2em] uppercase mb-1">
           <span>OPERATIONS TELEMETRY // NOTIFICATIONS</span>
           <button
             onClick={() => onSelectSection('OVERVIEW')}
-            className="text-[#1a1816] font-bold hover:underline cursor-pointer"
+            className="text-[#f4f4f6] font-bold hover:underline cursor-pointer"
           >
             ← BACK TO OVERVIEW
           </button>
@@ -349,17 +349,17 @@ export const AdminOverviewView: React.FC<AdminOverviewViewProps> = ({
 
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div>
-            <h1 className="font-headline text-3xl sm:text-4xl text-[#1a1816] tracking-tight">
+            <h1 className="font-headline text-3xl sm:text-4xl text-[#f4f4f6] tracking-tight">
               Administrative Telemetry Log
             </h1>
-            <p className="font-sans text-[13px] text-[#59544c] mt-1">
+            <p className="font-sans text-[13px] text-[#8e8e98] mt-1">
               Live audit events, inventory alerts, courier milestones, and client enclave signals.
             </p>
           </div>
 
           <button
             onClick={handleMarkAllRead}
-            className="px-4 py-2.5 bg-[#ede7dd] border border-[#d5cdc0] text-[#1a1816] font-mono text-[11px] font-bold uppercase tracking-wider hover:bg-[#e4ddcf] flex items-center gap-2 cursor-pointer shadow-2xs"
+            className="px-4 py-2.5 bg-[#121215] border border-[#242429] text-[#f4f4f6] font-mono text-[11px] font-bold uppercase tracking-wider hover:bg-[#1e1e24] flex items-center gap-2 cursor-pointer shadow-2xs"
           >
             <Check className="w-3.5 h-3.5" />
             <span>MARK ALL AS READ</span>
@@ -375,23 +375,23 @@ export const AdminOverviewView: React.FC<AdminOverviewViewProps> = ({
               }}
               className={`p-4 border transition-colors cursor-pointer flex items-start gap-3.5 ${
                 notif.read
-                  ? 'bg-[#ede7dd]/50 border-[#d5cdc0]'
-                  : 'bg-[#ede7dd] border-[#1a1816] shadow-2xs'
+                  ? 'bg-[#121215]/50 border-[#242429]'
+                  : 'bg-[#121215] border-[#f4f4f6] shadow-2xs'
               }`}
             >
               <div
                 className={`w-2 h-2 rounded-full mt-1.5 shrink-0 ${
-                  notif.read ? 'bg-[#7b6e54]' : 'bg-[#16a34a] animate-pulse'
+                  notif.read ? 'bg-[#c9a96e]' : 'bg-[#16a34a] animate-pulse'
                 }`}
               />
               <div className="flex-1">
                 <div className="flex items-center justify-between">
-                  <span className="font-bold text-[#1a1816] text-[11px]">{notif.title}</span>
-                  <span className="text-[9px] text-[#7b6e54]">{notif.time}</span>
+                  <span className="font-bold text-[#f4f4f6] text-[11px]">{notif.title}</span>
+                  <span className="text-[9px] text-[#c9a96e]">{notif.time}</span>
                 </div>
-                <div className="text-[11px] text-[#59544c] mt-0.5">{notif.detail}</div>
+                <div className="text-[11px] text-[#8e8e98] mt-0.5">{notif.detail}</div>
               </div>
-              <ArrowRight className="w-3.5 h-3.5 text-[#7b6e54] shrink-0 mt-1" />
+              <ArrowRight className="w-3.5 h-3.5 text-[#c9a96e] shrink-0 mt-1" />
             </div>
           ))}
         </div>
@@ -413,12 +413,12 @@ export const AdminOverviewView: React.FC<AdminOverviewViewProps> = ({
     }, 0);
 
     return (
-      <div className="p-4 sm:p-8 font-sans space-y-8 bg-[#faf7f2] min-h-full">
-        <div className="flex items-center justify-between font-mono text-[10px] text-[#7b6e54] tracking-[0.2em] uppercase mb-1">
+      <div className="p-4 sm:p-8 font-sans space-y-8 bg-[#09090b] min-h-full">
+        <div className="flex items-center justify-between font-mono text-[10px] text-[#c9a96e] tracking-[0.2em] uppercase mb-1">
           <span>SUPPLY CHAIN // FULFILLMENT &amp; STOCK TELEMETRY</span>
           <button
             onClick={() => onSelectSection('OVERVIEW')}
-            className="text-[#1a1816] font-bold hover:underline cursor-pointer"
+            className="text-[#f4f4f6] font-bold hover:underline cursor-pointer"
           >
             ← BACK TO OVERVIEW
           </button>
@@ -426,10 +426,10 @@ export const AdminOverviewView: React.FC<AdminOverviewViewProps> = ({
 
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div>
-            <h1 className="font-headline text-3xl sm:text-4xl text-[#1a1816] tracking-tight">
+            <h1 className="font-headline text-3xl sm:text-4xl text-[#f4f4f6] tracking-tight">
               Product Inventory
             </h1>
-            <p className="font-sans text-[13px] text-[#59544c] mt-1">
+            <p className="font-sans text-[13px] text-[#8e8e98] mt-1">
               This dashboard shows catalog stock quantities. Warehouse locations and dispatch service levels are not stored in the database.
             </p>
           </div>
@@ -437,14 +437,14 @@ export const AdminOverviewView: React.FC<AdminOverviewViewProps> = ({
           <div className="flex items-center gap-2 font-mono text-[11px]">
             <button
               onClick={() => onSelectSection('LOW_STOCK_RADAR')}
-              className="px-3.5 py-2 bg-[#ede7dd] border border-[#d5cdc0] text-[#1a1816] hover:bg-[#e4ddcf] font-bold uppercase tracking-wider cursor-pointer shadow-2xs flex items-center gap-1.5"
+              className="px-3.5 py-2 bg-[#121215] border border-[#242429] text-[#f4f4f6] hover:bg-[#1e1e24] font-bold uppercase tracking-wider cursor-pointer shadow-2xs flex items-center gap-1.5"
             >
               <Radar className="w-3.5 h-3.5 text-[#991b1b]" />
               <span>LOW-STOCK RADAR ({lowStockItems.length}) →</span>
             </button>
             <button
               onClick={() => onSelectSection('SKU_MATRIX')}
-              className="px-3.5 py-2 bg-[#141312] text-[#f5efe6] hover:bg-[#35322e] font-bold uppercase tracking-wider cursor-pointer shadow-xs flex items-center gap-1.5"
+              className="px-3.5 py-2 bg-[#141312] text-[#18181c] hover:bg-[#35322e] font-bold uppercase tracking-wider cursor-pointer shadow-xs flex items-center gap-1.5"
             >
               <Boxes className="w-3.5 h-3.5" />
               <span>SKU MATRIX →</span>
@@ -454,29 +454,29 @@ export const AdminOverviewView: React.FC<AdminOverviewViewProps> = ({
 
         {/* Top 4 Supply Chain Stats */}
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 font-mono">
-          <div className="bg-[#ede7dd] border border-[#d5cdc0] p-4 shadow-2xs">
-            <div className="text-[9px] text-[#7b6e54] uppercase tracking-wider font-bold">TOTAL CATALOG UNITS</div>
-            <div className="text-2xl font-bold text-[#1a1816] mt-1">{totalStockCount} Units</div>
+          <div className="bg-[#121215] border border-[#242429] p-4 shadow-2xs">
+            <div className="text-[9px] text-[#c9a96e] uppercase tracking-wider font-bold">TOTAL CATALOG UNITS</div>
+            <div className="text-2xl font-bold text-[#f4f4f6] mt-1">{totalStockCount} Units</div>
             <div className="text-[9px] text-[#16a34a] font-bold mt-0.5">Loaded from the connected database</div>
           </div>
-          <div className="bg-[#ede7dd] border border-[#d5cdc0] p-4 shadow-2xs">
-            <div className="text-[9px] text-[#7b6e54] uppercase tracking-wider font-bold">WAREHOUSE LOCATIONS</div>
-            <div className="text-2xl font-bold text-[#1a1816] mt-1">Not tracked</div>
-            <div className="text-[9px] text-[#59544c] mt-0.5">No location field in the current schema</div>
+          <div className="bg-[#121215] border border-[#242429] p-4 shadow-2xs">
+            <div className="text-[9px] text-[#c9a96e] uppercase tracking-wider font-bold">WAREHOUSE LOCATIONS</div>
+            <div className="text-2xl font-bold text-[#f4f4f6] mt-1">Not tracked</div>
+            <div className="text-[9px] text-[#8e8e98] mt-0.5">No location field in the current schema</div>
           </div>
-          <div className="bg-[#ede7dd] border border-[#d5cdc0] p-4 shadow-2xs">
-            <div className="text-[9px] text-[#7b6e54] uppercase tracking-wider font-bold">DEPLETION RISK SPECIMENS</div>
+          <div className="bg-[#121215] border border-[#242429] p-4 shadow-2xs">
+            <div className="text-[9px] text-[#c9a96e] uppercase tracking-wider font-bold">DEPLETION RISK SPECIMENS</div>
             <div className="text-2xl font-bold text-[#991b1b] mt-1">{lowStockItems.length} Variants</div>
-            <div className="text-[9px] text-[#7b6e54] mt-0.5">Stock threshold &le; 5 units</div>
+            <div className="text-[9px] text-[#c9a96e] mt-0.5">Stock threshold &le; 5 units</div>
           </div>
-          <div className="bg-[#ede7dd] border border-[#d5cdc0] p-4 shadow-2xs">
-            <div className="text-[9px] text-[#7b6e54] uppercase tracking-wider font-bold">DISPATCH SLA</div>
-            <div className="text-2xl font-bold text-[#59544c] mt-1">Not tracked</div>
-            <div className="text-[9px] text-[#7b6e54] mt-0.5">No dispatch SLA data available</div>
+          <div className="bg-[#121215] border border-[#242429] p-4 shadow-2xs">
+            <div className="text-[9px] text-[#c9a96e] uppercase tracking-wider font-bold">DISPATCH SLA</div>
+            <div className="text-2xl font-bold text-[#8e8e98] mt-1">Not tracked</div>
+            <div className="text-[9px] text-[#c9a96e] mt-0.5">No dispatch SLA data available</div>
           </div>
         </div>
 
-        <div className="border border-[#d5cdc0] bg-[#ede7dd] p-5 font-mono text-[11px] text-[#59544c]">
+        <div className="border border-[#242429] bg-[#121215] p-5 font-mono text-[11px] text-[#8e8e98]">
           Stock is stored per product variant. The current database schema does not track warehouses, courier assignments, or inventory transfers.
         </div>
       </div>
@@ -486,12 +486,12 @@ export const AdminOverviewView: React.FC<AdminOverviewViewProps> = ({
   // SUBVIEW: LOW STOCK RADAR
   if (activeSection === 'LOW_STOCK_RADAR') {
     return (
-      <div className="p-4 sm:p-8 font-sans space-y-8 bg-[#faf7f2] min-h-full">
-        <div className="flex items-center justify-between font-mono text-[10px] text-[#7b6e54] tracking-[0.2em] uppercase mb-1">
+      <div className="p-4 sm:p-8 font-sans space-y-8 bg-[#09090b] min-h-full">
+        <div className="flex items-center justify-between font-mono text-[10px] text-[#c9a96e] tracking-[0.2em] uppercase mb-1">
           <span>CATALOG INTELLIGENCE // INVENTORY RADAR</span>
           <button
             onClick={() => onSelectSection('OVERVIEW')}
-            className="text-[#1a1816] font-bold hover:underline cursor-pointer"
+            className="text-[#f4f4f6] font-bold hover:underline cursor-pointer"
           >
             ← BACK TO OVERVIEW
           </button>
@@ -499,33 +499,33 @@ export const AdminOverviewView: React.FC<AdminOverviewViewProps> = ({
 
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div>
-            <h1 className="font-headline text-3xl sm:text-4xl text-[#1a1816] tracking-tight">
+            <h1 className="font-headline text-3xl sm:text-4xl text-[#f4f4f6] tracking-tight">
               Low-Stock Sentinel &amp; Restock Radar
             </h1>
-            <p className="font-sans text-[13px] text-[#59544c] mt-1">
+            <p className="font-sans text-[13px] text-[#8e8e98] mt-1">
               Specimens nearing scarcity thresholds requiring replenishment or atelier re-allocation.
             </p>
           </div>
 
           <button
             onClick={() => onSelectSection('PRODUCTS')}
-            className="px-4 py-2.5 bg-[#141312] text-[#f5efe6] font-mono text-[11px] font-bold uppercase tracking-wider hover:bg-[#35322e] flex items-center gap-2 cursor-pointer shadow-xs"
+            className="px-4 py-2.5 bg-[#141312] text-[#18181c] font-mono text-[11px] font-bold uppercase tracking-wider hover:bg-[#35322e] flex items-center gap-2 cursor-pointer shadow-xs"
           >
             <span>OPEN FULL SPECIMEN REGISTRY →</span>
           </button>
         </div>
 
         {lowStockItems.length === 0 ? (
-          <div className="p-12 text-center font-mono border border-[#d5cdc0] bg-[#ede7dd] text-[#7b6e54] space-y-2">
+          <div className="p-12 text-center font-mono border border-[#242429] bg-[#121215] text-[#c9a96e] space-y-2">
             <CheckCircle2 className="w-8 h-8 mx-auto text-[#16a34a]" />
-            <div className="text-sm font-bold text-[#1a1816]">ALL SPECIMEN STOCKS NORMALIZED</div>
+            <div className="text-sm font-bold text-[#f4f4f6]">ALL SPECIMEN STOCKS NORMALIZED</div>
             <div className="text-xs">Zero sizing variants currently at critical depletion.</div>
           </div>
         ) : (
-          <div className="border border-[#d5cdc0] bg-[#ede7dd] font-mono text-[11px] overflow-hidden">
+          <div className="border border-[#242429] bg-[#121215] font-mono text-[11px] overflow-hidden">
             <table className="w-full text-left border-collapse">
               <thead>
-                <tr className="border-b border-[#d5cdc0] text-[9px] text-[#7b6e54] tracking-widest uppercase bg-[#e4ddcf]">
+                <tr className="border-b border-[#242429] text-[9px] text-[#c9a96e] tracking-widest uppercase bg-[#1e1e24]">
                   <th className="p-3">SPECIMEN &amp; SKU</th>
                   <th className="p-3">COLORWAY</th>
                   <th className="p-3">SIZE</th>
@@ -534,15 +534,15 @@ export const AdminOverviewView: React.FC<AdminOverviewViewProps> = ({
                   <th className="p-3 text-right">ACTION</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-[#d5cdc0]/70">
+              <tbody className="divide-y divide-[#242429]/70">
                 {lowStockItems.map((item, idx) => (
-                  <tr key={idx} className="hover:bg-[#e4ddcf] transition-colors">
+                  <tr key={idx} className="hover:bg-[#1e1e24] transition-colors">
                     <td className="p-3">
-                      <div className="font-bold text-[#1a1816]">{item.name}</div>
-                      <div className="text-[9px] text-[#7b6e54]">{item.sku}</div>
+                      <div className="font-bold text-[#f4f4f6]">{item.name}</div>
+                      <div className="text-[9px] text-[#c9a96e]">{item.sku}</div>
                     </td>
-                    <td className="p-3 text-[#59544c]">{item.color}</td>
-                    <td className="p-3 font-bold text-[#1a1816]">US {item.size}</td>
+                    <td className="p-3 text-[#8e8e98]">{item.color}</td>
+                    <td className="p-3 font-bold text-[#f4f4f6]">US {item.size}</td>
                     <td className="p-3 font-bold text-[#991b1b]">{item.stock} Units Left</td>
                     <td className="p-3">
                       <span className="px-2 py-0.5 bg-[#fee2e2] text-[#991b1b] text-[9px] font-bold uppercase rounded-2xs">
@@ -555,7 +555,7 @@ export const AdminOverviewView: React.FC<AdminOverviewViewProps> = ({
                           onSelectSection('PRODUCTS');
                           onShowToast(`ROUTING TO MATRIX FOR ${item.sku}`);
                         }}
-                        className="px-2.5 py-1 bg-[#faf7f2] border border-[#d5cdc0] text-[#1a1816] hover:bg-[#ded6c9] font-bold text-[9px] uppercase cursor-pointer"
+                        className="px-2.5 py-1 bg-[#09090b] border border-[#242429] text-[#f4f4f6] hover:bg-[#242429] font-bold text-[9px] uppercase cursor-pointer"
                       >
                         REPLENISH →
                       </button>
@@ -573,12 +573,12 @@ export const AdminOverviewView: React.FC<AdminOverviewViewProps> = ({
   // SUBVIEW: CHRONO DROPS
   if (activeSection === 'CHRONO_DROPS') {
     return (
-      <div className="p-4 sm:p-8 font-sans space-y-8 bg-[#faf7f2] min-h-full">
-        <div className="flex items-center justify-between font-mono text-[10px] text-[#7b6e54] tracking-[0.2em] uppercase mb-1">
+      <div className="p-4 sm:p-8 font-sans space-y-8 bg-[#09090b] min-h-full">
+        <div className="flex items-center justify-between font-mono text-[10px] text-[#c9a96e] tracking-[0.2em] uppercase mb-1">
           <span>MARKETING ENGINE // CHRONO ARCHIVE RELEASES</span>
           <button
             onClick={() => onSelectSection('OVERVIEW')}
-            className="text-[#1a1816] font-bold hover:underline cursor-pointer"
+            className="text-[#f4f4f6] font-bold hover:underline cursor-pointer"
           >
             ← BACK TO OVERVIEW
           </button>
@@ -586,17 +586,17 @@ export const AdminOverviewView: React.FC<AdminOverviewViewProps> = ({
 
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div>
-            <h1 className="font-headline text-3xl sm:text-4xl text-[#1a1816] tracking-tight">
+            <h1 className="font-headline text-3xl sm:text-4xl text-[#f4f4f6] tracking-tight">
               Chrono Drops &amp; Time-Locked Allocations
             </h1>
-            <p className="font-sans text-[13px] text-[#59544c] mt-1">
+            <p className="font-sans text-[13px] text-[#8e8e98] mt-1">
               Cryptographically scheduled footwear releases with countdown tickers and automated patron dispatch.
             </p>
           </div>
 
           <button
             onClick={() => setShowDropModal(true)}
-            className="px-4 py-2.5 bg-[#141312] text-[#f5efe6] font-mono text-[11px] font-bold uppercase tracking-wider hover:bg-[#35322e] flex items-center gap-2 cursor-pointer shadow-xs"
+            className="px-4 py-2.5 bg-[#141312] text-[#18181c] font-mono text-[11px] font-bold uppercase tracking-wider hover:bg-[#35322e] flex items-center gap-2 cursor-pointer shadow-xs"
           >
             <Plus className="w-3.5 h-3.5" />
             <span>SCHEDULE NEW DROP</span>
@@ -614,14 +614,14 @@ export const AdminOverviewView: React.FC<AdminOverviewViewProps> = ({
             return (
               <div
                 key={drop.id}
-                className="bg-[#ede7dd] border border-[#d5cdc0] p-6 space-y-4 rounded-xs shadow-xs"
+                className="bg-[#121215] border border-[#242429] p-6 space-y-4 rounded-xs shadow-xs"
               >
-                <div className="flex flex-wrap items-center justify-between gap-3 pb-3 border-b border-[#d5cdc0]">
+                <div className="flex flex-wrap items-center justify-between gap-3 pb-3 border-b border-[#242429]">
                   <div>
-                    <div className="font-bold text-[#1a1816] uppercase text-base sm:text-lg">
+                    <div className="font-bold text-[#f4f4f6] uppercase text-base sm:text-lg">
                       {drop.productName}
                     </div>
-                    <div className="text-[10px] text-[#7b6e54] uppercase mt-0.5">
+                    <div className="text-[10px] text-[#c9a96e] uppercase mt-0.5">
                       {drop.edition} • {drop.brand} • {drop.stock} Total Specimen Units
                     </div>
                   </div>
@@ -640,7 +640,7 @@ export const AdminOverviewView: React.FC<AdminOverviewViewProps> = ({
                         onUpdateDropStatus(drop.id, newStatus);
                         onShowToast(`DROP STATUS ADVANCED: ${drop.productName} -> ${newStatus}`);
                       }}
-                      className="px-3 py-1 bg-[#faf7f2] border border-[#d5cdc0] text-[#1a1816] text-[10px] font-bold uppercase hover:bg-[#ded6c9] cursor-pointer"
+                      className="px-3 py-1 bg-[#09090b] border border-[#242429] text-[#f4f4f6] text-[10px] font-bold uppercase hover:bg-[#242429] cursor-pointer"
                     >
                       TOGGLE STATUS
                     </button>
@@ -648,41 +648,41 @@ export const AdminOverviewView: React.FC<AdminOverviewViewProps> = ({
                 </div>
 
                 <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 text-[11px]">
-                  <div className="bg-[#faf7f2] border border-[#d5cdc0] p-3">
-                    <div className="text-[9px] text-[#7b6e54] uppercase font-bold">EDITION PRICE</div>
-                    <div className="font-bold text-[#1a1816] text-[13px] mt-0.5">₹{drop.price?.toLocaleString()}</div>
-                    <div className="text-[9px] text-[#7b6e54] line-through">MRP: ₹{drop.mrp?.toLocaleString()}</div>
+                  <div className="bg-[#09090b] border border-[#242429] p-3">
+                    <div className="text-[9px] text-[#c9a96e] uppercase font-bold">EDITION PRICE</div>
+                    <div className="font-bold text-[#f4f4f6] text-[13px] mt-0.5">₹{drop.price?.toLocaleString()}</div>
+                    <div className="text-[9px] text-[#c9a96e] line-through">MRP: ₹{drop.mrp?.toLocaleString()}</div>
                   </div>
 
-                  <div className="bg-[#faf7f2] border border-[#d5cdc0] p-3">
-                    <div className="text-[9px] text-[#7b6e54] uppercase font-bold">RELEASE WINDOW</div>
-                    <div className="font-bold text-[#1a1816] mt-0.5">{drop.launchDate || '2026-11-01'}</div>
-                    <div className="text-[9px] text-[#7b6e54]">{drop.launchTime || '18:00 UTC'}</div>
+                  <div className="bg-[#09090b] border border-[#242429] p-3">
+                    <div className="text-[9px] text-[#c9a96e] uppercase font-bold">RELEASE WINDOW</div>
+                    <div className="font-bold text-[#f4f4f6] mt-0.5">{drop.launchDate || '2026-11-01'}</div>
+                    <div className="text-[9px] text-[#c9a96e]">{drop.launchTime || '18:00 UTC'}</div>
                   </div>
 
-                  <div className="bg-[#faf7f2] border border-[#d5cdc0] p-3">
-                    <div className="text-[9px] text-[#7b6e54] uppercase font-bold">TOTAL ALLOCATION</div>
-                    <div className="font-bold text-[#1a1816] text-[13px] mt-0.5">{drop.stock} Pairs</div>
+                  <div className="bg-[#09090b] border border-[#242429] p-3">
+                    <div className="text-[9px] text-[#c9a96e] uppercase font-bold">TOTAL ALLOCATION</div>
+                    <div className="font-bold text-[#f4f4f6] text-[13px] mt-0.5">{drop.stock} Pairs</div>
                     <div className="text-[9px] text-[#16a34a] font-bold">Limited Vault Production</div>
                   </div>
 
-                  <div className="bg-[#faf7f2] border border-[#d5cdc0] p-3">
-                    <div className="text-[9px] text-[#7b6e54] uppercase font-bold">TICKING COUNTDOWN</div>
-                    <div className="font-bold text-[#1a1816] mt-0.5 flex items-center gap-1">
-                      <Clock className="w-3 h-3 text-[#7b6e54]" />
+                  <div className="bg-[#09090b] border border-[#242429] p-3">
+                    <div className="text-[9px] text-[#c9a96e] uppercase font-bold">TICKING COUNTDOWN</div>
+                    <div className="font-bold text-[#f4f4f6] mt-0.5 flex items-center gap-1">
+                      <Clock className="w-3 h-3 text-[#c9a96e]" />
                       <span className="text-[10px]">{countdown}</span>
                     </div>
-                    <div className="text-[9px] text-[#59544c]">Hardware clock sync</div>
+                    <div className="text-[9px] text-[#8e8e98]">Hardware clock sync</div>
                   </div>
                 </div>
 
-                <div className="pt-3 border-t border-[#d5cdc0] flex flex-wrap items-center justify-between gap-3 text-[10px]">
-                  <span className="text-[#7b6e54]">640 PATRONS ENROLLED IN HIGH-PRIORITY AIR NOTIFICATION</span>
+                <div className="pt-3 border-t border-[#242429] flex flex-wrap items-center justify-between gap-3 text-[10px]">
+                  <span className="text-[#c9a96e]">640 PATRONS ENROLLED IN HIGH-PRIORITY AIR NOTIFICATION</span>
                   <button
                     onClick={() => {
                       onShowToast(`DISPATCHED TELEMETRY PUSH TO ALL SUBSCRIBERS FOR ${drop.productName}`);
                     }}
-                    className="px-3 py-1.5 bg-[#141312] text-[#f5efe6] font-bold uppercase text-[9px] tracking-wider hover:bg-[#35322e] cursor-pointer"
+                    className="px-3 py-1.5 bg-[#141312] text-[#18181c] font-bold uppercase text-[9px] tracking-wider hover:bg-[#35322e] cursor-pointer"
                   >
                     TRANSMIT DROP NOTIFICATION
                   </button>
@@ -698,12 +698,12 @@ export const AdminOverviewView: React.FC<AdminOverviewViewProps> = ({
   // SUBVIEW: COUPONS
   if (activeSection === 'COUPONS') {
     return (
-      <div className="p-4 sm:p-8 font-sans space-y-8 bg-[#faf7f2] min-h-full">
-        <div className="flex items-center justify-between font-mono text-[10px] text-[#7b6e54] tracking-[0.2em] uppercase mb-1">
+      <div className="p-4 sm:p-8 font-sans space-y-8 bg-[#09090b] min-h-full">
+        <div className="flex items-center justify-between font-mono text-[10px] text-[#c9a96e] tracking-[0.2em] uppercase mb-1">
           <span>COMMERCE ENGINE // PRIVILEGE VOUCHERS</span>
           <button
             onClick={() => onSelectSection('OVERVIEW')}
-            className="text-[#1a1816] font-bold hover:underline cursor-pointer"
+            className="text-[#f4f4f6] font-bold hover:underline cursor-pointer"
           >
             ← BACK TO OVERVIEW
           </button>
@@ -711,17 +711,17 @@ export const AdminOverviewView: React.FC<AdminOverviewViewProps> = ({
 
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div>
-            <h1 className="font-headline text-3xl sm:text-4xl text-[#1a1816] tracking-tight">
+            <h1 className="font-headline text-3xl sm:text-4xl text-[#f4f4f6] tracking-tight">
               Privilege Coupons &amp; Atelier Vouchers
             </h1>
-            <p className="font-sans text-[13px] text-[#59544c] mt-1">
+            <p className="font-sans text-[13px] text-[#8e8e98] mt-1">
               Manage promotional discount tokens, minimum expenditure thresholds, and VIP member codes.
             </p>
           </div>
 
           <button
             onClick={() => setShowCouponModal(true)}
-            className="px-4 py-2.5 bg-[#141312] text-[#f5efe6] font-mono text-[11px] font-bold uppercase tracking-wider hover:bg-[#35322e] flex items-center gap-2 cursor-pointer shadow-xs"
+            className="px-4 py-2.5 bg-[#141312] text-[#18181c] font-mono text-[11px] font-bold uppercase tracking-wider hover:bg-[#35322e] flex items-center gap-2 cursor-pointer shadow-xs"
           >
             <Plus className="w-3.5 h-3.5" />
             <span>GENERATE NEW COUPON</span>
@@ -729,10 +729,10 @@ export const AdminOverviewView: React.FC<AdminOverviewViewProps> = ({
         </div>
 
         {/* Coupons Table */}
-        <div className="border border-[#d5cdc0] bg-[#ede7dd] font-mono text-[11px] overflow-hidden rounded-xs shadow-xs">
+        <div className="border border-[#242429] bg-[#121215] font-mono text-[11px] overflow-hidden rounded-xs shadow-xs">
           <table className="w-full text-left border-collapse">
             <thead>
-              <tr className="border-b border-[#d5cdc0] text-[9px] text-[#7b6e54] tracking-widest uppercase bg-[#e4ddcf]">
+              <tr className="border-b border-[#242429] text-[9px] text-[#c9a96e] tracking-widest uppercase bg-[#1e1e24]">
                 <th className="p-3.5">COUPON CODE</th>
                 <th className="p-3.5">DISCOUNT PERCENT</th>
                 <th className="p-3.5">MINIMUM ORDER</th>
@@ -740,31 +740,31 @@ export const AdminOverviewView: React.FC<AdminOverviewViewProps> = ({
                 <th className="p-3.5 text-right">ACTIONS</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-[#d5cdc0]/70">
+            <tbody className="divide-y divide-[#242429]/70">
               {coupons.map((c) => (
-                <tr key={c.code} className="hover:bg-[#e4ddcf] transition-colors">
+                <tr key={c.code} className="hover:bg-[#1e1e24] transition-colors">
                   <td className="p-3.5">
                     <div className="flex items-center gap-2">
-                      <span className="font-bold text-[#1a1816] text-[12px]">{c.code}</span>
+                      <span className="font-bold text-[#f4f4f6] text-[12px]">{c.code}</span>
                       <button
                         onClick={() => {
                           navigator.clipboard?.writeText(c.code);
                           onShowToast(`COUPON ${c.code} COPIED TO CLIPBOARD`);
                         }}
-                        className="text-[#7b6e54] hover:text-[#1a1816] cursor-pointer"
+                        className="text-[#c9a96e] hover:text-[#f4f4f6] cursor-pointer"
                         title="Copy Code"
                       >
                         <Copy className="w-3 h-3" />
                       </button>
                     </div>
-                    <div className="text-[9px] text-[#7b6e54]">{c.description || 'Atelier Privilege Voucher'}</div>
+                    <div className="text-[9px] text-[#c9a96e]">{c.description || 'Atelier Privilege Voucher'}</div>
                   </td>
-                  <td className="p-3.5 font-bold text-[#1a1816]">
-                    <span className="px-2 py-0.5 bg-[#faf7f2] border border-[#d5cdc0]">
+                  <td className="p-3.5 font-bold text-[#f4f4f6]">
+                    <span className="px-2 py-0.5 bg-[#09090b] border border-[#242429]">
                       {c.discountPercent}% OFF
                     </span>
                   </td>
-                  <td className="p-3.5 font-bold text-[#59544c]">
+                  <td className="p-3.5 font-bold text-[#8e8e98]">
                     ₹{c.minOrderValue.toLocaleString()}
                   </td>
                   <td className="p-3.5">
@@ -778,7 +778,7 @@ export const AdminOverviewView: React.FC<AdminOverviewViewProps> = ({
                         navigator.clipboard?.writeText(c.code);
                         onShowToast(`COUPON ${c.code} COPIED TO CLIPBOARD`);
                       }}
-                      className="px-2.5 py-1 bg-[#faf7f2] border border-[#d5cdc0] text-[#1a1816] hover:bg-[#ded6c9] font-bold text-[9px] uppercase cursor-pointer mr-2"
+                      className="px-2.5 py-1 bg-[#09090b] border border-[#242429] text-[#f4f4f6] hover:bg-[#242429] font-bold text-[9px] uppercase cursor-pointer mr-2"
                     >
                       COPY
                     </button>
@@ -794,19 +794,19 @@ export const AdminOverviewView: React.FC<AdminOverviewViewProps> = ({
 
   // DEFAULT MAIN OVERVIEW VIEW
   return (
-    <div className="p-4 sm:p-8 font-sans space-y-8 bg-[#faf7f2] min-h-full">
+    <div className="p-4 sm:p-8 font-sans space-y-8 bg-[#09090b] min-h-full">
       {/* Header */}
       <div>
-        <div className="font-mono text-[10px] text-[#7b6e54] tracking-[0.2em] uppercase mb-1">
+        <div className="font-mono text-[10px] text-[#c9a96e] tracking-[0.2em] uppercase mb-1">
           EXECUTIVE COMMAND // ARCHITECTURAL TELEMETRY
         </div>
 
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div>
-            <h1 className="font-headline text-3xl sm:text-4xl text-[#1a1816] tracking-tight">
+            <h1 className="font-headline text-3xl sm:text-4xl text-[#f4f4f6] tracking-tight">
               Executive Overview &amp; Control
             </h1>
-            <p className="font-sans text-[13px] text-[#59544c] mt-1">
+            <p className="font-sans text-[13px] text-[#8e8e98] mt-1">
               Real-time synchronization across catalog specimens, fulfillment nodes, and security telemetry.
             </p>
           </div>
@@ -814,13 +814,13 @@ export const AdminOverviewView: React.FC<AdminOverviewViewProps> = ({
           <div className="flex items-center gap-2 font-mono text-[11px]">
             <button
               onClick={() => onSelectSection('PRODUCTS')}
-              className="px-3.5 py-2 bg-[#ede7dd] border border-[#d5cdc0] text-[#1a1816] hover:bg-[#e4ddcf] font-bold uppercase tracking-wider cursor-pointer shadow-2xs"
+              className="px-3.5 py-2 bg-[#121215] border border-[#242429] text-[#f4f4f6] hover:bg-[#1e1e24] font-bold uppercase tracking-wider cursor-pointer shadow-2xs"
             >
               SPECIMEN DOSSIERS →
             </button>
             <button
               onClick={() => onSelectSection('ORDERS')}
-              className="px-3.5 py-2 bg-[#141312] text-[#f5efe6] hover:bg-[#35322e] font-bold uppercase tracking-wider cursor-pointer shadow-xs"
+              className="px-3.5 py-2 bg-[#141312] text-[#18181c] hover:bg-[#35322e] font-bold uppercase tracking-wider cursor-pointer shadow-xs"
             >
               LOGISTICS COMMAND →
             </button>
@@ -830,70 +830,70 @@ export const AdminOverviewView: React.FC<AdminOverviewViewProps> = ({
 
       {/* Top 4 Metrics */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 font-mono">
-        <div className="bg-[#ede7dd] border border-[#d5cdc0] p-4 shadow-2xs">
-          <div className="text-[9px] text-[#7b6e54] uppercase tracking-wider font-bold">
+        <div className="bg-[#121215] border border-[#242429] p-4 shadow-2xs">
+          <div className="text-[9px] text-[#c9a96e] uppercase tracking-wider font-bold">
             VALUE OF LOADED ORDERS
           </div>
-          <div className="text-2xl font-bold text-[#1a1816] mt-1">
+          <div className="text-2xl font-bold text-[#f4f4f6] mt-1">
             ₹{loadedOrderValue.toLocaleString()}
           </div>
-          <div className="text-[9px] text-[#59544c] mt-0.5">Across currently loaded orders</div>
+          <div className="text-[9px] text-[#8e8e98] mt-0.5">Across currently loaded orders</div>
         </div>
 
-        <div className="bg-[#ede7dd] border border-[#d5cdc0] p-4 shadow-2xs">
-          <div className="text-[9px] text-[#7b6e54] uppercase tracking-wider font-bold">
+        <div className="bg-[#121215] border border-[#242429] p-4 shadow-2xs">
+          <div className="text-[9px] text-[#c9a96e] uppercase tracking-wider font-bold">
             LOADED ORDERS
           </div>
-          <div className="text-2xl font-bold text-[#1a1816] mt-1">
+          <div className="text-2xl font-bold text-[#f4f4f6] mt-1">
             {loadedOrderCount} Orders
           </div>
-          <div className="text-[9px] text-[#59544c] mt-0.5">From the connected database</div>
+          <div className="text-[9px] text-[#8e8e98] mt-0.5">From the connected database</div>
         </div>
 
-        <div className="bg-[#ede7dd] border border-[#d5cdc0] p-4 shadow-2xs">
-          <div className="text-[9px] text-[#7b6e54] uppercase tracking-wider font-bold">
+        <div className="bg-[#121215] border border-[#242429] p-4 shadow-2xs">
+          <div className="text-[9px] text-[#c9a96e] uppercase tracking-wider font-bold">
             ARCHIVAL SPECIMENS
           </div>
-          <div className="text-2xl font-bold text-[#1a1816] mt-1">
+          <div className="text-2xl font-bold text-[#f4f4f6] mt-1">
             {totalMasterStyles} Master Styles
           </div>
-          <div className="text-[9px] text-[#59544c] mt-0.5">Dimensional size matrix intact</div>
+          <div className="text-[9px] text-[#8e8e98] mt-0.5">Dimensional size matrix intact</div>
         </div>
 
-        <div className="bg-[#ede7dd] border border-[#d5cdc0] p-4 shadow-2xs">
-          <div className="text-[9px] text-[#7b6e54] uppercase tracking-wider font-bold">
+        <div className="bg-[#121215] border border-[#242429] p-4 shadow-2xs">
+          <div className="text-[9px] text-[#c9a96e] uppercase tracking-wider font-bold">
             SECURITY INTEGRITY
           </div>
-          <div className="text-2xl font-bold text-[#59544c] mt-1">Not measured</div>
-          <div className="text-[9px] text-[#7b6e54] mt-0.5">See database security events</div>
+          <div className="text-2xl font-bold text-[#8e8e98] mt-1">Not measured</div>
+          <div className="text-[9px] text-[#c9a96e] mt-0.5">See database security events</div>
         </div>
       </div>
 
       {/* Historical analytics are not currently backed by an API. */}
-      <div className="border border-[#d5cdc0] bg-[#ede7dd] p-5 sm:p-6 space-y-4 rounded-xs shadow-xs font-mono">
-        <div className="pb-3 border-b border-[#d5cdc0]">
-          <div className="text-[9px] text-[#7b6e54] tracking-widest uppercase font-bold">ORDER ANALYTICS</div>
-          <h3 className="font-headline text-xl font-bold text-[#1a1816] tracking-tight">Historical volume</h3>
+      <div className="border border-[#242429] bg-[#121215] p-5 sm:p-6 space-y-4 rounded-xs shadow-xs font-mono">
+        <div className="pb-3 border-b border-[#242429]">
+          <div className="text-[9px] text-[#c9a96e] tracking-widest uppercase font-bold">ORDER ANALYTICS</div>
+          <h3 className="font-headline text-xl font-bold text-[#f4f4f6] tracking-tight">Historical volume</h3>
         </div>
-        <p className="text-[12px] text-[#59544c]">Historical revenue and order velocity are not connected to this dashboard yet. The totals above use only the orders currently loaded from the database.</p>
+        <p className="text-[12px] text-[#8e8e98]">Historical revenue and order velocity are not connected to this dashboard yet. The totals above use only the orders currently loaded from the database.</p>
       </div>
 
       {/* 2-Column Split: Chrono Drops & Coupons */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 font-mono">
         {/* Chrono Drops */}
-        <div className="border border-[#d5cdc0] bg-[#ede7dd] p-5 sm:p-6 space-y-4 rounded-xs shadow-xs">
-          <div className="flex items-center justify-between pb-3 border-b border-[#d5cdc0]">
+        <div className="border border-[#242429] bg-[#121215] p-5 sm:p-6 space-y-4 rounded-xs shadow-xs">
+          <div className="flex items-center justify-between pb-3 border-b border-[#242429]">
             <div>
-              <div className="text-[9px] text-[#7b6e54] tracking-widest uppercase font-bold">
+              <div className="text-[9px] text-[#c9a96e] tracking-widest uppercase font-bold">
                 MARKETING ENGINE
               </div>
-              <h3 className="font-headline text-xl font-bold text-[#1a1816] tracking-tight">
+              <h3 className="font-headline text-xl font-bold text-[#f4f4f6] tracking-tight">
                 Chrono Drops ({drops.length})
               </h3>
             </div>
             <button
               onClick={() => setShowDropModal(true)}
-              className="px-2.5 py-1 bg-[#141312] text-[#f5efe6] text-[10px] font-bold uppercase tracking-wider hover:bg-[#35322e] cursor-pointer flex items-center gap-1 shadow-2xs"
+              className="px-2.5 py-1 bg-[#141312] text-[#18181c] text-[10px] font-bold uppercase tracking-wider hover:bg-[#35322e] cursor-pointer flex items-center gap-1 shadow-2xs"
             >
               <Plus className="w-3 h-3" />
               <span>SCHEDULE DROP</span>
@@ -910,14 +910,14 @@ export const AdminOverviewView: React.FC<AdminOverviewViewProps> = ({
               return (
                 <div
                   key={drop.id}
-                  className="bg-[#faf7f2] border border-[#d5cdc0] p-3.5 space-y-2"
+                  className="bg-[#09090b] border border-[#242429] p-3.5 space-y-2"
                 >
                   <div className="flex items-center justify-between">
                     <div>
-                      <div className="font-bold text-[#1a1816] uppercase text-[12px]">
+                      <div className="font-bold text-[#f4f4f6] uppercase text-[12px]">
                         {drop.productName}
                       </div>
-                      <div className="text-[9px] text-[#7b6e54] uppercase">
+                      <div className="text-[9px] text-[#c9a96e] uppercase">
                         {drop.edition} • {drop.stock} Units
                       </div>
                     </div>
@@ -937,23 +937,23 @@ export const AdminOverviewView: React.FC<AdminOverviewViewProps> = ({
                           onUpdateDropStatus(drop.id, newStatus);
                           onShowToast(`Drop status change requested for ${drop.productName}.`);
                         }}
-                        className="p-1 hover:bg-[#ede7dd] text-[#1a1816] text-[9px] font-bold underline cursor-pointer"
+                        className="p-1 hover:bg-[#121215] text-[#f4f4f6] text-[9px] font-bold underline cursor-pointer"
                       >
                         TOGGLE
                       </button>
                     </div>
                   </div>
 
-                  <div className="flex items-center justify-between text-[10px] pt-2 border-t border-[#d5cdc0]/70">
-                    <div className="flex items-center gap-1 text-[#1a1816] font-bold">
-                      <Clock className="w-3 h-3 text-[#7b6e54]" />
+                  <div className="flex items-center justify-between text-[10px] pt-2 border-t border-[#242429]/70">
+                    <div className="flex items-center gap-1 text-[#f4f4f6] font-bold">
+                      <Clock className="w-3 h-3 text-[#c9a96e]" />
                       <span>{countdown}</span>
                     </div>
                     <button
                       onClick={() => {
                         onShowToast('Drop subscriber notifications are not configured. No alert was sent.');
                       }}
-                      className="text-[9px] font-bold text-[#7b6e54] hover:text-[#1a1816] uppercase underline cursor-pointer"
+                      className="text-[9px] font-bold text-[#c9a96e] hover:text-[#f4f4f6] uppercase underline cursor-pointer"
                     >
                       NOTIFY SUBSCRIBERS
                     </button>
@@ -965,19 +965,19 @@ export const AdminOverviewView: React.FC<AdminOverviewViewProps> = ({
         </div>
 
         {/* Coupons */}
-        <div className="border border-[#d5cdc0] bg-[#ede7dd] p-5 sm:p-6 space-y-4 rounded-xs shadow-xs">
-          <div className="flex items-center justify-between pb-3 border-b border-[#d5cdc0]">
+        <div className="border border-[#242429] bg-[#121215] p-5 sm:p-6 space-y-4 rounded-xs shadow-xs">
+          <div className="flex items-center justify-between pb-3 border-b border-[#242429]">
             <div>
-              <div className="text-[9px] text-[#7b6e54] tracking-widest uppercase font-bold">
+              <div className="text-[9px] text-[#c9a96e] tracking-widest uppercase font-bold">
                 COMMERCE VOUCHERS
               </div>
-              <h3 className="font-headline text-xl font-bold text-[#1a1816] tracking-tight">
+              <h3 className="font-headline text-xl font-bold text-[#f4f4f6] tracking-tight">
                 Privilege Coupons ({coupons.length})
               </h3>
             </div>
             <button
               onClick={() => setShowCouponModal(true)}
-              className="px-2.5 py-1 bg-[#141312] text-[#f5efe6] text-[10px] font-bold uppercase tracking-wider hover:bg-[#35322e] cursor-pointer flex items-center gap-1 shadow-2xs"
+              className="px-2.5 py-1 bg-[#141312] text-[#18181c] text-[10px] font-bold uppercase tracking-wider hover:bg-[#35322e] cursor-pointer flex items-center gap-1 shadow-2xs"
             >
               <Plus className="w-3 h-3" />
               <span>GENERATE CODE</span>
@@ -988,23 +988,23 @@ export const AdminOverviewView: React.FC<AdminOverviewViewProps> = ({
             {coupons.map((c) => (
               <div
                 key={c.code}
-                className="bg-[#faf7f2] border border-[#d5cdc0] p-3 flex items-center justify-between"
+                className="bg-[#09090b] border border-[#242429] p-3 flex items-center justify-between"
               >
                 <div>
                   <div className="flex items-center gap-2">
-                    <span className="font-bold text-[#1a1816]">{c.code}</span>
+                    <span className="font-bold text-[#f4f4f6]">{c.code}</span>
                     <button
                       onClick={() => {
                         navigator.clipboard?.writeText(c.code);
                         onShowToast(`COUPON ${c.code} COPIED TO CLIPBOARD`);
                       }}
-                      className="text-[#7b6e54] hover:text-[#1a1816] cursor-pointer"
+                      className="text-[#c9a96e] hover:text-[#f4f4f6] cursor-pointer"
                       title="Copy Code"
                     >
                       <Copy className="w-2.5 h-2.5" />
                     </button>
                   </div>
-                  <div className="text-[9px] text-[#7b6e54]">
+                  <div className="text-[9px] text-[#c9a96e]">
                     {c.discountPercent}% Discount • Min order: ₹{c.minOrderValue.toLocaleString()}
                   </div>
                 </div>
@@ -1019,14 +1019,14 @@ export const AdminOverviewView: React.FC<AdminOverviewViewProps> = ({
 
       {/* Schedule Drop Modal */}
       {showDropModal && (
-        <div className="fixed inset-0 z-50 bg-[#1a1816]/75 backdrop-blur-xs flex items-center justify-center p-4">
-          <div className="bg-[#faf7f2] border border-[#d5cdc0] max-w-md w-full p-6 font-mono text-xs shadow-2xl">
-            <h3 className="font-headline text-xl font-bold text-[#1a1816] mb-3">
+        <div className="fixed inset-0 z-50 bg-[#f4f4f6]/75 backdrop-blur-xs flex items-center justify-center p-4">
+          <div className="bg-[#09090b] border border-[#242429] max-w-md w-full p-6 font-mono text-xs shadow-2xl">
+            <h3 className="font-headline text-xl font-bold text-[#f4f4f6] mb-3">
               Schedule Sneaker Drop
             </h3>
             <form onSubmit={handleCreateDrop} className="space-y-3">
               <div>
-                <label className="block text-[9px] font-bold uppercase text-[#1a1816] mb-1">
+                <label className="block text-[9px] font-bold uppercase text-[#f4f4f6] mb-1">
                   DROP TITLE *
                 </label>
                 <input
@@ -1035,11 +1035,11 @@ export const AdminOverviewView: React.FC<AdminOverviewViewProps> = ({
                   value={dropTitle}
                   onChange={(e) => setDropTitle(e.target.value)}
                   placeholder="e.g. MONOLITH DERBY LIMITED"
-                  className="w-full bg-white border border-[#d5cdc0] p-2 text-[11px] font-mono outline-none"
+                  className="w-full bg-[#18181c] border border-[#242429] p-2 text-[11px] font-mono outline-none"
                 />
               </div>
               <div>
-                <label className="block text-[9px] font-bold uppercase text-[#1a1816] mb-1">
+                <label className="block text-[9px] font-bold uppercase text-[#f4f4f6] mb-1">
                   EDITION SPECIFICATION
                 </label>
                 <input
@@ -1047,44 +1047,44 @@ export const AdminOverviewView: React.FC<AdminOverviewViewProps> = ({
                   value={dropEdition}
                   onChange={(e) => setDropEdition(e.target.value)}
                   placeholder="ARCHIVAL SPECIMEN // EDITION 01"
-                  className="w-full bg-white border border-[#d5cdc0] p-2 text-[11px] font-mono outline-none"
+                  className="w-full bg-[#18181c] border border-[#242429] p-2 text-[11px] font-mono outline-none"
                 />
               </div>
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="block text-[9px] font-bold uppercase text-[#1a1816] mb-1">
+                  <label className="block text-[9px] font-bold uppercase text-[#f4f4f6] mb-1">
                     TOTAL UNITS
                   </label>
                   <input
                     type="number"
                     value={dropUnits}
                     onChange={(e) => setDropUnits(e.target.value)}
-                    className="w-full bg-white border border-[#d5cdc0] p-2 text-[11px] font-mono outline-none"
+                    className="w-full bg-[#18181c] border border-[#242429] p-2 text-[11px] font-mono outline-none"
                   />
                 </div>
                 <div>
-                  <label className="block text-[9px] font-bold uppercase text-[#1a1816] mb-1">
+                  <label className="block text-[9px] font-bold uppercase text-[#f4f4f6] mb-1">
                     PRICE (₹)
                   </label>
                   <input
                     type="number"
                     value={dropPrice}
                     onChange={(e) => setDropPrice(e.target.value)}
-                    className="w-full bg-white border border-[#d5cdc0] p-2 text-[11px] font-mono outline-none"
+                    className="w-full bg-[#18181c] border border-[#242429] p-2 text-[11px] font-mono outline-none"
                   />
                 </div>
               </div>
-              <div className="pt-3 flex justify-end gap-2 border-t border-[#d5cdc0]">
+              <div className="pt-3 flex justify-end gap-2 border-t border-[#242429]">
                 <button
                   type="button"
                   onClick={() => setShowDropModal(false)}
-                  className="px-3 py-1.5 uppercase font-bold text-[10px] text-[#59544c] cursor-pointer"
+                  className="px-3 py-1.5 uppercase font-bold text-[10px] text-[#8e8e98] cursor-pointer"
                 >
                   CANCEL
                 </button>
                 <button
                   type="submit"
-                  className="px-4 py-1.5 bg-[#141312] text-[#f5efe6] uppercase font-bold text-[10px] cursor-pointer"
+                  className="px-4 py-1.5 bg-[#141312] text-[#18181c] uppercase font-bold text-[10px] cursor-pointer"
                 >
                   SCHEDULE
                 </button>
@@ -1096,14 +1096,14 @@ export const AdminOverviewView: React.FC<AdminOverviewViewProps> = ({
 
       {/* Coupon Modal */}
       {showCouponModal && (
-        <div className="fixed inset-0 z-50 bg-[#1a1816]/75 backdrop-blur-xs flex items-center justify-center p-4">
-          <div className="bg-[#faf7f2] border border-[#d5cdc0] max-w-md w-full p-6 font-mono text-xs shadow-2xl">
-            <h3 className="font-headline text-xl font-bold text-[#1a1816] mb-3">
+        <div className="fixed inset-0 z-50 bg-[#f4f4f6]/75 backdrop-blur-xs flex items-center justify-center p-4">
+          <div className="bg-[#09090b] border border-[#242429] max-w-md w-full p-6 font-mono text-xs shadow-2xl">
+            <h3 className="font-headline text-xl font-bold text-[#f4f4f6] mb-3">
               Generate Privilege Coupon
             </h3>
             <form onSubmit={handleCreateCoupon} className="space-y-3">
               <div>
-                <label className="block text-[9px] font-bold uppercase text-[#1a1816] mb-1">
+                <label className="block text-[9px] font-bold uppercase text-[#f4f4f6] mb-1">
                   COUPON CODE *
                 </label>
                 <input
@@ -1112,44 +1112,44 @@ export const AdminOverviewView: React.FC<AdminOverviewViewProps> = ({
                   value={couponCode}
                   onChange={(e) => setCouponCode(e.target.value)}
                   placeholder="e.g. ATELIER20"
-                  className="w-full bg-white border border-[#d5cdc0] p-2 text-[11px] font-mono outline-none uppercase"
+                  className="w-full bg-[#18181c] border border-[#242429] p-2 text-[11px] font-mono outline-none uppercase"
                 />
               </div>
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="block text-[9px] font-bold uppercase text-[#1a1816] mb-1">
+                  <label className="block text-[9px] font-bold uppercase text-[#f4f4f6] mb-1">
                     DISCOUNT %
                   </label>
                   <input
                     type="number"
                     value={couponDiscount}
                     onChange={(e) => setCouponDiscount(e.target.value)}
-                    className="w-full bg-white border border-[#d5cdc0] p-2 text-[11px] font-mono outline-none"
+                    className="w-full bg-[#18181c] border border-[#242429] p-2 text-[11px] font-mono outline-none"
                   />
                 </div>
                 <div>
-                  <label className="block text-[9px] font-bold uppercase text-[#1a1816] mb-1">
+                  <label className="block text-[9px] font-bold uppercase text-[#f4f4f6] mb-1">
                     MIN ORDER VALUE (₹)
                   </label>
                   <input
                     type="number"
                     value={couponMinOrder}
                     onChange={(e) => setCouponMinOrder(e.target.value)}
-                    className="w-full bg-white border border-[#d5cdc0] p-2 text-[11px] font-mono outline-none"
+                    className="w-full bg-[#18181c] border border-[#242429] p-2 text-[11px] font-mono outline-none"
                   />
                 </div>
               </div>
-              <div className="pt-3 flex justify-end gap-2 border-t border-[#d5cdc0]">
+              <div className="pt-3 flex justify-end gap-2 border-t border-[#242429]">
                 <button
                   type="button"
                   onClick={() => setShowCouponModal(false)}
-                  className="px-3 py-1.5 uppercase font-bold text-[10px] text-[#59544c] cursor-pointer"
+                  className="px-3 py-1.5 uppercase font-bold text-[10px] text-[#8e8e98] cursor-pointer"
                 >
                   CANCEL
                 </button>
                 <button
                   type="submit"
-                  className="px-4 py-1.5 bg-[#141312] text-[#f5efe6] uppercase font-bold text-[10px] cursor-pointer"
+                  className="px-4 py-1.5 bg-[#141312] text-[#18181c] uppercase font-bold text-[10px] cursor-pointer"
                 >
                   GENERATE
                 </button>

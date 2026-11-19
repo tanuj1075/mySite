@@ -19,29 +19,29 @@ export const SizeSelectorModal: React.FC<SizeSelectorModalProps> = ({
 
   return (
     <div
-      className="fixed inset-0 z-50 bg-[#1a1816]/70 backdrop-blur-sm flex items-center justify-center p-4 overflow-y-auto"
+      className="fixed inset-0 z-50 bg-[#09090b]/80 backdrop-blur-md flex items-center justify-center p-4 overflow-y-auto font-mono"
       role="dialog"
       aria-modal="true"
     >
-      <div className="bg-[#f5efe6] border border-[#d5cdc0] max-w-md w-full p-6 sm:p-8 flex flex-col gap-6 shadow-2xl">
-        <div className="flex items-center justify-between border-b border-[#d5cdc0] pb-4">
+      <div className="bg-[#121215] border border-[#242429] max-w-md w-full p-6 sm:p-8 flex flex-col gap-6 shadow-2xl animate-fade-in">
+        <div className="flex items-center justify-between border-b border-[#242429] pb-4">
           <div>
-            <span className="font-mono text-[10px] text-[#7b6e54] uppercase tracking-wider block font-bold">
+            <span className="text-[10px] text-[#c9a96e] uppercase tracking-wider block font-bold">
               SPECIFICATION SELECTOR
             </span>
-            <h3 className="font-headline text-lg font-bold text-[#1a1816] uppercase mt-0.5">
+            <h3 className="font-headline text-lg font-bold text-[#f4f4f6] uppercase mt-0.5">
               {item.name}
             </h3>
           </div>
           <button
             onClick={onClose}
-            className="text-[#59544c] hover:text-[#1a1816] p-1 cursor-pointer transition-colors"
+            className="text-[#8e8e98] hover:text-[#f4f4f6] p-1 cursor-pointer transition-colors"
           >
             <X className="w-5 h-5" />
           </button>
         </div>
 
-        <div className="font-mono text-[11px] text-[#59544c]">
+        <div className="text-[11px] text-[#8e8e98]">
           Select desired archival scale specification for unit allocation:
         </div>
 
@@ -58,18 +58,18 @@ export const SizeSelectorModal: React.FC<SizeSelectorModalProps> = ({
                 }}
                 className={`p-3 text-left border font-mono text-[11px] flex items-center justify-between transition-all cursor-pointer ${
                   isSelected
-                    ? 'bg-[#1a1816] border-[#1a1816] text-[#ede7dd] font-bold'
-                    : 'bg-[#ede7dd] border-[#d5cdc0] hover:bg-[#ded6c9] text-[#1a1816]'
+                    ? 'bg-[#f4f4f6] border-[#f4f4f6] text-[#09090b] font-bold'
+                    : 'bg-[#18181c] border-[#242429] hover:border-[#3a3a42] text-[#f4f4f6]'
                 }`}
               >
                 <span>{size}</span>
-                {isSelected && <Check className="w-3.5 h-3.5 text-[#ede7dd]" />}
+                {isSelected && <Check className="w-3.5 h-3.5 text-[#09090b]" />}
               </button>
             );
           })}
         </div>
 
-        <div className="pt-3 border-t border-[#d5cdc0] text-[10px] font-mono text-[#59544c]">
+        <div className="pt-3 border-t border-[#242429] text-[10px] text-[#8e8e98]">
           Note: Sizing strictly corresponds to architectural millimeter specifications.
         </div>
       </div>

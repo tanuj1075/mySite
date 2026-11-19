@@ -10,7 +10,7 @@ import { matchesVerifiedProviderPayment, paymentAmountMatches } from '../lib/pay
 
 const router = Router();
 router.use(requireAuth, requireAdmin);
-router.get('/customers', async (_req, res, next) => { try { res.json(await prisma.user.findMany({ where: { role: 'CUSTOMER' }, select: { id: true, email: true, name: true, phone: true, createdAt: true, orders: { select: { total: true } }, addresses: { select: { city: true, country: true } } } })); } catch (error) { next(error); } });
+router.get('/customers', async (_req, res, next) => { try { res.json(await prisma.user.findMany({ where: { role: 'CUSTOMER' }, select: { id: true, email: true, name: true, phone: true, createdAt: true, orders: { select: { total: true } }, addresses: { select: { city: true, country: true } } }, orderBy: { createdAt: 'desc' } })); } catch (error) { next(error); } });
 router.get('/orders', async (_req, res, next) => { try { res.json(await prisma.order.findMany({ include: { items: { include: { product: { select: { catalog: true } } } } }, orderBy: { createdAt: 'desc' } })); } catch (error) { next(error); } });
 router.patch('/orders/:id/status', async (req, res, next) => {
   try {

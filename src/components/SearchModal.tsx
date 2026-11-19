@@ -54,26 +54,26 @@ export const SearchModal: React.FC<SearchModalProps> = ({
 
   return (
     <div
-      className="fixed inset-0 z-50 bg-[#1a1816]/70 backdrop-blur-sm flex items-start justify-center pt-24 px-4 overflow-y-auto"
+      className="fixed inset-0 z-50 bg-[#09090b]/85 backdrop-blur-md flex items-start justify-center pt-24 px-4 overflow-y-auto"
       role="dialog"
       aria-modal="true"
     >
-      <div className="bg-[#f5efe6] border border-[#d5cdc0] max-w-xl w-full p-6 sm:p-8 flex flex-col gap-6 shadow-2xl">
-        <div className="flex items-center justify-between border-b border-[#d5cdc0] pb-4">
+      <div className="bg-[#121215] border border-[#242429] max-w-xl w-full p-6 sm:p-8 flex flex-col gap-6 shadow-2xl">
+        <div className="flex items-center justify-between border-b border-[#242429] pb-4">
           <div className="flex items-center gap-3 w-full mr-4">
-            <Search className="w-5 h-5 text-[#7b6e54]" />
+            <Search className="w-5 h-5 text-[#c9a96e]" />
             <input
               type="text"
               autoFocus
               value={query}
               onChange={(e) => setQuery(e.target.value)}
               placeholder="SEARCH CATALOG (NAME, BRAND, CATEGORY, COLOR, SKU, TAGS)..."
-              className="bg-transparent border-none text-[#1a1816] font-mono text-[12px] w-full focus:outline-none placeholder:text-[#59544c]"
+              className="bg-transparent border-none text-[#f4f4f6] font-mono text-[12px] w-full focus:outline-none placeholder:text-[#52525b]"
             />
           </div>
           <button
             onClick={onClose}
-            className="text-[#59544c] hover:text-[#1a1816] p-1 cursor-pointer transition-colors"
+            className="text-[#8e8e98] hover:text-[#f4f4f6] p-1 cursor-pointer transition-colors"
           >
             <X className="w-5 h-5" />
           </button>
@@ -81,12 +81,12 @@ export const SearchModal: React.FC<SearchModalProps> = ({
 
         {/* Quick Suggestion Pills */}
         <div className="flex items-center gap-2 flex-wrap font-mono text-[10px]">
-          <span className="text-[#59544c] font-bold">SUGGESTIONS:</span>
-          {['NIKE', 'CAMPUS', 'ADIDAS', 'RUNNING', 'SNEAKERS', 'BOOTS'].map((pill) => (
+          <span className="text-[#8e8e98] font-bold">SUGGESTIONS:</span>
+          {['VANTA', 'NIKE', 'CAMPUS', 'ADIDAS', 'RUNNING', 'SNEAKERS'].map((pill) => (
             <button
               key={pill}
               onClick={() => setQuery(pill)}
-              className="bg-[#ede7dd] border border-[#d5cdc0] px-2.5 py-1 text-[#59544c] hover:border-[#1a1816] hover:text-[#1a1816] transition-colors cursor-pointer"
+              className="bg-[#18181c] border border-[#242429] px-2.5 py-1 text-[#8e8e98] hover:border-[#8e8e98] hover:text-[#f4f4f6] transition-colors cursor-pointer"
             >
               {pill}
             </button>
@@ -96,56 +96,46 @@ export const SearchModal: React.FC<SearchModalProps> = ({
         {/* Results */}
         <div className="flex flex-col gap-3 max-h-80 overflow-y-auto">
           {!trimmed ? (
-            <div className="py-8 text-center text-[#59544c] font-mono text-xs">
+            <div className="py-8 text-center text-[#52525b] font-mono text-xs">
               TYPE TO SEARCH {products.length} ARCHIVE PRODUCTS...
             </div>
           ) : filtered.length === 0 ? (
-            <div className="py-8 text-center text-[#59544c] font-mono text-xs">
-              NO MATCHING FOOTWEAR SPECIFICATIONS FOUND
+            <div className="py-8 text-center text-[#52525b] font-mono text-xs">
+              NO MATCHING SPECIMENS LOCATED.
             </div>
           ) : (
-            filtered.map((product) => {
-              const image =
-                product.colors[0]?.images.front ||
-                product.productImages?.[0] ||
-                '';
-
-              return (
-                <div
-                  key={product.id}
-                  onClick={() => {
-                    onSelectProduct(product);
-                    onClose();
-                  }}
-                  className="bg-[#ede7dd] border border-[#d5cdc0] p-3.5 flex items-center justify-between hover:border-[#1a1816] cursor-pointer transition-all group"
-                >
-                  <div className="flex items-center gap-4 min-w-0">
+            filtered.map((product) => (
+              <div
+                key={product.id}
+                onClick={() => {
+                  onSelectProduct(product);
+                  onClose();
+                }}
+                className="flex items-center justify-between p-3 bg-[#18181c] border border-[#242429] hover:border-[#3a3a42] cursor-pointer transition-colors group"
+              >
+                <div className="flex items-center gap-3">
+                  <div className="w-12 h-12 bg-[#09090b] border border-[#242429] overflow-hidden shrink-0">
                     <img
-                      src={image}
+                      src={product.colors[0]?.images.front}
                       alt={product.name}
-                      className="w-12 h-12 object-contain bg-[#f5efe6] border border-[#d5cdc0] p-1 shrink-0"
+                      className="w-full h-full object-cover group-hover:scale-105 transition-transform"
                     />
-                    <div className="font-mono text-[11px] truncate">
-                      <span className="text-[#7b6e54] text-[9px] font-bold uppercase block tracking-wider">
-                        {product.brand} • {product.category}
-                      </span>
-                      <span className="text-[#1a1816] font-bold block truncate">
-                        {product.name}
-                      </span>
-                      <span className="text-[#59544c] text-[10px]">
-                        SKU: {product.sku}
-                      </span>
+                  </div>
+                  <div>
+                    <div className="font-mono text-[10px] text-[#c9a96e] uppercase">
+                      {product.brand} // {product.code}
+                    </div>
+                    <div className="font-headline text-xs font-bold text-[#f4f4f6] uppercase">
+                      {product.name}
+                    </div>
+                    <div className="font-mono text-[10px] text-[#8e8e98]">
+                      {product.category} • {formatCurrency(product.price)}
                     </div>
                   </div>
-                  <div className="flex items-center gap-3 font-mono text-[11px] shrink-0 ml-4">
-                    <span className="text-[#1a1816] font-bold">
-                      {formatCurrency(product.price)}
-                    </span>
-                    <ArrowRight className="w-4 h-4 text-[#59544c] group-hover:text-[#1a1816] transition-colors" />
-                  </div>
                 </div>
-              );
-            })
+                <ArrowRight className="w-4 h-4 text-[#8e8e98] group-hover:text-[#f4f4f6] group-hover:translate-x-1 transition-all" />
+              </div>
+            ))
           )}
         </div>
       </div>

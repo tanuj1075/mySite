@@ -8,6 +8,7 @@ import { AdminSecurityView } from './admin/AdminSecurityView';
 import { AdminOverviewView } from './admin/AdminOverviewView';
 import { AdminReviewsView } from './admin/AdminReviewsView';
 import { AdminPaymentsView } from './admin/AdminPaymentsView';
+import { AdminCustomersView } from './admin/AdminCustomersView';
 
 
 interface AdminPanelViewProps {
@@ -69,7 +70,7 @@ export const AdminPanelView: React.FC<AdminPanelViewProps> = ({
 
   return (
     <div
-      className="fixed inset-0 z-50 bg-[#faf7f2] flex flex-col font-sans select-text overflow-hidden"
+      className="fixed inset-0 z-50 bg-[#09090b] text-[#f4f4f6] flex flex-col font-sans select-text overflow-hidden"
       role="dialog"
       aria-modal="true"
     >
@@ -121,8 +122,8 @@ export const AdminPanelView: React.FC<AdminPanelViewProps> = ({
         </div>
 
         {/* Right Scrollable Content Pane */}
-        <main className="flex-1 overflow-y-auto bg-[#faf7f2]">
-          {/* CATALOG -> PRODUCTS / SPECIMENS (IMAGE 2) */}
+        <main className="flex-1 overflow-y-auto bg-[#09090b]">
+          {/* CATALOG -> PRODUCTS / SPECIMENS */}
           {(activeSection === 'PRODUCTS' ||
             activeSection === 'CATEGORIES' ||
             activeSection === 'BRANDS' ||
@@ -141,8 +142,21 @@ export const AdminPanelView: React.FC<AdminPanelViewProps> = ({
             />
           )}
 
-          {/* COMMERCE -> ORDERS & LOGISTICS (IMAGE 3 - TOP) */}
-          {(activeSection === 'ORDERS' || activeSection === 'CUSTOMERS') && (
+          {/* COMMERCE -> CUSTOMERS DOSSIER */}
+          {activeSection === 'CUSTOMERS' && (
+            <AdminCustomersView
+              orders={orders}
+              onShowToast={onShowToast}
+              onBackToOrders={() => setActiveSection('ORDERS')}
+              onSelectOrder={(ordId) => {
+                setActiveSection('ORDERS');
+                onShowToast(`NAVIGATED TO ORDER #${ordId}`);
+              }}
+            />
+          )}
+
+          {/* COMMERCE -> ORDERS */}
+          {activeSection === 'ORDERS' && (
             <AdminLogisticsView
               orders={orders}
               onUpdateOrderStatus={onUpdateOrderStatus}

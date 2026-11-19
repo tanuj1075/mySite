@@ -88,7 +88,7 @@ export const AdminSidebar: React.FC<AdminSidebarProps> = ({
       group: 'INVENTORY',
       items: [
         { id: 'STOCK_LOGISTICS' as AdminSection, label: 'STOCK LOGISTICS', icon: Boxes },
-        { id: 'LOW_STOCK_RADAR' as AdminSection, label: 'LOW-STOCK RADAR', icon: Radar, badge: lowStockCount, badgeColor: 'bg-[#991b1b]' },
+        { id: 'LOW_STOCK_RADAR' as AdminSection, label: 'LOW-STOCK RADAR', icon: Radar, badge: lowStockCount, badgeColor: 'bg-[#b83b3b]/30 text-[#ef4444]' },
       ],
     },
     {
@@ -109,11 +109,11 @@ export const AdminSidebar: React.FC<AdminSidebarProps> = ({
   ];
 
   return (
-    <aside className="w-64 bg-[#ede7dd] border-r border-[#d5cdc0] flex flex-col justify-between font-mono text-[11px] select-none shrink-0 overflow-y-auto">
+    <aside className="w-64 bg-[#0d0d10] border-r border-[#242429] flex flex-col justify-between font-mono text-[11px] select-none shrink-0 overflow-y-auto">
       <div className="py-4 px-3 space-y-6">
         {navGroups.map((grp) => (
           <div key={grp.group}>
-            <div className="text-[9px] font-bold text-[#7b6e54] tracking-[0.2em] px-3 mb-1.5 uppercase">
+            <div className="text-[9px] font-bold text-[#c9a96e] tracking-[0.2em] px-3 mb-1.5 uppercase">
               {grp.group}
             </div>
             <div className="space-y-0.5">
@@ -124,10 +124,10 @@ export const AdminSidebar: React.FC<AdminSidebarProps> = ({
                   <button
                     key={item.id}
                     onClick={() => onSelectSection(item.id)}
-                    className={`w-full flex items-center justify-between px-3 py-2 text-left transition-colors cursor-pointer rounded-xs ${
+                    className={`w-full flex items-center justify-between px-3 py-2 text-left transition-colors cursor-pointer ${
                       isActive
-                        ? 'bg-[#ded6c9] text-[#1a1816] font-bold shadow-2xs'
-                        : 'text-[#59544c] hover:bg-[#e4ddcf] hover:text-[#1a1816]'
+                        ? 'bg-[#18181c] text-[#f4f4f6] font-bold border-l-2 border-[#c9a96e]'
+                        : 'text-[#8e8e98] hover:bg-[#121215] hover:text-[#f4f4f6]'
                     }`}
                   >
                     <div className="flex items-center gap-2.5">
@@ -139,10 +139,10 @@ export const AdminSidebar: React.FC<AdminSidebarProps> = ({
 
                     {item.badge !== undefined && (
                       <span
-                        className={`text-[9px] font-bold px-1.5 py-0.2 rounded-2xs ${
+                        className={`text-[9px] font-bold px-1.5 py-0.2 ${
                           item.badgeColor
-                            ? `${item.badgeColor} text-white`
-                            : 'bg-[#cfc5b4] text-[#1a1816]'
+                            ? item.badgeColor
+                            : 'bg-[#18181c] text-[#c9a96e] border border-[#242429]'
                         }`}
                       >
                         {item.badge}
@@ -157,24 +157,24 @@ export const AdminSidebar: React.FC<AdminSidebarProps> = ({
       </div>
 
       {/* Bottom Security Engine Section */}
-      <div className="p-3 border-t border-[#d5cdc0] bg-[#e4ddcf]">
+      <div className="p-3 border-t border-[#242429] bg-[#121215]">
         <button
           onClick={() => onSelectSection('SECURITY_CLUSTER')}
-          className={`w-full flex items-center justify-between px-3 py-2.5 transition-colors cursor-pointer rounded-xs ${
+          className={`w-full flex items-center justify-between px-3 py-2.5 transition-colors cursor-pointer ${
             activeSection === 'SECURITY_CLUSTER'
-              ? 'bg-[#141312] text-[#f5efe6] font-bold'
-              : 'text-[#1a1816] hover:bg-[#ded6c9]'
+              ? 'bg-[#18181c] text-[#f4f4f6] font-bold border-l-2 border-[#c9a96e]'
+              : 'text-[#8e8e98] hover:bg-[#18181c] hover:text-[#f4f4f6]'
           }`}
         >
           <div className="text-left">
-            <span className="text-[9px] block tracking-widest text-[#7b6e54] uppercase">
+            <span className="text-[9px] block tracking-widest text-[#c9a96e] uppercase">
               SECURITY ENGINE
             </span>
-            <span className="text-[11px] font-bold tracking-wider uppercase flex items-center gap-1.5">
-              <span>ADMIN SYSTEM</span>
+            <span className="text-[11px] font-bold tracking-wider uppercase flex items-center gap-1.5 text-[#f4f4f6]">
+              <span>ADMIN ENCLAVE</span>
             </span>
           </div>
-          <ShieldCheck className="w-4 h-4 text-[#16a34a]" />
+          <ShieldCheck className="w-4 h-4 text-emerald-500" />
         </button>
       </div>
     </aside>

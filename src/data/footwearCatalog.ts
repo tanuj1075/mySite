@@ -51,6 +51,159 @@ export const ALL_SIZES = ['5', '6', '7', '8', '9', '10', '11', '12'];
 
 export const INITIAL_PRODUCTS: ShoeProduct[] = [
   {
+    "id": "vn-runner-x01",
+    "mrp": 52000,
+    "sku": "VN-RN-X01-CRM",
+    "use": "Running / Architectural",
+    "code": "RUNNER_X01",
+    "name": "X-01 ARCHITECTURAL RUNNER",
+    "sole": "Dual-Density Cold Cure Foam & Natural Crepe",
+    "brand": "VANTA ATELIER",
+    "color": "Travertine Cream & Natural Crepe",
+    "price": 48000,
+    "sport": "Lifestyle",
+    "upper": "Tuscan Veg-Tanned Calfskin",
+    "width": "Medium",
+    "colors": [
+      {
+        "hex": "#eae3d5",
+        "name": "Travertine Cream & Natural Crepe",
+        "images": {
+          "top": "/assets/images/cream_runner_pedestal_1788842341279.jpg",
+          "back": "/assets/images/hero_welt_macro_1788842274475.jpg",
+          "side": "/assets/images/cream_runner_pedestal_1788842341279.jpg",
+          "sole": "/assets/images/hero_welt_macro_1788842274475.jpg",
+          "front": "/assets/images/cream_runner_pedestal_1788842341279.jpg"
+        }
+      }
+    ],
+    "gender": "Unisex",
+    "discountPercent": 8,
+    "waterResistance": "Water Repellent",
+    "countryOfOrigin": "Italy",
+    "isSale": false,
+    "rating": 4.9,
+    "weight": "395g",
+    "closure": "Artisanal Saddle Lacing",
+    "fitType": "Regular Fit",
+    "category": "Sneakers",
+    "features": [
+      "Artisanal saddle stitching",
+      "Travertine stone geometry",
+      "Natural crepe rubber sole"
+    ],
+    "occasion": "Architectural, Editorial & Daily Elevation",
+    "warranty": "Lifetime Craftsmanship Warranty",
+    "sizeSystem": "EU",
+    "sourceTags": [
+      "Atelier Direct",
+      "Limited Edition",
+      "Permanent Vault"
+    ],
+    "collections": [
+      "New Drops",
+      "Limited Edition"
+    ],
+    "description": "Artisanal saddle stitching on vegetable-tanned cream calfskin and natural crepe. Precision-sculpted wedge on curved travertine.",
+    "recommended": "True to size. Order your standard European size.",
+    "sourceStore": "VANTA ATELIER",
+    "comfortScore": 4.9,
+    "fitIndicator": "True to Size",
+    "isNewArrival": true,
+    "reviewsCount": 84,
+    "isLimitedDrop": true,
+    "productImages": [
+      "/assets/images/cream_runner_pedestal_1788842341279.jpg",
+      "/assets/images/hero_welt_macro_1788842274475.jpg"
+    ],
+    "sizeInventory": {
+      "Travertine Cream & Natural Crepe": [
+        { "sku": "VN-RN-X01-EU39", "size": "EU 39", "stock": 6 },
+        { "sku": "VN-RN-X01-EU40", "size": "EU 40", "stock": 8 },
+        { "sku": "VN-RN-X01-EU41", "size": "EU 41", "stock": 12 },
+        { "sku": "VN-RN-X01-EU42", "size": "EU 42", "stock": 14 },
+        { "sku": "VN-RN-X01-EU43", "size": "EU 43", "stock": 10 },
+        { "sku": "VN-RN-X01-EU44", "size": "EU 44", "stock": 6 },
+        { "sku": "VN-RN-X01-EU45", "size": "EU 45", "stock": 4 }
+      ]
+    }
+  },
+  {
+    "id": "vn-runner-taupe-02",
+    "mrp": 58000,
+    "sku": "VN-RN-02-TPE",
+    "use": "Running / Architectural",
+    "code": "RUNNER_TAUPE_02",
+    "name": "ARCHIVAL LOW RUNNER",
+    "sole": "Vibram Morflex Compound",
+    "brand": "VANTA ATELIER",
+    "color": "Mineral Taupe & Raw Limestone",
+    "price": 52000,
+    "sport": "Lifestyle",
+    "upper": "Italian Tuscan Suede",
+    "width": "Medium",
+    "colors": [
+      {
+        "hex": "#a39788",
+        "name": "Mineral Taupe & Raw Limestone",
+        "images": {
+          "top": "/assets/images/taupe_runner_pedestal_1788842355799.jpg",
+          "back": "/assets/images/taupe_runner_pedestal_1788842355799.jpg",
+          "side": "/assets/images/taupe_runner_pedestal_1788842355799.jpg",
+          "sole": "/assets/images/taupe_runner_pedestal_1788842355799.jpg",
+          "front": "/assets/images/taupe_runner_pedestal_1788842355799.jpg"
+        }
+      }
+    ],
+    "gender": "Unisex",
+    "discountPercent": 8,
+    "waterResistance": "Water Repellent",
+    "countryOfOrigin": "Italy",
+    "isSale": false,
+    "rating": 4.8,
+    "weight": "380g",
+    "closure": "Tonal Lacing System",
+    "fitType": "Regular Fit",
+    "category": "Sneakers",
+    "features": [
+      "Tactile taupe suede chassis",
+      "Vibram Morflex outsole",
+      "Siped flex grooves"
+    ],
+    "occasion": "Architectural, Editorial & Daily Elevation",
+    "warranty": "Lifetime Craftsmanship Warranty",
+    "sizeSystem": "EU",
+    "sourceTags": [
+      "Atelier Direct",
+      "Series 02",
+      "Permanent Vault"
+    ],
+    "collections": [
+      "New Drops",
+      "Limited Edition"
+    ],
+    "description": "Sand beige and tactile taupe suede chassis with dual-density foam wedge on curved travertino. Siped flex grooves for natural articulation.",
+    "recommended": "True to size. Order your standard European size.",
+    "sourceStore": "VANTA ATELIER",
+    "comfortScore": 4.8,
+    "fitIndicator": "True to Size",
+    "isNewArrival": true,
+    "reviewsCount": 42,
+    "isLimitedDrop": true,
+    "productImages": [
+      "/assets/images/taupe_runner_pedestal_1788842355799.jpg"
+    ],
+    "sizeInventory": {
+      "Mineral Taupe & Raw Limestone": [
+        { "sku": "VN-RN-02-EU40", "size": "EU 40", "stock": 5 },
+        { "sku": "VN-RN-02-EU41", "size": "EU 41", "stock": 7 },
+        { "sku": "VN-RN-02-EU42", "size": "EU 42", "stock": 9 },
+        { "sku": "VN-RN-02-EU43", "size": "EU 43", "stock": 8 },
+        { "sku": "VN-RN-02-EU44", "size": "EU 44", "stock": 4 }
+      ]
+    }
+  },
+  {
     "id": "superkicks-9389711786235",
     "mrp": 2744,
     "sku": "SU-HF3263-600-7",

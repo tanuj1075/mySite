@@ -353,6 +353,15 @@ export default function App() {
   const restoreCustomerRecords = async (user: { name: string; email: string; memberId: string }) => {
     setCurrentUser(user);
     try {
+      if (cartItems.length > 0) {
+        for (const guestItem of cartItems) {
+          try {
+            await customerApi.addCartItem(guestItem.productId, guestItem.colorway, guestItem.specification, guestItem.quantity);
+          } catch {
+            // Ignore if already in server cart or invalid
+          }
+        }
+      }
       const [cart, storedAddresses, storedOrders, storedExchanges, storedWishlist] = await Promise.all([
         customerApi.cart(),
         customerApi.addresses(),
@@ -881,18 +890,29 @@ export default function App() {
         window.scrollTo({ top: 0, behavior: 'smooth' });
         showToast(`ORDER SAVED: #${order.id} // PAYMENT COD`);
       } else {
-        // Genuine UPI payment flow
-        const upiSession = await customerApi.initiateUpiPayment(String(savedOrder.id));
-        setUpiPaymentSession({
-          isOpen: true,
-          orderId: String(savedOrder.id),
-          displayId: String(savedOrder.displayId || savedOrder.id),
-          amount: upiSession.amount,
-          currency: upiSession.currency,
-          upiPaymentUrl: upiSession.upiPaymentUrl,
-          qrCodeDataUrl: upiSession.qrCodeDataUrl,
-          expiresAt: upiSession.expiresAt,
-        });
+        // Genuine UPI payment flow with graceful network/config fallback
+        try {
+          const upiSession = await customerApi.initiateUpiPayment(String(savedOrder.id));
+          setUpiPaymentSession({
+            isOpen: true,
+            orderId: String(savedOrder.id),
+            displayId: String(savedOrder.displayId || savedOrder.id),
+            amount: upiSession.amount,
+            currency: upiSession.currency,
+            upiPaymentUrl: upiSession.upiPaymentUrl,
+            qrCodeDataUrl: upiSession.qrCodeDataUrl,
+            expiresAt: upiSession.expiresAt,
+          });
+        } catch (upiErr) {
+          // If UPI gateway fails to initiate, the order is still safely logged in DB
+          const order = toOrderRecord(savedOrder);
+          setOrders((prev) => [order, ...prev]);
+          setCurrentOrder(order);
+          setCartItems([]);
+          setActiveNav('ORDER_SUCCESS');
+          window.scrollTo({ top: 0, behavior: 'smooth' });
+          showToast(`ORDER SAVED: #${order.id} // CONCIERGE WILL CONTACT FOR UPI SETTLEMENT`);
+        }
       }
     } catch (error) {
       showToast(error instanceof Error ? error.message : 'Order could not be saved');
@@ -1090,9 +1110,9 @@ export default function App() {
         {toastMessage && (
           <aside
             aria-live="polite"
-            className="fixed bottom-6 right-6 z-50 bg-[#1a1816] border border-[#d5cdc0] text-[#ede7dd] px-4 py-3 font-mono text-[10px] tracking-widest shadow-2xl flex items-center gap-3"
+            className="fixed bottom-6 right-6 z-50 bg-[#18181c] border border-[#242429] text-[#f4f4f6] px-4 py-3 font-mono text-[10px] tracking-widest shadow-2xl flex items-center gap-3 animate-fade-in"
           >
-            <span className="w-1.5 h-1.5 bg-[#7b6e54] shrink-0"></span>
+            <span className="w-1.5 h-1.5 bg-[#c9a96e] shrink-0"></span>
             <span>{toastMessage}</span>
           </aside>
         )}
@@ -1102,16 +1122,16 @@ export default function App() {
 
   if (adminRoute === 'panel' && (!isAdminAuthenticated || isAdminSessionLoading)) {
     return (
-      <main className="min-h-screen bg-[#ede7dd] text-[#1a1816] flex items-center justify-center p-6 font-mono text-xs">
+      <main className="min-h-screen bg-[#09090b] text-[#f4f4f6] flex items-center justify-center p-6 font-mono text-xs">
         {adminSessionError ? (
           <div className="max-w-md text-center">
-            <p className="uppercase tracking-widest">Admin service unavailable</p>
-            <p className="mt-3 text-[#59544c]">{adminSessionError}</p>
-            <button className="mt-6 border border-[#1a1816] px-4 py-3 uppercase tracking-widest" onClick={() => setAdminSessionAttempt((attempt) => attempt + 1)}>Retry</button>
-            <button className="ml-3 underline" onClick={() => navigateAdminRoute('/admin/login', true)}>Admin login</button>
+            <p className="uppercase tracking-widest text-[#c9a96e]">Admin service unavailable</p>
+            <p className="mt-3 text-[#8e8e98]">{adminSessionError}</p>
+            <button className="mt-6 border border-[#242429] hover:border-[#c9a96e] px-4 py-3 uppercase tracking-widest text-[#f4f4f6] transition-colors cursor-pointer" onClick={() => setAdminSessionAttempt((attempt) => attempt + 1)}>Retry</button>
+            <button className="ml-3 underline text-[#8e8e98] hover:text-[#f4f4f6] cursor-pointer" onClick={() => navigateAdminRoute('/admin/login', true)}>Admin login</button>
           </div>
         ) : (
-          <p className="uppercase tracking-widest">Validating admin session...</p>
+          <p className="uppercase tracking-widest text-[#8e8e98]">Validating admin session...</p>
         )}
       </main>
     );
@@ -1140,9 +1160,9 @@ export default function App() {
         {toastMessage && (
           <aside
             aria-live="polite"
-            className="fixed bottom-6 right-6 z-50 bg-[#1a1816] border border-[#d5cdc0] text-[#ede7dd] px-4 py-3 font-mono text-[10px] tracking-widest shadow-2xl flex items-center gap-3"
+            className="fixed bottom-6 right-6 z-50 bg-[#18181c] border border-[#242429] text-[#f4f4f6] px-4 py-3 font-mono text-[10px] tracking-widest shadow-2xl flex items-center gap-3 animate-fade-in"
           >
-            <span className="w-1.5 h-1.5 bg-[#7b6e54] shrink-0"></span>
+            <span className="w-1.5 h-1.5 bg-[#c9a96e] shrink-0"></span>
             <span>{toastMessage}</span>
           </aside>
         )}
@@ -1151,7 +1171,7 @@ export default function App() {
   }
 
   return (
-    <div className="min-h-screen bg-[#ede7dd] text-[#1a1816] antialiased flex flex-col justify-between selection:bg-[#1a1816] selection:text-[#ede7dd]">
+    <div className="min-h-screen bg-[#09090b] text-[#f4f4f6] antialiased flex flex-col justify-between selection:bg-[#c9a96e33] selection:text-[#f4f4f6]">
       {/* Fixed Luxury Brutalist Header */}
       <Header
         cartCount={totalItemCount}
@@ -1197,7 +1217,7 @@ export default function App() {
       />
 
       {/* Main Content Area */}
-      <main className="w-full pt-16 sm:pt-24 bg-[#ede7dd] flex-1">
+      <main className="w-full pt-16 sm:pt-24 bg-[#09090b] flex-1">
         {/* VIEW 1: COLLECTIONS (Hero & Home Experience) */}
         {activeNav === 'COLLECTIONS' && (
           <CollectionsView
@@ -1374,7 +1394,7 @@ export default function App() {
         <div className="fixed bottom-6 left-6 z-40 flex items-center gap-2">
           <button
             onClick={() => setIsAdminPanelOpen(true)}
-            className="bg-[#1a1816] text-[#ede7dd] border border-[#7b6e54] px-3 py-1.5 font-mono text-[10px] uppercase font-bold tracking-wider hover:bg-[#35322e] transition-colors shadow-2xl flex items-center gap-2 cursor-pointer"
+            className="bg-[#121215] text-[#f4f4f6] border border-[#242429] hover:border-[#c9a96e] px-3 py-1.5 font-mono text-[10px] uppercase font-bold tracking-wider transition-colors shadow-2xl flex items-center gap-2 cursor-pointer"
             title="Open Atelier Administrator Console"
           >
             <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
@@ -1527,6 +1547,15 @@ export default function App() {
       <AccountModal
         isOpen={isAccountOpen}
         onClose={() => setIsAccountOpen(false)}
+        currentUser={currentUser}
+        onLogout={() => {
+          clearSession();
+          setCurrentUser(null);
+          setCartItems([]);
+          setOrders([]);
+          setCurrentOrder(null);
+          showToast('CLIENT SESSION TERMINATED // GUEST RESTORED');
+        }}
       />
 
       {/* Genuine UPI Payment Enclave Modal */}
@@ -1550,13 +1579,13 @@ export default function App() {
       )}
 
 
-      {/* Tactile Brutalist Feedback Toast */}
+      {/* Tactile Obsidian Dark Feedback Toast */}
       {toastMessage && (
         <aside
           aria-live="polite"
-          className="fixed bottom-6 right-6 z-50 bg-[#1a1816] border border-[#d5cdc0] text-[#ede7dd] px-4 py-3 font-mono text-[10px] tracking-widest shadow-2xl flex items-center gap-3"
+          className="fixed bottom-6 right-6 z-50 bg-[#18181c] border border-[#242429] text-[#f4f4f6] px-4 py-3 font-mono text-[10px] tracking-widest shadow-2xl flex items-center gap-3 animate-fade-in"
         >
-          <span className="w-1.5 h-1.5 bg-[#7b6e54] shrink-0"></span>
+          <span className="w-1.5 h-1.5 bg-[#c9a96e] shrink-0"></span>
           <span>{toastMessage}</span>
         </aside>
       )}

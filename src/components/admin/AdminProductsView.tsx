@@ -580,19 +580,19 @@ export const AdminProductsView: React.FC<AdminProductsViewProps> = ({
     });
 
   return (
-    <div className="p-4 sm:p-8 font-sans space-y-8 bg-[#faf7f2] min-h-full">
+    <div className="p-4 sm:p-8 font-sans space-y-8 bg-[#09090b] min-h-full">
       {/* Top Header Section matching Image 2 */}
       <div>
-        <div className="font-mono text-[10px] text-[#7b6e54] tracking-[0.2em] uppercase mb-1">
+        <div className="font-mono text-[10px] text-[#c9a96e] tracking-[0.2em] uppercase mb-1">
           ARCHIVE REFERENCE // SPECIMEN MANAGEMENT / SYS.VER.4.62
         </div>
 
         <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
           <div>
-            <h1 className="font-headline text-3xl sm:text-4xl text-[#1a1816] tracking-tight">
+            <h1 className="font-headline text-3xl sm:text-4xl text-[#f4f4f6] tracking-tight">
               Product Inventory &amp; Specimen Dossiers
             </h1>
-            <p className="font-sans text-[13px] text-[#59544c] mt-1 max-w-2xl">
+            <p className="font-sans text-[13px] text-[#8e8e98] mt-1 max-w-2xl">
               Catalog control across 48 master styles, multi-color palettes, and individual size SKU variants within the monolithic archive.
             </p>
           </div>
@@ -600,7 +600,7 @@ export const AdminProductsView: React.FC<AdminProductsViewProps> = ({
           <div className="flex items-center gap-3 font-mono text-[11px] shrink-0">
             <button
               onClick={handleExportCSV}
-              className="px-4 py-2.5 bg-[#ede7dd] border border-[#d5cdc0] text-[#1a1816] hover:bg-[#e4ddcf] transition-colors flex items-center gap-2 uppercase tracking-wider font-bold cursor-pointer"
+              className="px-4 py-2.5 bg-[#121215] border border-[#242429] text-[#f4f4f6] hover:bg-[#1e1e24] transition-colors flex items-center gap-2 uppercase tracking-wider font-bold cursor-pointer"
               title="Download Encrypted Specimen Catalog CSV"
             >
               <Download className="w-3.5 h-3.5" />
@@ -609,7 +609,7 @@ export const AdminProductsView: React.FC<AdminProductsViewProps> = ({
 
             <button
               onClick={() => setShowAddModal(true)}
-              className="px-4 py-2.5 bg-[#141312] text-[#f5efe6] hover:bg-[#35322e] transition-colors flex items-center gap-2 uppercase tracking-wider font-bold cursor-pointer shadow-sm"
+              className="px-4 py-2.5 bg-[#141312] text-[#18181c] hover:bg-[#35322e] transition-colors flex items-center gap-2 uppercase tracking-wider font-bold cursor-pointer shadow-sm"
             >
               <Plus className="w-3.5 h-3.5" />
               <span>+ ADD NEW SPECIMEN</span>
@@ -619,22 +619,22 @@ export const AdminProductsView: React.FC<AdminProductsViewProps> = ({
       </div>
 
       {/* Filter and Search Bar matching Image 2 */}
-      <div className="bg-[#ede7dd] border border-[#d5cdc0] p-2 sm:p-3 flex flex-wrap items-center gap-3 font-mono text-[11px]">
+      <div className="bg-[#121215] border border-[#242429] p-2 sm:p-3 flex flex-wrap items-center gap-3 font-mono text-[11px]">
         {/* Search Input */}
-        <div className="flex items-center gap-2 bg-[#faf7f2] border border-[#d5cdc0] px-3 py-1.5 flex-1 min-w-[240px]">
-          <Search className="w-3.5 h-3.5 text-[#7b6e54]" />
+        <div className="flex items-center gap-2 bg-[#09090b] border border-[#242429] px-3 py-1.5 flex-1 min-w-[240px]">
+          <Search className="w-3.5 h-3.5 text-[#c9a96e]" />
           <input
             type="text"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             placeholder="Lookup Specimen SKU or Code..."
-            className="w-full bg-transparent border-none outline-none text-[#1a1816] text-[11px] font-mono placeholder:text-[#9c9384]"
+            className="w-full bg-transparent border-none outline-none text-[#f4f4f6] text-[11px] font-mono placeholder:text-[#52525b]"
           />
         </div>
 
         {/* Dropdown: Category */}
-        <div className="flex items-center gap-1.5 bg-[#faf7f2] border border-[#d5cdc0] px-3 py-1.5 text-[#1a1816]">
-          <span className="text-[#7b6e54]">CAT:</span>
+        <div className="flex items-center gap-1.5 bg-[#09090b] border border-[#242429] px-3 py-1.5 text-[#f4f4f6]">
+          <span className="text-[#c9a96e]">CAT:</span>
           <select
             value={selectedCategory}
             onChange={(e) => setSelectedCategory(e.target.value)}
@@ -649,8 +649,8 @@ export const AdminProductsView: React.FC<AdminProductsViewProps> = ({
         </div>
 
         {/* Dropdown: Stock */}
-        <div className="flex items-center gap-1.5 bg-[#faf7f2] border border-[#d5cdc0] px-3 py-1.5 text-[#1a1816]">
-          <span className="text-[#7b6e54]">STOCK:</span>
+        <div className="flex items-center gap-1.5 bg-[#09090b] border border-[#242429] px-3 py-1.5 text-[#f4f4f6]">
+          <span className="text-[#c9a96e]">STOCK:</span>
           <select
             value={selectedStockLevel}
             onChange={(e) => setSelectedStockLevel(e.target.value)}
@@ -664,8 +664,8 @@ export const AdminProductsView: React.FC<AdminProductsViewProps> = ({
         </div>
 
         {/* Dropdown: Label / Atelier */}
-        <div className="flex items-center gap-1.5 bg-[#faf7f2] border border-[#d5cdc0] px-3 py-1.5 text-[#1a1816]">
-          <span className="text-[#7b6e54]">LABEL:</span>
+        <div className="flex items-center gap-1.5 bg-[#09090b] border border-[#242429] px-3 py-1.5 text-[#f4f4f6]">
+          <span className="text-[#c9a96e]">LABEL:</span>
           <select
             value={selectedAtelier}
             onChange={(e) => setSelectedAtelier(e.target.value)}
@@ -681,9 +681,9 @@ export const AdminProductsView: React.FC<AdminProductsViewProps> = ({
 
       {/* FOCAL SPECIMEN DOSSIER (UPPER BOX) matching Image 2 */}
       {focalSpecimen && (
-        <div className="relative border border-[#d5cdc0] bg-[#ede7dd] p-5 sm:p-8 rounded-sm shadow-xs">
+        <div className="relative border border-[#242429] bg-[#121215] p-5 sm:p-8 rounded-sm shadow-xs">
           {/* Focal Specimen Dossier Pill Badge */}
-          <div className="absolute -top-3 right-6 bg-[#f5efe6] border border-[#d5cdc0] px-3 py-0.5 font-mono text-[9px] font-bold text-[#7b6e54] tracking-widest uppercase">
+          <div className="absolute -top-3 right-6 bg-[#18181c] border border-[#242429] px-3 py-0.5 font-mono text-[9px] font-bold text-[#c9a96e] tracking-widest uppercase">
             FOCAL SPECIMEN DOSSIER
           </div>
 
@@ -692,47 +692,47 @@ export const AdminProductsView: React.FC<AdminProductsViewProps> = ({
             <div className="xl:col-span-4 flex flex-col justify-between">
               <div>
                 {/* Product Photo with 360° Laser Scan Verified Overlay */}
-                <div className="relative border border-[#d5cdc0] bg-[#e4ddcf] overflow-hidden rounded-xs">
+                <div className="relative border border-[#242429] bg-[#1e1e24] overflow-hidden rounded-xs">
                   <img
                     src={focalSpecimen.image}
                     alt={focalSpecimen.name}
                     className="w-full h-56 sm:h-64 object-cover object-center"
                   />
-                  <div className="absolute bottom-2 left-2 bg-[#141312]/90 text-[#f5efe6] font-mono text-[8px] tracking-widest px-2 py-0.5 uppercase font-bold backdrop-blur-2xs">
+                  <div className="absolute bottom-2 left-2 bg-[#141312]/90 text-[#18181c] font-mono text-[8px] tracking-widest px-2 py-0.5 uppercase font-bold backdrop-blur-2xs">
                     360° LASER SCAN VERIFIED
                   </div>
                 </div>
 
                 {/* Title and Price */}
                 <div className="mt-4 flex items-baseline justify-between gap-2">
-                  <h2 className="font-headline text-2xl sm:text-3xl text-[#1a1816] tracking-tight font-bold">
+                  <h2 className="font-headline text-2xl sm:text-3xl text-[#f4f4f6] tracking-tight font-bold">
                     {focalSpecimen.name}
                   </h2>
-                  <span className="font-mono text-xl sm:text-2xl font-bold text-[#1a1816] shrink-0">
+                  <span className="font-mono text-xl sm:text-2xl font-bold text-[#f4f4f6] shrink-0">
                     ₹{focalSpecimen.basePrice.toLocaleString()}
                   </span>
                 </div>
 
                 {/* Master SKU and Category */}
-                <div className="mt-1 font-mono text-[10px] text-[#7b6e54] tracking-wider uppercase">
+                <div className="mt-1 font-mono text-[10px] text-[#c9a96e] tracking-wider uppercase">
                   MASTER SKU: {focalSpecimen.sku} • CATEGORY: {focalSpecimen.category} // LAB
                 </div>
               </div>
 
               {/* 3 Metrics Row */}
-              <div className="grid grid-cols-3 gap-3 mt-6 pt-4 border-t border-[#d5cdc0] font-mono">
-                <div className="bg-[#faf7f2] border border-[#d5cdc0] p-3 text-center">
-                  <div className="text-[9px] text-[#7b6e54] uppercase tracking-wider">GROSS UNITS</div>
-                  <div className="text-2xl font-bold text-[#1a1816] mt-0.5">{focalSpecimen.totalStock}</div>
+              <div className="grid grid-cols-3 gap-3 mt-6 pt-4 border-t border-[#242429] font-mono">
+                <div className="bg-[#09090b] border border-[#242429] p-3 text-center">
+                  <div className="text-[9px] text-[#c9a96e] uppercase tracking-wider">GROSS UNITS</div>
+                  <div className="text-2xl font-bold text-[#f4f4f6] mt-0.5">{focalSpecimen.totalStock}</div>
                 </div>
-                <div className="bg-[#faf7f2] border border-[#d5cdc0] p-3 text-center">
-                  <div className="text-[9px] text-[#7b6e54] uppercase tracking-wider">COLORWAYS</div>
-                  <div className="text-2xl font-bold text-[#1a1816] mt-0.5">
+                <div className="bg-[#09090b] border border-[#242429] p-3 text-center">
+                  <div className="text-[9px] text-[#c9a96e] uppercase tracking-wider">COLORWAYS</div>
+                  <div className="text-2xl font-bold text-[#f4f4f6] mt-0.5">
                     {focalSpecimen.colorways.length.toString().padStart(2, '0')}
                   </div>
                 </div>
-                <div className="bg-[#faf7f2] border border-[#d5cdc0] p-3 text-center">
-                  <div className="text-[9px] text-[#7b6e54] uppercase tracking-wider">SKU HEALTH</div>
+                <div className="bg-[#09090b] border border-[#242429] p-3 text-center">
+                  <div className="text-[9px] text-[#c9a96e] uppercase tracking-wider">SKU HEALTH</div>
                   <div className="text-2xl font-bold text-[#16a34a] mt-0.5">94%</div>
                 </div>
               </div>
@@ -741,12 +741,12 @@ export const AdminProductsView: React.FC<AdminProductsViewProps> = ({
             {/* Right Column: SKU Velocity & Dimensional Stock Grid */}
             <div className="xl:col-span-8 flex flex-col justify-between">
               <div>
-                <div className="flex items-center justify-between pb-3 border-b border-[#d5cdc0]">
-                  <div className="flex items-center gap-2 font-mono text-[11px] font-bold text-[#1a1816] tracking-wider uppercase">
-                    <Grid className="w-3.5 h-3.5 text-[#7b6e54]" />
+                <div className="flex items-center justify-between pb-3 border-b border-[#242429]">
+                  <div className="flex items-center gap-2 font-mono text-[11px] font-bold text-[#f4f4f6] tracking-wider uppercase">
+                    <Grid className="w-3.5 h-3.5 text-[#c9a96e]" />
                     <span>SKU VELOCITY &amp; DIMENSIONAL STOCK GRID</span>
                   </div>
-                  <span className="font-mono text-[9px] text-[#7b6e54] tracking-wider uppercase hidden sm:inline">
+                  <span className="font-mono text-[9px] text-[#c9a96e] tracking-wider uppercase hidden sm:inline">
                     INDIVIDUAL SKU INVENTORY IS DECOUPLED FROM MODEL LEVEL
                   </span>
                 </div>
@@ -758,13 +758,13 @@ export const AdminProductsView: React.FC<AdminProductsViewProps> = ({
                       <div className="flex items-center justify-between font-mono text-[10px] tracking-wider">
                         <div className="flex items-center gap-2">
                           <span
-                            className="w-3 h-3 rounded-full border border-[#d5cdc0]"
+                            className="w-3 h-3 rounded-full border border-[#242429]"
                             style={{ backgroundColor: cw.code }}
                           ></span>
-                          <span className="font-bold text-[#1a1816] uppercase">{cw.name}</span>
-                          <span className="text-[#7b6e54]">CODE: {cw.code} // SKU SUFFIX: {cw.skuSuffix}</span>
+                          <span className="font-bold text-[#f4f4f6] uppercase">{cw.name}</span>
+                          <span className="text-[#c9a96e]">CODE: {cw.code} // SKU SUFFIX: {cw.skuSuffix}</span>
                         </div>
-                        <div className="font-bold text-[#1a1816] uppercase">
+                        <div className="font-bold text-[#f4f4f6] uppercase">
                           TOTAL AVAILABLE: {cw.totalAvailable} PRS
                         </div>
                       </div>
@@ -787,17 +787,17 @@ export const AdminProductsView: React.FC<AdminProductsViewProps> = ({
                                   ? 'bg-[#fff1f2] border-[#fecdd3] text-[#be123c]'
                                   : isLow
                                   ? 'bg-[#fffbeb] border-[#fde68a] text-[#b45309]'
-                                  : 'bg-[#faf7f2] border-[#d5cdc0] text-[#1a1816]'
+                                  : 'bg-[#09090b] border-[#242429] text-[#f4f4f6]'
                               }`}
                             >
-                              <div className="font-mono text-[9px] text-[#7b6e54] uppercase tracking-wider">
+                              <div className="font-mono text-[9px] text-[#c9a96e] uppercase tracking-wider">
                                 {sz.size}
                               </div>
                               <div className="my-1.5 flex items-center justify-center gap-1">
                                 <button
                                   type="button"
                                   onClick={() => handleAdjustStock(focalSpecimen.id, cIdx, sIdx, -1)}
-                                  className="w-4 h-4 bg-[#ede7dd] hover:bg-[#d5cdc0] text-[#1a1816] font-bold text-[9px] flex items-center justify-center cursor-pointer transition-colors"
+                                  className="w-4 h-4 bg-[#121215] hover:bg-[#242429] text-[#f4f4f6] font-bold text-[9px] flex items-center justify-center cursor-pointer transition-colors"
                                   title="Decrease 1"
                                 >
                                   -
@@ -808,7 +808,7 @@ export const AdminProductsView: React.FC<AdminProductsViewProps> = ({
                                 <button
                                   type="button"
                                   onClick={() => handleAdjustStock(focalSpecimen.id, cIdx, sIdx, 1)}
-                                  className="w-4 h-4 bg-[#ede7dd] hover:bg-[#d5cdc0] text-[#1a1816] font-bold text-[9px] flex items-center justify-center cursor-pointer transition-colors"
+                                  className="w-4 h-4 bg-[#121215] hover:bg-[#242429] text-[#f4f4f6] font-bold text-[9px] flex items-center justify-center cursor-pointer transition-colors"
                                   title="Increase 1"
                                 >
                                   +
@@ -824,7 +824,7 @@ export const AdminProductsView: React.FC<AdminProductsViewProps> = ({
                                     ? 'text-[#b45309]'
                                     : isOptimal
                                     ? 'text-[#15803d]'
-                                    : 'text-[#59544c]'
+                                    : 'text-[#8e8e98]'
                                 }`}
                               >
                                 {sz.label || 'IN STOCK'}
@@ -839,7 +839,7 @@ export const AdminProductsView: React.FC<AdminProductsViewProps> = ({
               </div>
 
               {/* Bottom Quick Advice */}
-              <div className="mt-6 pt-3 border-t border-[#d5cdc0] flex items-center justify-between font-mono text-[10px] text-[#7b6e54]">
+              <div className="mt-6 pt-3 border-t border-[#242429] flex items-center justify-between font-mono text-[10px] text-[#c9a96e]">
                 <span>OPTICAL SCAN DATA SYNC: 100% NOMINAL</span>
                 <span>CLICK +/- ON ANY SKU TO DEPLOY REAL-TIME INVENTORY REALLOCATION</span>
               </div>
@@ -849,18 +849,18 @@ export const AdminProductsView: React.FC<AdminProductsViewProps> = ({
       )}
 
       {/* MASTER SPECIMEN REGISTRY (BOTTOM TABLE) matching Image 2 */}
-      <div className="border border-[#d5cdc0] bg-[#ede7dd] p-5 sm:p-6 rounded-sm shadow-xs">
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-4 border-b border-[#d5cdc0]">
+      <div className="border border-[#242429] bg-[#121215] p-5 sm:p-6 rounded-sm shadow-xs">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-4 border-b border-[#242429]">
           <div className="flex items-center gap-3">
-            <h3 className="font-headline text-2xl text-[#1a1816] tracking-tight font-bold">
+            <h3 className="font-headline text-2xl text-[#f4f4f6] tracking-tight font-bold">
               Master Specimen Registry
             </h3>
-            <span className="bg-[#141312] text-[#f5efe6] font-mono text-[9px] tracking-widest uppercase px-2 py-0.5 font-bold">
+            <span className="bg-[#141312] text-[#18181c] font-mono text-[9px] tracking-widest uppercase px-2 py-0.5 font-bold">
               CURRENT CATALOG
             </span>
           </div>
 
-          <div className="flex items-center gap-2 font-mono text-[10px] text-[#59544c]">
+          <div className="flex items-center gap-2 font-mono text-[10px] text-[#8e8e98]">
             <span>SORT BY:</span>
             <button
               onClick={() => {
@@ -881,7 +881,7 @@ export const AdminProductsView: React.FC<AdminProductsViewProps> = ({
                 };
                 onShowToast(`SORT ORDER: ${labels[nextSort]}`);
               }}
-              className="font-bold text-[#1a1816] uppercase hover:underline cursor-pointer flex items-center gap-1 bg-[#ede7dd] border border-[#d5cdc0] px-2 py-1"
+              className="font-bold text-[#f4f4f6] uppercase hover:underline cursor-pointer flex items-center gap-1 bg-[#121215] border border-[#242429] px-2 py-1"
             >
               <span>
                 {sortOrder === 'DATE' && 'DATE ADDED'}
@@ -898,7 +898,7 @@ export const AdminProductsView: React.FC<AdminProductsViewProps> = ({
         <div className="overflow-x-auto mt-4">
           <table className="w-full text-left font-mono text-[11px] border-collapse">
             <thead>
-              <tr className="border-b border-[#d5cdc0] text-[10px] text-[#7b6e54] tracking-widest uppercase">
+              <tr className="border-b border-[#242429] text-[10px] text-[#c9a96e] tracking-widest uppercase">
                 <th className="py-2.5 px-3">SPECIMEN</th>
                 <th className="py-2.5 px-3">TITLE &amp; REFERENCE SKU</th>
                 <th className="py-2.5 px-3">CATEGORY</th>
@@ -910,20 +910,20 @@ export const AdminProductsView: React.FC<AdminProductsViewProps> = ({
                 <th className="py-2.5 px-3 text-right">ACTIONS</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-[#d5cdc0]/70">
+            <tbody className="divide-y divide-[#242429]/70">
               {filteredSpecimens.map((item) => {
                 const isSelected = focalSpecimenId === item.id;
                 return (
                   <tr
                     key={item.id}
                     onClick={() => setFocalSpecimenId(item.id)}
-                    className={`hover:bg-[#e4ddcf] transition-colors cursor-pointer ${
-                      isSelected ? 'bg-[#e4ddcf] font-medium' : ''
+                    className={`hover:bg-[#1e1e24] transition-colors cursor-pointer ${
+                      isSelected ? 'bg-[#1e1e24] font-medium' : ''
                     }`}
                   >
                     {/* Thumbnail */}
                     <td className="py-3 px-3">
-                      <div className="w-12 h-12 bg-[#faf7f2] border border-[#d5cdc0] overflow-hidden rounded-2xs">
+                      <div className="w-12 h-12 bg-[#09090b] border border-[#242429] overflow-hidden rounded-2xs">
                         <img
                           src={item.image}
                           alt={item.name}
@@ -934,15 +934,15 @@ export const AdminProductsView: React.FC<AdminProductsViewProps> = ({
 
                     {/* Title & SKU */}
                     <td className="py-3 px-3">
-                      <div className="font-bold text-[#1a1816] uppercase text-[12px]">{item.name}</div>
-                      <div className="text-[#7b6e54] text-[10px] tracking-wider">SKU: {item.sku}</div>
+                      <div className="font-bold text-[#f4f4f6] uppercase text-[12px]">{item.name}</div>
+                      <div className="text-[#c9a96e] text-[10px] tracking-wider">SKU: {item.sku}</div>
                     </td>
 
                     {/* Category */}
-                    <td className="py-3 px-3 text-[#59544c] uppercase">{item.category}</td>
+                    <td className="py-3 px-3 text-[#8e8e98] uppercase">{item.category}</td>
 
                     {/* Price */}
-                    <td className="py-3 px-3 font-bold text-[#1a1816]">
+                    <td className="py-3 px-3 font-bold text-[#f4f4f6]">
                       ₹{item.basePrice.toLocaleString()}
                     </td>
 
@@ -954,15 +954,15 @@ export const AdminProductsView: React.FC<AdminProductsViewProps> = ({
                         ) : item.totalStock > 0 ? (
                           <span className="w-2 h-2 rounded-full bg-[#16a34a]"></span>
                         ) : (
-                          <span className="w-2 h-2 rounded-full bg-[#7b6e54]"></span>
+                          <span className="w-2 h-2 rounded-full bg-[#c9a96e]"></span>
                         )}
                         <span
                           className={
                             item.status === 'CRITICAL'
                               ? 'text-[#ef4444]'
                               : item.totalStock === 0
-                              ? 'text-[#7b6e54]'
-                              : 'text-[#1a1816]'
+                              ? 'text-[#c9a96e]'
+                              : 'text-[#f4f4f6]'
                           }
                         >
                           {item.totalStock.toString().padStart(2, '0')} Units
@@ -971,19 +971,19 @@ export const AdminProductsView: React.FC<AdminProductsViewProps> = ({
                     </td>
 
                     {/* Variants */}
-                    <td className="py-3 px-3 text-[#59544c]">{item.variantsText}</td>
+                    <td className="py-3 px-3 text-[#8e8e98]">{item.variantsText}</td>
 
                     {/* Status Badge */}
                     <td className="py-3 px-3">
                       <span
                         className={`px-2 py-0.5 text-[9px] font-bold tracking-wider uppercase rounded-2xs ${
                           item.status === 'ACTIVE'
-                            ? 'bg-[#ded6c9] text-[#1a1816]'
+                            ? 'bg-[#242429] text-[#f4f4f6]'
                             : item.status === 'CRITICAL'
                             ? 'bg-[#fee2e2] text-[#991b1b]'
                             : item.status === 'DRAFT'
                             ? 'bg-[#fef3c7] text-[#92400e]'
-                            : 'bg-[#d5cdc0] text-[#59544c]'
+                            : 'bg-[#242429] text-[#8e8e98]'
                         }`}
                       >
                         {item.status}
@@ -991,7 +991,7 @@ export const AdminProductsView: React.FC<AdminProductsViewProps> = ({
                     </td>
 
                     {/* Last Synchronized */}
-                    <td className="py-3 px-3 text-[#7b6e54] uppercase text-[10px]">
+                    <td className="py-3 px-3 text-[#c9a96e] uppercase text-[10px]">
                       {item.lastSynchronized}
                     </td>
 
@@ -1003,14 +1003,14 @@ export const AdminProductsView: React.FC<AdminProductsViewProps> = ({
                             setFocalSpecimenId(item.id);
                             onShowToast(`OPENED SKU MATRIX FOR ${item.sku}`);
                           }}
-                          className="p-1.5 text-[#59544c] hover:text-[#1a1816] hover:bg-[#ded6c9] transition-colors rounded-2xs cursor-pointer"
+                          className="p-1.5 text-[#8e8e98] hover:text-[#f4f4f6] hover:bg-[#242429] transition-colors rounded-2xs cursor-pointer"
                           title="Inspect Matrix"
                         >
                           <Grid className="w-3.5 h-3.5" />
                         </button>
                         <button
                           onClick={() => handleOpenEditModal(item)}
-                          className="p-1.5 text-[#59544c] hover:text-[#1a1816] hover:bg-[#ded6c9] transition-colors rounded-2xs cursor-pointer"
+                          className="p-1.5 text-[#8e8e98] hover:text-[#f4f4f6] hover:bg-[#242429] transition-colors rounded-2xs cursor-pointer"
                           title="Edit Specimen Dossier"
                         >
                           <Edit3 className="w-3.5 h-3.5" />
@@ -1032,20 +1032,20 @@ export const AdminProductsView: React.FC<AdminProductsViewProps> = ({
         </div>
 
         {/* Table Footer with Pagination matching Image 2 */}
-        <div className="mt-4 pt-4 border-t border-[#d5cdc0] flex flex-col sm:flex-row items-center justify-between gap-3 font-mono text-[10px] text-[#7b6e54]">
+        <div className="mt-4 pt-4 border-t border-[#242429] flex flex-col sm:flex-row items-center justify-between gap-3 font-mono text-[10px] text-[#c9a96e]">
           <div>SHOWING 01 – 06 OF 48 MASTER SPECIMENS • PAGE 01 / 08</div>
           <div className="flex items-center gap-1">
-            <button className="px-2.5 py-1 bg-[#ede7dd] border border-[#d5cdc0] hover:bg-[#e4ddcf] cursor-pointer text-[#1a1816] font-bold uppercase">
+            <button className="px-2.5 py-1 bg-[#121215] border border-[#242429] hover:bg-[#1e1e24] cursor-pointer text-[#f4f4f6] font-bold uppercase">
               PREV
             </button>
-            <button className="px-2.5 py-1 bg-[#141312] text-[#f5efe6] font-bold">1</button>
-            <button className="px-2.5 py-1 bg-[#ede7dd] border border-[#d5cdc0] hover:bg-[#e4ddcf] cursor-pointer text-[#1a1816] font-bold">
+            <button className="px-2.5 py-1 bg-[#141312] text-[#18181c] font-bold">1</button>
+            <button className="px-2.5 py-1 bg-[#121215] border border-[#242429] hover:bg-[#1e1e24] cursor-pointer text-[#f4f4f6] font-bold">
               2
             </button>
-            <button className="px-2.5 py-1 bg-[#ede7dd] border border-[#d5cdc0] hover:bg-[#e4ddcf] cursor-pointer text-[#1a1816] font-bold">
+            <button className="px-2.5 py-1 bg-[#121215] border border-[#242429] hover:bg-[#1e1e24] cursor-pointer text-[#f4f4f6] font-bold">
               3
             </button>
-            <button className="px-2.5 py-1 bg-[#ede7dd] border border-[#d5cdc0] hover:bg-[#e4ddcf] cursor-pointer text-[#1a1816] font-bold uppercase">
+            <button className="px-2.5 py-1 bg-[#121215] border border-[#242429] hover:bg-[#1e1e24] cursor-pointer text-[#f4f4f6] font-bold uppercase">
               NEXT
             </button>
           </div>
@@ -1054,18 +1054,18 @@ export const AdminProductsView: React.FC<AdminProductsViewProps> = ({
 
       {/* Add New Specimen Modal */}
       {showAddModal && (
-        <div className="fixed inset-0 z-50 bg-[#1a1816]/75 backdrop-blur-xs flex items-center justify-center p-4">
-          <div className="bg-[#faf7f2] border border-[#d5cdc0] max-w-lg w-full p-6 sm:p-8 font-mono text-xs shadow-2xl">
-            <h3 className="font-headline text-2xl font-bold text-[#1a1816] tracking-tight mb-2">
+        <div className="fixed inset-0 z-50 bg-[#f4f4f6]/75 backdrop-blur-xs flex items-center justify-center p-4">
+          <div className="bg-[#09090b] border border-[#242429] max-w-lg w-full p-6 sm:p-8 font-mono text-xs shadow-2xl">
+            <h3 className="font-headline text-2xl font-bold text-[#f4f4f6] tracking-tight mb-2">
               Add New Archival Specimen
             </h3>
-            <p className="text-[#59544c] mb-6">
+            <p className="text-[#8e8e98] mb-6">
               Create a new master style and register its dimensional matrix into the monolithic archive.
             </p>
 
             <form onSubmit={handleAddSpecimenSubmit} className="space-y-4">
               <div>
-                <label className="block text-[10px] font-bold text-[#1a1816] uppercase tracking-wider mb-1.5">
+                <label className="block text-[10px] font-bold text-[#f4f4f6] uppercase tracking-wider mb-1.5">
                   SPECIMEN TITLE *
                 </label>
                 <input
@@ -1074,13 +1074,13 @@ export const AdminProductsView: React.FC<AdminProductsViewProps> = ({
                   value={newName}
                   onChange={(e) => setNewName(e.target.value)}
                   placeholder="e.g. S-02 SCULPTED DERBY"
-                  className="w-full bg-white border border-[#d5cdc0] px-3.5 py-2.5 text-[#1a1816] text-[12px] font-mono outline-none focus:border-[#1a1816]"
+                  className="w-full bg-[#18181c] border border-[#242429] px-3.5 py-2.5 text-[#f4f4f6] text-[12px] font-mono outline-none focus:border-[#f4f4f6]"
                 />
               </div>
 
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="block text-[10px] font-bold text-[#1a1816] uppercase tracking-wider mb-1.5">
+                  <label className="block text-[10px] font-bold text-[#f4f4f6] uppercase tracking-wider mb-1.5">
                     MASTER SKU (OPTIONAL)
                   </label>
                   <input
@@ -1088,17 +1088,17 @@ export const AdminProductsView: React.FC<AdminProductsViewProps> = ({
                     value={newSku}
                     onChange={(e) => setNewSku(e.target.value)}
                     placeholder="VNT-S02-DRB-01"
-                    className="w-full bg-white border border-[#d5cdc0] px-3 py-2 text-[#1a1816] text-[11px] font-mono outline-none focus:border-[#1a1816]"
+                    className="w-full bg-[#18181c] border border-[#242429] px-3 py-2 text-[#f4f4f6] text-[11px] font-mono outline-none focus:border-[#f4f4f6]"
                   />
                 </div>
                 <div>
-                  <label className="block text-[10px] font-bold text-[#1a1816] uppercase tracking-wider mb-1.5">
+                  <label className="block text-[10px] font-bold text-[#f4f4f6] uppercase tracking-wider mb-1.5">
                     CATEGORY
                   </label>
                   <select
                     value={newCategory}
                     onChange={(e) => setNewCategory(e.target.value)}
-                    className="w-full bg-white border border-[#d5cdc0] px-3 py-2 text-[#1a1816] text-[11px] font-mono outline-none focus:border-[#1a1816]"
+                    className="w-full bg-[#18181c] border border-[#242429] px-3 py-2 text-[#f4f4f6] text-[11px] font-mono outline-none focus:border-[#f4f4f6]"
                   >
                     <option value="SNEAKERS">SNEAKERS</option>
                     <option value="FOOTWEAR">FOOTWEAR</option>
@@ -1109,7 +1109,7 @@ export const AdminProductsView: React.FC<AdminProductsViewProps> = ({
               </div>
 
               <div>
-                <label className="block text-[10px] font-bold text-[#1a1816] uppercase tracking-wider mb-1.5">
+                <label className="block text-[10px] font-bold text-[#f4f4f6] uppercase tracking-wider mb-1.5">
                   BASE RETAIL VALUATION (₹) *
                 </label>
                 <input
@@ -1118,21 +1118,21 @@ export const AdminProductsView: React.FC<AdminProductsViewProps> = ({
                   value={newPrice}
                   onChange={(e) => setNewPrice(e.target.value)}
                   placeholder="42500"
-                  className="w-full bg-white border border-[#d5cdc0] px-3.5 py-2 text-[#1a1816] text-[12px] font-mono outline-none focus:border-[#1a1816]"
+                  className="w-full bg-[#18181c] border border-[#242429] px-3.5 py-2 text-[#f4f4f6] text-[12px] font-mono outline-none focus:border-[#f4f4f6]"
                 />
               </div>
 
-              <div className="pt-4 flex items-center justify-end gap-3 border-t border-[#d5cdc0]">
+              <div className="pt-4 flex items-center justify-end gap-3 border-t border-[#242429]">
                 <button
                   type="button"
                   onClick={() => setShowAddModal(false)}
-                  className="px-4 py-2 text-[#59544c] hover:text-[#1a1816] uppercase font-bold text-[10px] cursor-pointer"
+                  className="px-4 py-2 text-[#8e8e98] hover:text-[#f4f4f6] uppercase font-bold text-[10px] cursor-pointer"
                 >
                   CANCEL
                 </button>
                 <button
                   type="submit"
-                  className="px-5 py-2.5 bg-[#141312] text-[#f5efe6] uppercase font-bold text-[10px] tracking-widest hover:bg-[#35322e] transition-colors cursor-pointer"
+                  className="px-5 py-2.5 bg-[#141312] text-[#18181c] uppercase font-bold text-[10px] tracking-widest hover:bg-[#35322e] transition-colors cursor-pointer"
                 >
                   CATALOG SPECIMEN
                 </button>
@@ -1145,14 +1145,14 @@ export const AdminProductsView: React.FC<AdminProductsViewProps> = ({
       {/* Edit Specimen Modal */}
       {editingSpecimen && (
         <div className="fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4">
-          <div className="bg-[#ede7dd] border border-[#d5cdc0] max-w-lg w-full p-6 shadow-2xl space-y-4 font-mono">
-            <div className="flex items-center justify-between pb-3 border-b border-[#d5cdc0]">
-              <div className="text-[10px] text-[#7b6e54] font-bold uppercase tracking-wider">
+          <div className="bg-[#121215] border border-[#242429] max-w-lg w-full p-6 shadow-2xl space-y-4 font-mono">
+            <div className="flex items-center justify-between pb-3 border-b border-[#242429]">
+              <div className="text-[10px] text-[#c9a96e] font-bold uppercase tracking-wider">
                 ARCHIVE EDITOR // {editingSpecimen.sku}
               </div>
               <button
                 onClick={() => setEditingSpecimen(null)}
-                className="text-[#59544c] hover:text-[#1a1816] cursor-pointer text-sm font-bold"
+                className="text-[#8e8e98] hover:text-[#f4f4f6] cursor-pointer text-sm font-bold"
               >
                 ✕
               </button>
@@ -1160,7 +1160,7 @@ export const AdminProductsView: React.FC<AdminProductsViewProps> = ({
 
             <form onSubmit={handleSaveEditSpecimen} className="space-y-4">
               <div>
-                <label className="block text-[10px] font-bold text-[#1a1816] uppercase tracking-wider mb-1.5">
+                <label className="block text-[10px] font-bold text-[#f4f4f6] uppercase tracking-wider mb-1.5">
                   SPECIMEN TITLE
                 </label>
                 <input
@@ -1168,13 +1168,13 @@ export const AdminProductsView: React.FC<AdminProductsViewProps> = ({
                   required
                   value={editName}
                   onChange={(e) => setEditName(e.target.value)}
-                  className="w-full bg-white border border-[#d5cdc0] px-3.5 py-2 text-[#1a1816] text-[12px] font-mono outline-none focus:border-[#1a1816]"
+                  className="w-full bg-[#18181c] border border-[#242429] px-3.5 py-2 text-[#f4f4f6] text-[12px] font-mono outline-none focus:border-[#f4f4f6]"
                 />
               </div>
 
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-[10px] font-bold text-[#1a1816] uppercase tracking-wider mb-1.5">
+                  <label className="block text-[10px] font-bold text-[#f4f4f6] uppercase tracking-wider mb-1.5">
                     SKU REFERENCE
                   </label>
                   <input
@@ -1182,17 +1182,17 @@ export const AdminProductsView: React.FC<AdminProductsViewProps> = ({
                     required
                     value={editSku}
                     onChange={(e) => setEditSku(e.target.value)}
-                    className="w-full bg-white border border-[#d5cdc0] px-3 py-2 text-[#1a1816] text-[11px] font-mono outline-none focus:border-[#1a1816]"
+                    className="w-full bg-[#18181c] border border-[#242429] px-3 py-2 text-[#f4f4f6] text-[11px] font-mono outline-none focus:border-[#f4f4f6]"
                   />
                 </div>
                 <div>
-                  <label className="block text-[10px] font-bold text-[#1a1816] uppercase tracking-wider mb-1.5">
+                  <label className="block text-[10px] font-bold text-[#f4f4f6] uppercase tracking-wider mb-1.5">
                     CATEGORY
                   </label>
                   <select
                     value={editCategory}
                     onChange={(e) => setEditCategory(e.target.value)}
-                    className="w-full bg-white border border-[#d5cdc0] px-3 py-2 text-[#1a1816] text-[11px] font-mono outline-none focus:border-[#1a1816]"
+                    className="w-full bg-[#18181c] border border-[#242429] px-3 py-2 text-[#f4f4f6] text-[11px] font-mono outline-none focus:border-[#f4f4f6]"
                   >
                     <option value="SNEAKERS">SNEAKERS</option>
                     <option value="RUNNING">RUNNING</option>
@@ -1206,7 +1206,7 @@ export const AdminProductsView: React.FC<AdminProductsViewProps> = ({
 
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-[10px] font-bold text-[#1a1816] uppercase tracking-wider mb-1.5">
+                  <label className="block text-[10px] font-bold text-[#f4f4f6] uppercase tracking-wider mb-1.5">
                     BASE PRICE (₹)
                   </label>
                   <input
@@ -1214,17 +1214,17 @@ export const AdminProductsView: React.FC<AdminProductsViewProps> = ({
                     required
                     value={editPrice}
                     onChange={(e) => setEditPrice(e.target.value)}
-                    className="w-full bg-white border border-[#d5cdc0] px-3 py-2 text-[#1a1816] text-[11px] font-mono outline-none focus:border-[#1a1816]"
+                    className="w-full bg-[#18181c] border border-[#242429] px-3 py-2 text-[#f4f4f6] text-[11px] font-mono outline-none focus:border-[#f4f4f6]"
                   />
                 </div>
                 <div>
-                  <label className="block text-[10px] font-bold text-[#1a1816] uppercase tracking-wider mb-1.5">
+                  <label className="block text-[10px] font-bold text-[#f4f4f6] uppercase tracking-wider mb-1.5">
                     CATALOG STATUS
                   </label>
                   <select
                     value={editStatus}
                     onChange={(e) => setEditStatus(e.target.value as any)}
-                    className="w-full bg-white border border-[#d5cdc0] px-3 py-2 text-[#1a1816] text-[11px] font-mono outline-none focus:border-[#1a1816]"
+                    className="w-full bg-[#18181c] border border-[#242429] px-3 py-2 text-[#f4f4f6] text-[11px] font-mono outline-none focus:border-[#f4f4f6]"
                   >
                     <option value="ACTIVE">ACTIVE</option>
                     <option value="CRITICAL">CRITICAL</option>
@@ -1234,17 +1234,17 @@ export const AdminProductsView: React.FC<AdminProductsViewProps> = ({
                 </div>
               </div>
 
-              <div className="pt-4 flex items-center justify-end gap-3 border-t border-[#d5cdc0]">
+              <div className="pt-4 flex items-center justify-end gap-3 border-t border-[#242429]">
                 <button
                   type="button"
                   onClick={() => setEditingSpecimen(null)}
-                  className="px-4 py-2 text-[#59544c] hover:text-[#1a1816] uppercase font-bold text-[10px] cursor-pointer"
+                  className="px-4 py-2 text-[#8e8e98] hover:text-[#f4f4f6] uppercase font-bold text-[10px] cursor-pointer"
                 >
                   CANCEL
                 </button>
                 <button
                   type="submit"
-                  className="px-5 py-2.5 bg-[#141312] text-[#f5efe6] uppercase font-bold text-[10px] tracking-widest hover:bg-[#35322e] transition-colors cursor-pointer"
+                  className="px-5 py-2.5 bg-[#141312] text-[#18181c] uppercase font-bold text-[10px] tracking-widest hover:bg-[#35322e] transition-colors cursor-pointer"
                 >
                   SAVE SPECIMEN CHANGES
                 </button>
@@ -1257,38 +1257,38 @@ export const AdminProductsView: React.FC<AdminProductsViewProps> = ({
       {/* Delete Confirmation Modal */}
       {deletingSpecimen && (
         <div className="fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4">
-          <div className="bg-[#ede7dd] border border-[#d5cdc0] max-w-md w-full p-6 shadow-2xl space-y-4 font-mono">
-            <div className="flex items-center justify-between pb-3 border-b border-[#d5cdc0]">
+          <div className="bg-[#121215] border border-[#242429] max-w-md w-full p-6 shadow-2xl space-y-4 font-mono">
+            <div className="flex items-center justify-between pb-3 border-b border-[#242429]">
               <div className="text-[10px] text-[#991b1b] font-bold uppercase tracking-wider">
                 CONFIRM SPECIMEN DELETION
               </div>
               <button
                 onClick={() => setDeletingSpecimen(null)}
-                className="text-[#59544c] hover:text-[#1a1816] cursor-pointer text-sm font-bold"
+                className="text-[#8e8e98] hover:text-[#f4f4f6] cursor-pointer text-sm font-bold"
               >
                 ✕
               </button>
             </div>
 
-            <div className="text-[11px] text-[#1a1816] space-y-2">
+            <div className="text-[11px] text-[#f4f4f6] space-y-2">
               <p className="font-bold">
                 Are you sure you want to delete this product?
               </p>
-              <div className="p-3 bg-[#faf7f2] border border-[#d5cdc0] text-[10px]">
-                <div><span className="text-[#7b6e54]">SPECIMEN:</span> <span className="font-bold">{deletingSpecimen.name}</span></div>
-                <div><span className="text-[#7b6e54]">SKU:</span> <span className="font-bold">{deletingSpecimen.sku}</span></div>
-                <div><span className="text-[#7b6e54]">TOTAL STOCK:</span> {deletingSpecimen.totalStock} Units</div>
+              <div className="p-3 bg-[#09090b] border border-[#242429] text-[10px]">
+                <div><span className="text-[#c9a96e]">SPECIMEN:</span> <span className="font-bold">{deletingSpecimen.name}</span></div>
+                <div><span className="text-[#c9a96e]">SKU:</span> <span className="font-bold">{deletingSpecimen.sku}</span></div>
+                <div><span className="text-[#c9a96e]">TOTAL STOCK:</span> {deletingSpecimen.totalStock} Units</div>
               </div>
-              <p className="text-[#7b6e54] text-[9px]">
+              <p className="text-[#c9a96e] text-[9px]">
                 This will delete the specimen and unbind its dimensional size matrix from the live archive.
               </p>
             </div>
 
-            <div className="pt-3 border-t border-[#d5cdc0] flex items-center justify-end gap-3">
+            <div className="pt-3 border-t border-[#242429] flex items-center justify-end gap-3">
               <button
                 type="button"
                 onClick={() => setDeletingSpecimen(null)}
-                className="px-4 py-2 text-[#59544c] hover:text-[#1a1816] uppercase font-bold text-[10px] cursor-pointer"
+                className="px-4 py-2 text-[#8e8e98] hover:text-[#f4f4f6] uppercase font-bold text-[10px] cursor-pointer"
               >
                 CANCEL
               </button>

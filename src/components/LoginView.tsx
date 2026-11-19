@@ -62,7 +62,9 @@ export const LoginView: React.FC<LoginViewProps> = ({
       } else {
         onShowToast(msg.toUpperCase());
       }
-    } finally { setIsSubmitting(false); }
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   const handleRegister = async (e: React.FormEvent) => {
@@ -93,7 +95,9 @@ export const LoginView: React.FC<LoginViewProps> = ({
       } else {
         onShowToast(msg.toUpperCase());
       }
-    } finally { setIsSubmitting(false); }
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   const handleForgotPassword = async (e: React.FormEvent) => {
@@ -118,38 +122,38 @@ export const LoginView: React.FC<LoginViewProps> = ({
   // If user is already authenticated
   if (currentUser) {
     return (
-      <div className="min-h-screen bg-[#ede7dd] text-[#1a1816] flex flex-col justify-between selection:bg-[#1a1816] selection:text-[#ede7dd]">
-        {/* Top Navigation Bar Matching Image */}
-        <nav className="w-full border-b border-[#d5cdc0] bg-[#ede7dd] px-6 md:px-16 py-4.5 flex items-center justify-between font-mono text-[11px]">
+      <div className="min-h-screen bg-[#09090b] text-[#f4f4f6] flex flex-col justify-between selection:bg-[#c9a96e33] selection:text-[#f4f4f6]">
+        {/* Top Navigation Bar */}
+        <nav className="w-full border-b border-[#242429] bg-[#09090b] px-6 md:px-16 py-4.5 flex items-center justify-between font-mono text-[11px]">
           <div className="flex items-center gap-4">
             <button
               onClick={() => onNavigate('COLLECTIONS')}
-              className="font-headline text-2xl font-bold tracking-tight uppercase hover:opacity-80 transition-opacity cursor-pointer"
+              className="font-headline text-2xl font-bold tracking-tight uppercase hover:text-[#c9a96e] transition-colors cursor-pointer"
             >
               VANTA
             </button>
-            <span className="text-[#a39c90]">|</span>
-            <span className="text-[#59544c] tracking-widest uppercase">
+            <span className="text-[#3a3a42]">|</span>
+            <span className="text-[#8e8e98] tracking-widest uppercase">
               CLIENT AUTHENTICATION // NODE 01
             </span>
           </div>
 
-          <div className="flex items-center gap-6 text-[#59544c] uppercase tracking-wider">
+          <div className="flex items-center gap-6 text-[#8e8e98] uppercase tracking-wider">
             <button
               onClick={() => onNavigate('SHOP')}
-              className="hover:text-[#1a1816] transition-colors cursor-pointer"
+              className="hover:text-[#f4f4f6] transition-colors cursor-pointer"
             >
               ARCHIVE CATALOG
             </button>
             <button
               onClick={() => onShowToast('CONCIERGE DESK READY // LINE 01 ACTIVE')}
-              className="hover:text-[#1a1816] transition-colors cursor-pointer"
+              className="hover:text-[#f4f4f6] transition-colors cursor-pointer"
             >
               CONCIERGE
             </button>
             <button
               onClick={() => onNavigate('COLLECTIONS')}
-              className="text-[#1a1816] font-bold flex items-center gap-1 hover:opacity-75 transition-opacity cursor-pointer"
+              className="text-[#f4f4f6] font-bold flex items-center gap-1 hover:text-[#c9a96e] transition-colors cursor-pointer"
             >
               <span>RETURN TO FLAGSHIP</span>
               <ArrowRight className="w-3.5 h-3.5" />
@@ -159,25 +163,25 @@ export const LoginView: React.FC<LoginViewProps> = ({
 
         {/* Authenticated Member Session Card */}
         <div className="max-w-2xl mx-auto w-full px-6 py-16">
-          <div className="bg-[#faf7f2] border border-[#d5cdc0] p-8 md:p-12 shadow-sm flex flex-col gap-6">
+          <div className="bg-[#121215] border border-[#242429] p-8 md:p-12 shadow-2xl flex flex-col gap-6">
             <div className="flex items-center gap-2">
-              <span className="w-6 h-[1px] bg-[#7b6e54]"></span>
-              <span className="font-mono text-[10px] tracking-[0.2em] text-[#7b6e54] font-bold uppercase">
+              <span className="w-6 h-[1px] bg-[#c9a96e]"></span>
+              <span className="font-mono text-[10px] tracking-[0.2em] text-[#c9a96e] font-bold uppercase">
                 ACTIVE VAULT SESSION
               </span>
             </div>
 
-            <div className="flex items-center justify-between border-b border-[#d5cdc0] pb-6">
+            <div className="flex items-center justify-between border-b border-[#242429] pb-6">
               <div>
-                <h1 className="font-headline text-3xl font-bold text-[#1a1816]">
+                <h1 className="font-headline text-3xl font-bold text-[#f4f4f6]">
                   {currentUser.name}
                 </h1>
-                <p className="font-mono text-xs text-[#59544c] mt-1">{currentUser.email}</p>
-                <div className="inline-block mt-2 font-mono text-[10px] bg-[#ede7dd] border border-[#d5cdc0] px-2.5 py-0.5 text-[#1a1816] font-bold uppercase">
+                <p className="font-mono text-xs text-[#8e8e98] mt-1">{currentUser.email}</p>
+                <div className="inline-block mt-2 font-mono text-[10px] bg-[#18181c] border border-[#3a3a42] px-2.5 py-0.5 text-[#c9a96e] font-bold uppercase">
                   {currentUser.memberId} // VERIFIED VIP
                 </div>
               </div>
-              <div className="w-12 h-12 bg-[#1a1816] text-[#ede7dd] flex items-center justify-center font-headline text-xl font-bold">
+              <div className="w-12 h-12 bg-[#18181c] border border-[#3a3a42] text-[#f4f4f6] flex items-center justify-center font-headline text-xl font-bold">
                 {currentUser.name.charAt(0)}
               </div>
             </div>
@@ -185,24 +189,24 @@ export const LoginView: React.FC<LoginViewProps> = ({
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 font-mono text-xs">
               <button
                 onClick={() => onNavigate('BAG')}
-                className="p-4 bg-[#ede7dd] border border-[#d5cdc0] hover:border-[#1a1816] text-left transition-all cursor-pointer"
+                className="p-4 bg-[#18181c] border border-[#242429] hover:border-[#8e8e98] text-left transition-all cursor-pointer"
               >
-                <div className="text-[10px] text-[#7b6e54] font-bold uppercase">ALLOCATIONS</div>
-                <div className="text-[#1a1816] font-bold mt-1">VIEW ARCHIVE BAG &rarr;</div>
+                <div className="text-[10px] text-[#c9a96e] font-bold uppercase">ALLOCATIONS</div>
+                <div className="text-[#f4f4f6] font-bold mt-1">VIEW ARCHIVE BAG &rarr;</div>
               </button>
               <button
                 onClick={() => onNavigate('SHOP')}
-                className="p-4 bg-[#ede7dd] border border-[#d5cdc0] hover:border-[#1a1816] text-left transition-all cursor-pointer"
+                className="p-4 bg-[#18181c] border border-[#242429] hover:border-[#8e8e98] text-left transition-all cursor-pointer"
               >
-                <div className="text-[10px] text-[#7b6e54] font-bold uppercase">CATALOG</div>
-                <div className="text-[#1a1816] font-bold mt-1">BROWSE FOOTWEAR &rarr;</div>
+                <div className="text-[10px] text-[#c9a96e] font-bold uppercase">CATALOG</div>
+                <div className="text-[#f4f4f6] font-bold mt-1">BROWSE FOOTWEAR &rarr;</div>
               </button>
             </div>
 
-            <div className="pt-4 border-t border-[#d5cdc0] flex justify-between items-center font-mono text-xs">
+            <div className="pt-4 border-t border-[#242429] flex justify-between items-center font-mono text-xs">
               <button
                 onClick={() => onNavigate('COLLECTIONS')}
-                className="text-[#1a1816] font-bold hover:underline cursor-pointer flex items-center gap-1.5"
+                className="text-[#f4f4f6] font-bold hover:text-[#c9a96e] cursor-pointer flex items-center gap-1.5 transition-colors"
               >
                 <ArrowLeft className="w-3.5 h-3.5" />
                 <span>RETURN TO FLAGSHIP</span>
@@ -213,7 +217,7 @@ export const LoginView: React.FC<LoginViewProps> = ({
                     onLogout();
                     onShowToast('CLIENT LOGGED OUT SAFELY');
                   }}
-                  className="text-red-700 hover:text-red-900 font-bold uppercase cursor-pointer"
+                  className="text-red-400 hover:text-red-300 font-bold uppercase cursor-pointer transition-colors"
                 >
                   [TERMINATE SESSION]
                 </button>
@@ -222,13 +226,13 @@ export const LoginView: React.FC<LoginViewProps> = ({
           </div>
         </div>
 
-        {/* Footer Matching Image */}
-        <footer className="w-full px-6 md:px-16 py-6 border-t border-[#d5cdc0] flex flex-col md:flex-row justify-between items-center gap-4 font-mono text-[10px] text-[#7b6e54] uppercase tracking-wider">
+        {/* Footer */}
+        <footer className="w-full px-6 md:px-16 py-6 border-t border-[#242429] flex flex-col md:flex-row justify-between items-center gap-4 font-mono text-[10px] text-[#52525b] uppercase tracking-wider">
           <div>© 2025 VANTA CORDWAINING HOUSE // CIVITANOVA ATELIER. ALL RIGHTS RESERVED.</div>
           <div className="flex items-center gap-6">
-            <button className="hover:text-[#1a1816] cursor-pointer">PRIVACY POLICY</button>
-            <button className="hover:text-[#1a1816] cursor-pointer">TERMS OF DISPATCH</button>
-            <button className="hover:text-[#1a1816] cursor-pointer">SECURITY SPEC</button>
+            <button className="hover:text-[#f4f4f6] transition-colors cursor-pointer">PRIVACY POLICY</button>
+            <button className="hover:text-[#f4f4f6] transition-colors cursor-pointer">TERMS OF DISPATCH</button>
+            <button className="hover:text-[#f4f4f6] transition-colors cursor-pointer">SECURITY SPEC</button>
           </div>
         </footer>
       </div>
@@ -236,38 +240,38 @@ export const LoginView: React.FC<LoginViewProps> = ({
   }
 
   return (
-    <div className="min-h-screen bg-[#ede7dd] text-[#1a1816] flex flex-col justify-between selection:bg-[#1a1816] selection:text-[#ede7dd]">
-      {/* Top Navigation Bar Exactly as in Image */}
-      <nav className="w-full border-b border-[#d5cdc0] bg-[#ede7dd] px-6 md:px-16 py-4.5 flex items-center justify-between font-mono text-[11px]">
+    <div className="min-h-screen bg-[#09090b] text-[#f4f4f6] flex flex-col justify-between selection:bg-[#c9a96e33] selection:text-[#f4f4f6]">
+      {/* Top Navigation Bar */}
+      <nav className="w-full border-b border-[#242429] bg-[#09090b] px-6 md:px-16 py-4.5 flex items-center justify-between font-mono text-[11px]">
         <div className="flex items-center gap-4">
           <button
             onClick={() => onNavigate('COLLECTIONS')}
-            className="font-headline text-2xl md:text-3xl font-bold tracking-tight uppercase hover:opacity-80 transition-opacity cursor-pointer"
+            className="font-headline text-2xl md:text-3xl font-bold tracking-tight uppercase hover:text-[#c9a96e] transition-colors cursor-pointer"
           >
             VANTA
           </button>
-          <span className="text-[#a39c90]">|</span>
-          <span className="text-[#59544c] tracking-widest uppercase">
+          <span className="text-[#3a3a42]">|</span>
+          <span className="text-[#8e8e98] tracking-widest uppercase">
             CLIENT AUTHENTICATION // NODE 01
           </span>
         </div>
 
-        <div className="flex items-center gap-6 text-[#59544c] uppercase tracking-wider">
+        <div className="flex items-center gap-6 text-[#8e8e98] uppercase tracking-wider">
           <button
             onClick={() => onNavigate('SHOP')}
-            className="hover:text-[#1a1816] transition-colors cursor-pointer"
+            className="hover:text-[#f4f4f6] transition-colors cursor-pointer"
           >
             ARCHIVE CATALOG
           </button>
           <button
             onClick={() => onShowToast('CONCIERGE DESK READY // LINE 01 ACTIVE')}
-            className="hover:text-[#1a1816] transition-colors cursor-pointer"
+            className="hover:text-[#f4f4f6] transition-colors cursor-pointer"
           >
             CONCIERGE
           </button>
           <button
             onClick={() => onNavigate('COLLECTIONS')}
-            className="text-[#1a1816] font-bold flex items-center gap-1.5 hover:opacity-75 transition-opacity cursor-pointer"
+            className="text-[#f4f4f6] font-bold flex items-center gap-1.5 hover:text-[#c9a96e] transition-colors cursor-pointer"
           >
             <span>RETURN TO FLAGSHIP</span>
             <ArrowRight className="w-3.5 h-3.5" />
@@ -280,32 +284,32 @@ export const LoginView: React.FC<LoginViewProps> = ({
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-10 w-full items-stretch">
           {/* LEFT COLUMN: ARCHIVAL SPECIMEN EXHIBIT CARD (7 Cols) */}
           <div
-            className="lg:col-span-7 border border-[#d5cdc0] bg-[#f5efe6] p-7 md:p-10 flex flex-col justify-between relative shadow-sm"
+            className="lg:col-span-7 border border-[#242429] bg-[#121215] p-7 md:p-10 flex flex-col justify-between relative shadow-2xl"
             style={{
               backgroundImage:
-                'radial-gradient(#cfc5b4 1.2px, transparent 1.2px)',
+                'radial-gradient(#242429 1.2px, transparent 1.2px)',
               backgroundSize: '24px 24px',
             }}
           >
             {/* Top Badges & Specimen Identity */}
             <div>
               <div className="flex items-center justify-between">
-                <div className="bg-[#ede7dd]/90 border border-[#d5cdc0] px-3.5 py-1.5 font-mono text-[10px] tracking-widest text-[#1a1816] uppercase">
+                <div className="bg-[#18181c] border border-[#242429] px-3.5 py-1.5 font-mono text-[10px] tracking-widest text-[#f4f4f6] uppercase">
                   SPECIMEN // V-01 CORE
                 </div>
-                <div className="bg-[#ede7dd]/90 border border-[#d5cdc0] px-3.5 py-1.5 font-mono text-[10px] tracking-widest text-[#1a1816] uppercase flex items-center gap-2">
+                <div className="bg-[#18181c] border border-[#242429] px-3.5 py-1.5 font-mono text-[10px] tracking-widest text-[#f4f4f6] uppercase flex items-center gap-2">
                   <span>SESSION SECURE</span>
-                  <span className="w-2 h-2 rounded-full bg-[#7b6e54]"></span>
+                  <span className="w-2 h-2 rounded-full bg-[#c9a96e]"></span>
                 </div>
               </div>
 
-              <div className="font-mono text-[10px] text-[#59544c] tracking-widest uppercase mt-3">
+              <div className="font-mono text-[10px] text-[#8e8e98] tracking-widest uppercase mt-3">
                 ARCHIVAL RUNNER • VEG-TANNED CALFSKIN • TRAVERTINE BASE
               </div>
             </div>
 
             {/* Specimen Centerpiece Photograph */}
-            <div className="my-8 overflow-hidden border border-[#d5cdc0] shadow-sm bg-[#ede7dd]">
+            <div className="my-8 overflow-hidden border border-[#242429] bg-[#09090b]">
               <img
                 src="/assets/images/cream_runner_pedestal_1788842341279.jpg"
                 alt="VANTA V-01 Archival Specimen"
@@ -315,24 +319,24 @@ export const LoginView: React.FC<LoginViewProps> = ({
 
             {/* Telemetry Footprint */}
             <div>
-              <div className="text-center font-mono text-[10px] text-[#59544c] tracking-widest uppercase py-1">
+              <div className="text-center font-mono text-[10px] text-[#8e8e98] tracking-widest uppercase py-1">
                 WEIGHT // 385G &bull; LAST // MOD. V-09 &bull; CRAFT // CIVITANOVA ATELIER
               </div>
 
               {/* Dividing Rule */}
-              <div className="border-t border-[#d5cdc0] my-4"></div>
+              <div className="border-t border-[#242429] my-4"></div>
 
               {/* Manifesto & Vault Seal */}
               <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-3 pt-1">
                 <div>
-                  <h2 className="font-headline text-2xl sm:text-3xl text-[#1a1816]">
-                    Step Into <span className="italic font-serif">Your Style.</span>
+                  <h2 className="font-headline text-2xl sm:text-3xl text-[#f4f4f6]">
+                    Step Into <span className="italic font-serif text-[#c9a96e]">Your Style.</span>
                   </h2>
-                  <p className="font-mono text-[11px] text-[#59544c] mt-1 tracking-wider">
+                  <p className="font-mono text-[11px] text-[#8e8e98] mt-1 tracking-wider">
                     Discover your collection. Track your orders. Experience VANTA.
                   </p>
                 </div>
-                <div className="font-mono text-[10px] text-[#59544c] tracking-widest uppercase shrink-0">
+                <div className="font-mono text-[10px] text-[#52525b] tracking-widest uppercase shrink-0">
                   PERMANENT VAULT 2025
                 </div>
               </div>
@@ -340,33 +344,33 @@ export const LoginView: React.FC<LoginViewProps> = ({
           </div>
 
           {/* RIGHT COLUMN: VERIFIED MEMBERSHIP FORM CARD (5 Cols) */}
-          <div className="lg:col-span-5 border border-[#d5cdc0] bg-[#faf7f2] p-8 sm:p-10 lg:p-12 flex flex-col justify-between shadow-sm">
+          <div className="lg:col-span-5 border border-[#242429] bg-[#121215] p-8 sm:p-10 lg:p-12 flex flex-col justify-between shadow-2xl">
             {authMode === 'LOGIN' && (
               <form onSubmit={handleLogin} className="flex flex-col justify-between h-full">
                 <div>
                   {/* Eyebrow Label */}
                   <div className="flex items-center gap-2 mb-3">
-                    <span className="w-6 h-[1px] bg-[#7b6e54]"></span>
-                    <span className="font-mono text-[10px] tracking-[0.2em] text-[#7b6e54] font-bold uppercase">
+                    <span className="w-6 h-[1px] bg-[#c9a96e]"></span>
+                    <span className="font-mono text-[10px] tracking-[0.2em] text-[#c9a96e] font-bold uppercase">
                       VERIFIED MEMBERSHIP
                     </span>
                   </div>
 
                   {/* Heading */}
-                  <h1 className="font-headline text-3xl sm:text-4xl text-[#1a1816] tracking-tight mb-2">
+                  <h1 className="font-headline text-3xl sm:text-4xl text-[#f4f4f6] tracking-tight mb-2">
                     Welcome Back
                   </h1>
-                  <p className="text-[13px] text-[#59544c] mb-8 font-sans">
+                  <p className="text-[13px] text-[#8e8e98] mb-8 font-sans">
                     Sign in to continue your VANTA experience.
                   </p>
 
                   {/* Input 1: Email Address */}
                   <div className="mb-5">
                     <div className="flex justify-between items-center mb-2 font-mono text-[10px] tracking-widest uppercase">
-                      <label htmlFor="login-email" className="text-[#1a1816] font-bold">
+                      <label htmlFor="login-email" className="text-[#f4f4f6] font-bold">
                         EMAIL ADDRESS *
                       </label>
-                      <span className="text-[#7b6e54]">CLIENT_ID</span>
+                      <span className="text-[#c9a96e]">CLIENT_ID</span>
                     </div>
                     <input
                       id="login-email"
@@ -375,17 +379,17 @@ export const LoginView: React.FC<LoginViewProps> = ({
                       value={email}
                       onChange={(e) => setEmail(e.target.value)}
                       placeholder="Enter your email address"
-                      className="w-full bg-white border border-[#d5cdc0] px-4 py-3.5 text-[13px] text-[#1a1816] placeholder:text-[#a39c90] font-mono tracking-wide focus:outline-none focus:border-[#1a1816] transition-colors"
+                      className="w-full bg-[#18181c] border border-[#242429] px-4 py-3.5 text-[13px] text-[#f4f4f6] placeholder:text-[#52525b] font-mono tracking-wide focus:outline-none focus:border-[#8e8e98] transition-colors"
                     />
                   </div>
 
                   {/* Input 2: Password */}
                   <div className="mb-5">
                     <div className="flex justify-between items-center mb-2 font-mono text-[10px] tracking-widest uppercase">
-                      <label htmlFor="login-password" className="text-[#1a1816] font-bold">
+                      <label htmlFor="login-password" className="text-[#f4f4f6] font-bold">
                         PASSWORD *
                       </label>
-                      <span className="text-[#7b6e54]">ENCRYPTED</span>
+                      <span className="text-[#c9a96e]">ENCRYPTED</span>
                     </div>
                     <div className="relative">
                       <input
@@ -396,12 +400,12 @@ export const LoginView: React.FC<LoginViewProps> = ({
                         value={password}
                         onChange={(e) => setPassword(e.target.value)}
                         placeholder="Enter your password"
-                        className="w-full bg-white border border-[#d5cdc0] px-4 py-3.5 pr-11 text-[13px] text-[#1a1816] placeholder:text-[#a39c90] font-mono tracking-wide focus:outline-none focus:border-[#1a1816] transition-colors"
+                        className="w-full bg-[#18181c] border border-[#242429] px-4 py-3.5 pr-11 text-[13px] text-[#f4f4f6] placeholder:text-[#52525b] font-mono tracking-wide focus:outline-none focus:border-[#8e8e98] transition-colors"
                       />
                       <button
                         type="button"
                         onClick={() => setShowPassword(!showPassword)}
-                        className="absolute right-3 top-1/2 -translate-y-1/2 text-[#7b6e54] hover:text-[#1a1816] p-1 cursor-pointer transition-colors"
+                        className="absolute right-3 top-1/2 -translate-y-1/2 text-[#8e8e98] hover:text-[#f4f4f6] p-1 cursor-pointer transition-colors"
                         aria-label="Toggle password visibility"
                       >
                         {showPassword ? (
@@ -420,15 +424,15 @@ export const LoginView: React.FC<LoginViewProps> = ({
                         type="checkbox"
                         checked={rememberMe}
                         onChange={(e) => setRememberMe(e.target.checked)}
-                        className="w-4 h-4 accent-[#1a1816] border-[#d5cdc0] rounded-none cursor-pointer"
+                        className="w-4 h-4 accent-[#c9a96e] border-[#242429] rounded-none cursor-pointer"
                       />
-                      <span className="font-mono text-[11px] text-[#59544c]">Remember me</span>
+                      <span className="font-mono text-[11px] text-[#8e8e98]">Remember me</span>
                     </label>
 
                     <button
                       type="button"
                       onClick={() => setAuthMode('FORGOT')}
-                      className="font-mono text-[11px] text-[#59544c] underline hover:text-[#1a1816] tracking-wider cursor-pointer"
+                      className="font-mono text-[11px] text-[#8e8e98] underline hover:text-[#f4f4f6] tracking-wider cursor-pointer transition-colors"
                     >
                       Forgot Password?
                     </button>
@@ -438,21 +442,20 @@ export const LoginView: React.FC<LoginViewProps> = ({
                   <button
                     type="submit"
                     disabled={isSubmitting}
-                    className="w-full py-4 bg-[#141312] text-[#f5efe6] font-mono text-[12px] font-bold tracking-[0.2em] uppercase hover:bg-[#35322e] transition-all flex items-center justify-center gap-2 cursor-pointer shadow-sm active:scale-[0.99]"
+                    className="w-full py-4 bg-[#f4f4f6] text-[#09090b] font-mono text-[12px] font-bold tracking-[0.2em] uppercase hover:bg-[#c9a96e] transition-all flex items-center justify-center gap-2 cursor-pointer shadow-lg active:scale-[0.99]"
                   >
                     <span>{isSubmitting ? 'AUTHENTICATING...' : 'SIGN IN'}</span>
                     <ArrowRight className="w-3.5 h-3.5" />
                   </button>
-
                 </div>
 
                 {/* Don't have an account */}
-                <div className="text-center font-mono text-[11px] text-[#59544c] mt-8 pt-4 border-t border-[#d5cdc0]">
+                <div className="text-center font-mono text-[11px] text-[#8e8e98] mt-8 pt-4 border-t border-[#242429]">
                   <span>Don't have an account?</span>{' '}
                   <button
                     type="button"
                     onClick={() => updateAuthMode('REGISTER')}
-                    className="text-[#1a1816] font-bold underline uppercase ml-1 cursor-pointer tracking-wider"
+                    className="text-[#f4f4f6] font-bold underline uppercase ml-1 cursor-pointer tracking-wider hover:text-[#c9a96e] transition-colors"
                   >
                     CREATE ACCOUNT
                   </button>
@@ -465,21 +468,21 @@ export const LoginView: React.FC<LoginViewProps> = ({
               <form onSubmit={handleRegister} className="flex flex-col justify-between h-full">
                 <div>
                   <div className="flex items-center gap-2 mb-3">
-                    <span className="w-6 h-[1px] bg-[#7b6e54]"></span>
-                    <span className="font-mono text-[10px] tracking-[0.2em] text-[#7b6e54] font-bold uppercase">
+                    <span className="w-6 h-[1px] bg-[#c9a96e]"></span>
+                    <span className="font-mono text-[10px] tracking-[0.2em] text-[#c9a96e] font-bold uppercase">
                       VAULT REGISTRY
                     </span>
                   </div>
 
-                  <h1 className="font-headline text-3xl sm:text-4xl text-[#1a1816] tracking-tight mb-2">
+                  <h1 className="font-headline text-3xl sm:text-4xl text-[#f4f4f6] tracking-tight mb-2">
                     Create Account
                   </h1>
-                  <p className="text-[13px] text-[#59544c] mb-6 font-sans">
+                  <p className="text-[13px] text-[#8e8e98] mb-6 font-sans">
                     Register for private allocations, drop access, and archival concierge.
                   </p>
 
                   <div className="mb-4">
-                    <label className="block mb-2 font-mono text-[10px] tracking-widest uppercase text-[#1a1816] font-bold">
+                    <label className="block mb-2 font-mono text-[10px] tracking-widest uppercase text-[#f4f4f6] font-bold">
                       FULL CLIENT NAME *
                     </label>
                     <input
@@ -488,12 +491,12 @@ export const LoginView: React.FC<LoginViewProps> = ({
                       value={name}
                       onChange={(e) => setName(e.target.value)}
                       placeholder="e.g. TANUJ DORUGADE"
-                      className="w-full bg-white border border-[#d5cdc0] px-4 py-3 text-[13px] text-[#1a1816] font-mono focus:outline-none focus:border-[#1a1816]"
+                      className="w-full bg-[#18181c] border border-[#242429] px-4 py-3 text-[13px] text-[#f4f4f6] font-mono placeholder:text-[#52525b] focus:outline-none focus:border-[#8e8e98] transition-colors"
                     />
                   </div>
 
                   <div className="mb-4">
-                    <label className="block mb-2 font-mono text-[10px] tracking-widest uppercase text-[#1a1816] font-bold">
+                    <label className="block mb-2 font-mono text-[10px] tracking-widest uppercase text-[#f4f4f6] font-bold">
                       EMAIL ADDRESS *
                     </label>
                     <input
@@ -502,12 +505,12 @@ export const LoginView: React.FC<LoginViewProps> = ({
                       value={email}
                       onChange={(e) => setEmail(e.target.value)}
                       placeholder="client@atelier.vanta"
-                      className="w-full bg-white border border-[#d5cdc0] px-4 py-3 text-[13px] text-[#1a1816] font-mono focus:outline-none focus:border-[#1a1816]"
+                      className="w-full bg-[#18181c] border border-[#242429] px-4 py-3 text-[13px] text-[#f4f4f6] font-mono placeholder:text-[#52525b] focus:outline-none focus:border-[#8e8e98] transition-colors"
                     />
                   </div>
 
                   <div className="mb-6">
-                    <label className="block mb-2 font-mono text-[10px] tracking-widest uppercase text-[#1a1816] font-bold">
+                    <label className="block mb-2 font-mono text-[10px] tracking-widest uppercase text-[#f4f4f6] font-bold">
                       INITIALIZE ENCRYPTED PASSWORD *
                     </label>
                     <input
@@ -517,26 +520,26 @@ export const LoginView: React.FC<LoginViewProps> = ({
                       value={password}
                       onChange={(e) => setPassword(e.target.value)}
                       placeholder="At least 8 characters"
-                      className="w-full bg-white border border-[#d5cdc0] px-4 py-3 text-[13px] text-[#1a1816] font-mono focus:outline-none focus:border-[#1a1816]"
+                      className="w-full bg-[#18181c] border border-[#242429] px-4 py-3 text-[13px] text-[#f4f4f6] font-mono placeholder:text-[#52525b] focus:outline-none focus:border-[#8e8e98] transition-colors"
                     />
                   </div>
 
                   <button
                     type="submit"
                     disabled={isSubmitting}
-                    className="w-full py-4 bg-[#141312] text-[#f5efe6] font-mono text-[12px] font-bold tracking-[0.2em] uppercase hover:bg-[#35322e] transition-all flex items-center justify-center gap-2 cursor-pointer shadow-sm"
+                    className="w-full py-4 bg-[#f4f4f6] text-[#09090b] font-mono text-[12px] font-bold tracking-[0.2em] uppercase hover:bg-[#c9a96e] transition-all flex items-center justify-center gap-2 cursor-pointer shadow-lg active:scale-[0.99]"
                   >
                     <span>{isSubmitting ? 'REGISTERING...' : 'INITIALIZE ACCOUNT'}</span>
                     <ArrowRight className="w-3.5 h-3.5" />
                   </button>
                 </div>
 
-                <div className="text-center font-mono text-[11px] text-[#59544c] mt-8 pt-4 border-t border-[#d5cdc0]">
+                <div className="text-center font-mono text-[11px] text-[#8e8e98] mt-8 pt-4 border-t border-[#242429]">
                   <span>Already verified?</span>{' '}
                   <button
                     type="button"
                     onClick={() => updateAuthMode('LOGIN')}
-                    className="text-[#1a1816] font-bold underline uppercase ml-1 cursor-pointer tracking-wider"
+                    className="text-[#f4f4f6] font-bold underline uppercase ml-1 cursor-pointer tracking-wider hover:text-[#c9a96e] transition-colors"
                   >
                     SIGN IN
                   </button>
@@ -549,21 +552,21 @@ export const LoginView: React.FC<LoginViewProps> = ({
               <form onSubmit={handleForgotPassword} className="flex flex-col justify-between h-full">
                 <div>
                   <div className="flex items-center gap-2 mb-3">
-                    <span className="w-6 h-[1px] bg-[#7b6e54]"></span>
-                    <span className="font-mono text-[10px] tracking-[0.2em] text-[#7b6e54] font-bold uppercase">
+                    <span className="w-6 h-[1px] bg-[#c9a96e]"></span>
+                    <span className="font-mono text-[10px] tracking-[0.2em] text-[#c9a96e] font-bold uppercase">
                       KEY RECOVERY PROTOCOL
                     </span>
                   </div>
 
-                  <h1 className="font-headline text-3xl sm:text-4xl text-[#1a1816] tracking-tight mb-2">
+                  <h1 className="font-headline text-3xl sm:text-4xl text-[#f4f4f6] tracking-tight mb-2">
                     Reset Password
                   </h1>
-                  <p className="text-[13px] text-[#59544c] mb-6 font-sans">
+                  <p className="text-[13px] text-[#8e8e98] mb-6 font-sans">
                     Enter your registered client email to receive a single-use authentication key.
                   </p>
 
                   <div className="mb-6">
-                    <label className="block mb-2 font-mono text-[10px] tracking-widest uppercase text-[#1a1816] font-bold">
+                    <label className="block mb-2 font-mono text-[10px] tracking-widest uppercase text-[#f4f4f6] font-bold">
                       VERIFIED CLIENT EMAIL *
                     </label>
                     <input
@@ -572,25 +575,25 @@ export const LoginView: React.FC<LoginViewProps> = ({
                       value={email}
                       onChange={(e) => setEmail(e.target.value)}
                       placeholder="Enter your email address"
-                      className="w-full bg-white border border-[#d5cdc0] px-4 py-3.5 text-[13px] text-[#1a1816] font-mono focus:outline-none focus:border-[#1a1816]"
+                      className="w-full bg-[#18181c] border border-[#242429] px-4 py-3.5 text-[13px] text-[#f4f4f6] font-mono placeholder:text-[#52525b] focus:outline-none focus:border-[#8e8e98] transition-colors"
                     />
                   </div>
 
                   <button
                     type="submit"
                     disabled={isSubmitting}
-                    className="w-full py-4 bg-[#141312] text-[#f5efe6] font-mono text-[12px] font-bold tracking-[0.2em] uppercase hover:bg-[#35322e] transition-all flex items-center justify-center gap-2 cursor-pointer shadow-sm"
+                    className="w-full py-4 bg-[#f4f4f6] text-[#09090b] font-mono text-[12px] font-bold tracking-[0.2em] uppercase hover:bg-[#c9a96e] transition-all flex items-center justify-center gap-2 cursor-pointer shadow-lg active:scale-[0.99]"
                   >
                     <span>{isSubmitting ? 'DISPATCHING...' : 'SEND RESET PROTOCOL'}</span>
                     <ArrowRight className="w-3.5 h-3.5" />
                   </button>
                 </div>
 
-                <div className="text-center font-mono text-[11px] text-[#59544c] mt-8 pt-4 border-t border-[#d5cdc0]">
+                <div className="text-center font-mono text-[11px] text-[#8e8e98] mt-8 pt-4 border-t border-[#242429]">
                   <button
                     type="button"
                     onClick={() => updateAuthMode('LOGIN')}
-                    className="text-[#1a1816] font-bold underline uppercase cursor-pointer tracking-wider"
+                    className="text-[#f4f4f6] font-bold underline uppercase cursor-pointer tracking-wider hover:text-[#c9a96e] transition-colors"
                   >
                     &larr; BACK TO SIGN IN
                   </button>
@@ -601,25 +604,25 @@ export const LoginView: React.FC<LoginViewProps> = ({
         </div>
       </main>
 
-      {/* Brutalist Footer Exactly as in Image */}
-      <footer className="w-full px-6 md:px-16 py-6 border-t border-[#d5cdc0] flex flex-col md:flex-row justify-between items-center gap-4 font-mono text-[10px] text-[#7b6e54] uppercase tracking-wider">
+      {/* Obsidian Footer */}
+      <footer className="w-full px-6 md:px-16 py-6 border-t border-[#242429] flex flex-col md:flex-row justify-between items-center gap-4 font-mono text-[10px] text-[#52525b] uppercase tracking-wider">
         <div>© 2025 VANTA CORDWAINING HOUSE // CIVITANOVA ATELIER. ALL RIGHTS RESERVED.</div>
         <div className="flex items-center gap-6">
           <button
             onClick={() => onShowToast('PRIVACY POLICY // ZERO METRIC EXFILTRATION')}
-            className="hover:text-[#1a1816] cursor-pointer"
+            className="hover:text-[#f4f4f6] cursor-pointer transition-colors"
           >
             PRIVACY POLICY
           </button>
           <button
             onClick={() => onShowToast('DISPATCH SPECIFICATION // ARMORED COURIER SERVICE')}
-            className="hover:text-[#1a1816] cursor-pointer"
+            className="hover:text-[#f4f4f6] cursor-pointer transition-colors"
           >
             TERMS OF DISPATCH
           </button>
           <button
             onClick={() => onShowToast('SECURITY PROTOCOL // SHA-256 ENCRYPTION NODE')}
-            className="hover:text-[#1a1816] cursor-pointer"
+            className="hover:text-[#f4f4f6] cursor-pointer transition-colors"
           >
             SECURITY SPEC
           </button>

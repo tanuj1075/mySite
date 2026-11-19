@@ -36,28 +36,28 @@ export const NotifyMeModal: React.FC<NotifyMeModalProps> = ({
 
   return (
     <div
-      className="fixed inset-0 z-50 bg-[#1a1816]/70 backdrop-blur-sm flex items-center justify-center p-4 overflow-y-auto font-mono"
+      className="fixed inset-0 z-50 bg-[#09090b]/80 backdrop-blur-md flex items-center justify-center p-4 overflow-y-auto font-mono"
       role="dialog"
       aria-modal="true"
     >
-      <div className="bg-[#f5efe6] border border-[#d5cdc0] max-w-md w-full p-6 sm:p-8 flex flex-col gap-5 shadow-2xl">
-        <div className="flex items-center justify-between border-b border-[#d5cdc0] pb-4">
+      <div className="bg-[#121215] border border-[#242429] max-w-md w-full p-6 sm:p-8 flex flex-col gap-5 shadow-2xl animate-fade-in">
+        <div className="flex items-center justify-between border-b border-[#242429] pb-4">
           <div className="flex items-center gap-2.5">
-            <div className="w-8 h-8 bg-[#141312] text-[#f5efe6] flex items-center justify-center">
+            <div className="w-8 h-8 bg-[#18181c] border border-[#242429] text-[#c9a96e] flex items-center justify-center">
               <Bell className="w-4 h-4" />
             </div>
             <div>
-              <span className="text-[12px] font-bold text-[#1a1816] uppercase tracking-wider block">
+              <span className="text-[12px] font-bold text-[#f4f4f6] uppercase tracking-wider block">
                 ALLOCATION RESTOCK NOTIFICATION
               </span>
-              <span className="text-[9px] text-[#7b6e54]">
+              <span className="text-[9px] text-[#c9a96e]">
                 PRIVATE ATELIER DISPATCH SYSTEM
               </span>
             </div>
           </div>
           <button
             onClick={onClose}
-            className="text-[#59544c] hover:text-[#1a1816] p-1 cursor-pointer transition-colors"
+            className="text-[#8e8e98] hover:text-[#f4f4f6] p-1 cursor-pointer transition-colors"
           >
             <X className="w-5 h-5" />
           </button>
@@ -65,25 +65,25 @@ export const NotifyMeModal: React.FC<NotifyMeModalProps> = ({
 
         {isSubmitted ? (
           <div className="py-8 text-center space-y-3">
-            <CheckCircle2 className="w-10 h-10 text-[#1a1816] mx-auto" />
-            <h4 className="text-sm font-bold uppercase text-[#1a1816]">
+            <CheckCircle2 className="w-10 h-10 text-[#c9a96e] mx-auto" />
+            <h4 className="text-sm font-bold uppercase text-[#f4f4f6]">
               PRIORITY NOTIFICATION SCHEDULED
             </h4>
-            <p className="text-xs text-[#59544c] max-w-xs mx-auto leading-relaxed">
-              We will send an immediate dispatch alert to <strong className="text-[#1a1816]">{contact}</strong> as soon as {productName} {size ? `(Size ${size})` : ''} restocks in the vault.
+            <p className="text-xs text-[#8e8e98] max-w-xs mx-auto leading-relaxed">
+              We will send an immediate dispatch alert to <strong className="text-[#f4f4f6]">{contact}</strong> as soon as {productName} {size ? `(Size ${size})` : ''} restocks in the vault.
             </p>
           </div>
         ) : (
           <form onSubmit={handleSubmit} className="space-y-4 text-[11px]">
-            <div className="bg-[#ede7dd] border border-[#d5cdc0] p-4 space-y-1.5">
-              <div className="text-[10px] text-[#7b6e54] font-bold uppercase">
+            <div className="bg-[#18181c] border border-[#242429] p-4 space-y-1.5">
+              <div className="text-[10px] text-[#c9a96e] font-bold uppercase">
                 TARGET SPECIMEN
               </div>
-              <div className="font-bold text-sm text-[#1a1816] uppercase">{productName}</div>
-              <div className="text-[10px] text-[#59544c]">
+              <div className="font-bold text-sm text-[#f4f4f6] uppercase">{productName}</div>
+              <div className="text-[10px] text-[#8e8e98]">
                 {color && <span>COLOR: {color} • </span>}
                 {size ? (
-                  <span className="font-bold text-[#b83b3b]">
+                  <span className="font-bold text-[#ef4444]">
                     SIZE {size} — CURRENTLY OUT OF STOCK
                   </span>
                 ) : (
@@ -93,7 +93,7 @@ export const NotifyMeModal: React.FC<NotifyMeModalProps> = ({
             </div>
 
             <div className="space-y-1.5">
-              <label className="text-[#1a1816] font-bold uppercase block">
+              <label className="text-[#f4f4f6] font-bold uppercase block">
                 ENTER EMAIL OR MOBILE NUMBER:
               </label>
               <input
@@ -102,24 +102,24 @@ export const NotifyMeModal: React.FC<NotifyMeModalProps> = ({
                 placeholder="email@domain.com or +1 (555) 000-0000"
                 value={contact}
                 onChange={(e) => setContact(e.target.value)}
-                className="w-full bg-[#ede7dd] border border-[#d5cdc0] px-3.5 py-2.5 text-[#1a1816] focus:outline-none focus:border-[#1a1816]"
+                className="w-full bg-[#18181c] border border-[#242429] px-3.5 py-2.5 text-[#f4f4f6] focus:outline-none focus:border-[#c9a96e]"
               />
-              <p className="text-[10px] text-[#59544c]">
+              <p className="text-[10px] text-[#8e8e98]">
                 You will receive a single private notification when vault inventory is unlocked.
               </p>
             </div>
 
-            <div className="flex gap-3 pt-3 border-t border-[#d5cdc0]">
+            <div className="flex gap-3 pt-3 border-t border-[#242429]">
               <button
                 type="button"
                 onClick={onClose}
-                className="w-1/2 py-2.5 border border-[#d5cdc0] text-[#59544c] hover:bg-[#ede7dd] uppercase tracking-wider font-bold transition-colors cursor-pointer"
+                className="w-1/2 py-2.5 border border-[#242429] text-[#8e8e98] hover:text-[#f4f4f6] hover:border-[#3a3a42] uppercase tracking-wider font-bold transition-colors cursor-pointer"
               >
                 CANCEL
               </button>
               <button
                 type="submit"
-                className="w-1/2 py-2.5 bg-[#141312] text-[#f5efe6] font-bold uppercase tracking-wider hover:bg-[#35322e] transition-colors cursor-pointer"
+                className="w-1/2 py-2.5 bg-[#f4f4f6] text-[#09090b] font-bold uppercase tracking-wider hover:bg-[#c9a96e] transition-colors cursor-pointer"
               >
                 NOTIFY ME
               </button>

@@ -127,20 +127,20 @@ export const CheckoutProtocol: React.FC<CheckoutProtocolProps> = ({
   return (
     <section className="flex flex-col gap-6" id="checkout-protocol-section">
       {/* Primary Checkout Protocol Container */}
-      <div className="bg-[#f5efe6] border border-[#d5cdc0] p-6 md:p-8 flex flex-col gap-8 shadow-sm">
+      <div className="bg-[#121215] border border-[#242429] p-6 md:p-8 flex flex-col gap-8 shadow-2xl">
         {/* Stepper Index Header */}
         <div className="flex flex-col gap-3">
           <div className="flex justify-between items-center">
-            <span className="font-mono text-[11px] font-bold text-[#7b6e54] uppercase tracking-wider">
+            <span className="font-mono text-[11px] font-bold text-[#c9a96e] uppercase tracking-wider">
               CHECKOUT PROTOCOL
             </span>
-            <span className="font-mono text-[10px] text-[#1a1816] tracking-widest font-bold">
+            <span className="font-mono text-[10px] text-[#f4f4f6] tracking-widest font-bold">
               STEP 0{currentStep} OF 05
             </span>
           </div>
 
           {/* Stepper Progress Segments */}
-          <div className="grid grid-cols-5 gap-1.5 w-full h-1 bg-[#ded6c8]">
+          <div className="grid grid-cols-5 gap-1.5 w-full h-1 bg-[#18181c]">
             {CHECKOUT_STEPS.map((step) => {
               const isPassedOrActive = step.id <= currentStep;
               return (
@@ -148,7 +148,7 @@ export const CheckoutProtocol: React.FC<CheckoutProtocolProps> = ({
                   key={step.id}
                   onClick={() => setCurrentStep(step.id)}
                   className={`h-full transition-all duration-300 cursor-pointer ${
-                    isPassedOrActive ? 'bg-[#1a1816]' : 'bg-[#ded6c8] hover:bg-[#b8ad9c]'
+                    isPassedOrActive ? 'bg-[#f4f4f6]' : 'bg-[#18181c] hover:bg-[#242429]'
                   }`}
                   aria-label={`Go to step ${step.id}: ${step.label}`}
                   title={`Step ${step.id}: ${step.label}`}
@@ -158,7 +158,7 @@ export const CheckoutProtocol: React.FC<CheckoutProtocolProps> = ({
           </div>
 
           {/* Stepper Labels */}
-          <div className="flex justify-between font-mono text-[9px] uppercase tracking-wider text-[#59544c] pt-1 select-none">
+          <div className="flex justify-between font-mono text-[9px] uppercase tracking-wider text-[#8e8e98] pt-1 select-none">
             {CHECKOUT_STEPS.map((step) => {
               const isActive = step.id === currentStep;
               const isPast = step.id < currentStep;
@@ -168,10 +168,10 @@ export const CheckoutProtocol: React.FC<CheckoutProtocolProps> = ({
                   onClick={() => setCurrentStep(step.id)}
                   className={`cursor-pointer transition-colors text-left ${
                     isActive
-                      ? 'text-[#1a1816] font-bold underline underline-offset-2'
+                      ? 'text-[#f4f4f6] font-bold underline underline-offset-2'
                       : isPast
-                      ? 'text-[#1a1816]'
-                      : 'text-[#8e8474] hover:text-[#59544c]'
+                      ? 'text-[#c9a96e]'
+                      : 'text-[#52525b] hover:text-[#8e8e98]'
                   }`}
                 >
                   {step.id}. {step.label}
@@ -182,32 +182,32 @@ export const CheckoutProtocol: React.FC<CheckoutProtocolProps> = ({
         </div>
 
         {/* Active Stage Indicator */}
-        <div className="bg-[#ede7dd] border border-[#d5cdc0] p-4 flex items-center justify-between">
+        <div className="bg-[#18181c] border border-[#242429] p-4 flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <span className="w-2 h-2 bg-[#1a1816]"></span>
-            <span className="font-mono text-[11px] font-bold text-[#1a1816] uppercase tracking-wider">
+            <span className="w-2 h-2 bg-[#c9a96e]"></span>
+            <span className="font-mono text-[11px] font-bold text-[#f4f4f6] uppercase tracking-wider">
               {currentStepObj.fullLabel}
             </span>
           </div>
-          <span className="font-mono text-[10px] text-[#7b6e54] font-bold uppercase tracking-widest">
+          <span className="font-mono text-[10px] text-[#c9a96e] font-bold uppercase tracking-widest">
             SECURE SESSION
           </span>
         </div>
 
         {/* STEP 1: AUTH (if navigated to) */}
         {currentStep === 1 && (
-          <div className="bg-[#ede7dd] border border-[#d5cdc0] p-5 flex flex-col gap-3 font-mono text-xs">
+          <div className="bg-[#18181c] border border-[#242429] p-5 flex flex-col gap-3 font-mono text-xs">
             <div className="flex items-center justify-between">
-              <span className="text-[#59544c] uppercase">VERIFIED IDENTITY</span>
-              <span className="text-[#1a1816] font-bold">CLIENT #0084</span>
+              <span className="text-[#8e8e98] uppercase">VERIFIED IDENTITY</span>
+              <span className="text-[#f4f4f6] font-bold">CLIENT SESSION</span>
             </div>
-            <div className="text-[#1a1816]">ARCHIVE VIP PRIVILEGE LEVEL: ALPHA</div>
-            <p className="text-[#59544c] text-[11px]">
+            <div className="text-[#f4f4f6]">ARCHIVE VIP PRIVILEGE LEVEL: ALPHA</div>
+            <p className="text-[#8e8e98] text-[11px]">
               Session token verified via dual biometric vault authentication.
             </p>
             <button
               onClick={() => setCurrentStep(2)}
-              className="mt-2 py-2.5 bg-[#e4ddcf] border border-[#d5cdc0] text-[#1a1816] hover:bg-[#ded6c9] text-[10px] font-bold uppercase tracking-widest cursor-pointer"
+              className="mt-2 py-2.5 bg-[#121215] border border-[#242429] text-[#f4f4f6] hover:border-[#8e8e98] text-[10px] font-bold uppercase tracking-widest cursor-pointer transition-colors"
             >
               PROCEED TO DISPATCH LOCATION →
             </button>
@@ -217,10 +217,10 @@ export const CheckoutProtocol: React.FC<CheckoutProtocolProps> = ({
         {/* STEP 2: DISPATCH LOCATION */}
         <div className="flex flex-col gap-4" id="address-selection-block">
           <div className="flex items-center justify-between">
-            <span className="font-mono text-[10px] text-[#7b6e54] uppercase tracking-[0.14em] font-bold">
+            <span className="font-mono text-[10px] text-[#c9a96e] uppercase tracking-[0.14em] font-bold">
               SELECT REGISTERED DESTINATION
             </span>
-            <span className="font-mono text-[9px] text-[#59544c]">
+            <span className="font-mono text-[9px] text-[#8e8e98]">
               {addresses.length} VAULTS REGISTERED
             </span>
           </div>
@@ -235,8 +235,8 @@ export const CheckoutProtocol: React.FC<CheckoutProtocolProps> = ({
                   onClick={() => onSelectAddress(addr.id)}
                   className={`cursor-pointer p-4 flex items-start gap-4 transition-all duration-200 border ${
                     isSelected
-                      ? 'bg-[#ede7dd] border-[#1a1816] shadow-sm'
-                      : 'bg-[#f5efe6] border-[#d5cdc0] hover:bg-[#ede7dd] hover:border-[#8e8474]'
+                      ? 'bg-[#1e1e24] border-[#f4f4f6] shadow-md'
+                      : 'bg-[#18181c] border-[#242429] hover:bg-[#1e1e24] hover:border-[#3a3a42]'
                   }`}
                 >
                   <input
@@ -244,20 +244,20 @@ export const CheckoutProtocol: React.FC<CheckoutProtocolProps> = ({
                     name="address_selection"
                     checked={isSelected}
                     onChange={() => onSelectAddress(addr.id)}
-                    className="mt-1 accent-[#1a1816] cursor-pointer"
+                    className="mt-1 accent-[#c9a96e] cursor-pointer"
                   />
                   <div className="flex flex-col w-full">
                     <div className="flex items-center justify-between w-full">
-                      <span className="font-mono text-[11px] font-bold text-[#1a1816] uppercase tracking-wider">
+                      <span className="font-mono text-[11px] font-bold text-[#f4f4f6] uppercase tracking-wider">
                         {addr.name}
                       </span>
                       {addr.isPrimary && (
-                        <span className="font-mono text-[9px] font-bold bg-[#1a1816] text-[#ede7dd] px-1.5 py-0.5 tracking-widest">
+                        <span className="font-mono text-[9px] font-bold bg-[#c9a96e] text-[#09090b] px-1.5 py-0.5 tracking-widest">
                           PRIMARY
                         </span>
                       )}
                     </div>
-                    <p className="font-mono text-[12px] leading-5 text-[#59544c] mt-2">
+                    <p className="font-mono text-[12px] leading-5 text-[#8e8e98] mt-2">
                       {addr.line1}
                       {addr.line2 && (
                         <>
@@ -270,7 +270,7 @@ export const CheckoutProtocol: React.FC<CheckoutProtocolProps> = ({
                       {addr.postalCode}, {addr.country}
                     </p>
                     {addr.phone && (
-                      <div className="flex items-center gap-2 mt-3 font-mono text-[10px] text-[#7b6e54]">
+                      <div className="flex items-center gap-2 mt-3 font-mono text-[10px] text-[#c9a96e]">
                         <Phone className="w-3 h-3" />
                         <span>{addr.phone}</span>
                       </div>
@@ -285,40 +285,40 @@ export const CheckoutProtocol: React.FC<CheckoutProtocolProps> = ({
           <button
             type="button"
             onClick={onOpenNewAddressModal}
-            className="flex items-center justify-center gap-2 py-3 bg-[#ede7dd] border border-[#d5cdc0] text-[#1a1816] hover:bg-[#ded6c9] hover:border-[#1a1816] transition-colors font-mono text-[11px] font-bold uppercase tracking-wider cursor-pointer"
+            className="flex items-center justify-center gap-2 py-3 bg-[#18181c] border border-[#242429] text-[#f4f4f6] hover:bg-[#1e1e24] hover:border-[#8e8e98] transition-colors font-mono text-[11px] font-bold uppercase tracking-wider cursor-pointer"
           >
-            <Plus className="w-4 h-4 text-[#1a1816]" />
+            <Plus className="w-4 h-4 text-[#c9a96e]" />
             ENTER NEW DISPATCH DESTINATION
           </button>
 
           {/* Delivery Estimate Banner */}
           {isDeliveryLoading && (
-            <div className="bg-[#ede7dd] border border-[#d5cdc0] p-3 flex items-center gap-3 font-mono text-[10px] text-[#59544c]">
-              <Truck className="w-4 h-4 text-[#7b6e54] shrink-0 animate-pulse" />
+            <div className="bg-[#18181c] border border-[#242429] p-3 flex items-center gap-3 font-mono text-[10px] text-[#8e8e98]">
+              <Truck className="w-4 h-4 text-[#c9a96e] shrink-0 animate-pulse" />
               <span>ESTIMATING DELIVERY...</span>
             </div>
           )}
           {deliveryError && (
-            <div className="bg-[#ede7dd] border border-[#d5cdc0] p-3 font-mono text-[10px] text-red-800" role="alert">
+            <div className="bg-[#18181c] border border-red-900/50 p-3 font-mono text-[10px] text-red-400" role="alert">
               ⚠ {deliveryError}
             </div>
           )}
           {deliveryEstimate && !isDeliveryLoading && (
-            <div className="bg-[#ede7dd] border border-[#1a1816] p-3 flex items-start gap-3">
-              <Truck className="w-4 h-4 text-[#1a1816] shrink-0 mt-0.5" />
+            <div className="bg-[#18181c] border border-[#3a3a42] p-3 flex items-start gap-3">
+              <Truck className="w-4 h-4 text-[#c9a96e] shrink-0 mt-0.5" />
               <div className="flex flex-col gap-0.5">
-                <span className="font-mono text-[9px] font-bold text-[#7b6e54] uppercase tracking-widest">ESTIMATED ARRIVAL</span>
-                <span className="font-mono text-[12px] font-bold text-[#1a1816]">
+                <span className="font-mono text-[9px] font-bold text-[#c9a96e] uppercase tracking-widest">ESTIMATED ARRIVAL</span>
+                <span className="font-mono text-[12px] font-bold text-[#f4f4f6]">
                   {new Date(deliveryEstimate.minDate).toLocaleDateString('en-GB', { weekday: 'short', day: 'numeric', month: 'short' })}
                   {' – '}
                   {new Date(deliveryEstimate.maxDate).toLocaleDateString('en-GB', { weekday: 'short', day: 'numeric', month: 'short', year: 'numeric' })}
                   {' '}
-                  <span className="font-normal text-[#59544c]">({deliveryEstimate.minDays}–{deliveryEstimate.maxDays} business days)</span>
+                  <span className="font-normal text-[#8e8e98]">({deliveryEstimate.minDays}–{deliveryEstimate.maxDays} business days)</span>
                 </span>
                 {addresses.find((a) => a.id === selectedAddressId) && (() => {
                   const addr = addresses.find((a) => a.id === selectedAddressId)!;
                   return (
-                    <span className="font-mono text-[10px] text-[#59544c]">
+                    <span className="font-mono text-[10px] text-[#8e8e98]">
                       Delivering to {addr.city}{addr.state ? `, ${addr.state}` : ''} {addr.postalCode}
                     </span>
                   );
@@ -327,9 +327,9 @@ export const CheckoutProtocol: React.FC<CheckoutProtocolProps> = ({
             </div>
           )}
           {!deliveryEstimate && !isDeliveryLoading && !deliveryError && (
-            <div className="bg-[#ede7dd] border border-[#d5cdc0] p-3 flex items-center gap-3">
-              <ShieldCheck className="w-4 h-4 text-[#7b6e54] shrink-0" />
-              <span className="font-mono text-[10px] leading-tight text-[#1a1816]">
+            <div className="bg-[#18181c] border border-[#242429] p-3 flex items-center gap-3">
+              <ShieldCheck className="w-4 h-4 text-[#c9a96e] shrink-0" />
+              <span className="font-mono text-[10px] leading-tight text-[#8e8e98]">
                 Select a delivery address to see estimated arrival.
               </span>
             </div>
@@ -338,7 +338,7 @@ export const CheckoutProtocol: React.FC<CheckoutProtocolProps> = ({
 
         {/* STEP 3 & 4: SETTLEMENT METHOD SELECTOR */}
         <div className="flex flex-col gap-3" id="settlement-methods-block">
-          <span className="font-mono text-[10px] text-[#7b6e54] uppercase tracking-[0.14em] font-bold">
+          <span className="font-mono text-[10px] text-[#c9a96e] uppercase tracking-[0.14em] font-bold">
             SETTLEMENT METHOD
           </span>
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
@@ -357,24 +357,24 @@ export const CheckoutProtocol: React.FC<CheckoutProtocolProps> = ({
                   onClick={() => setPaymentMethod(method.id)}
                   className={`p-3 border flex flex-col items-center justify-center gap-2 transition-all cursor-pointer ${
                     isActive
-                      ? 'bg-[#1a1816] border-[#1a1816] text-[#ede7dd]'
-                      : 'bg-[#ede7dd] border-[#d5cdc0] hover:bg-[#ded6c9] text-[#59544c] hover:text-[#1a1816]'
+                      ? 'bg-[#f4f4f6] border-[#f4f4f6] text-[#09090b]'
+                      : 'bg-[#18181c] border-[#242429] hover:bg-[#1e1e24] text-[#8e8e98] hover:text-[#f4f4f6]'
                   }`}
                 >
                   <Icon
                     className={`w-5 h-5 ${
-                      isActive ? 'text-[#ede7dd]' : 'text-[#59544c]'
+                      isActive ? 'text-[#09090b]' : 'text-[#8e8e98]'
                     }`}
                   />
                   <span
                     className={`font-mono text-[10px] uppercase font-bold tracking-wider ${
-                      isActive ? 'text-[#ede7dd]' : 'text-[#59544c]'
+                      isActive ? 'text-[#09090b]' : 'text-[#f4f4f6]'
                     }`}
                   >
                     {method.label}
                   </span>
                   <span className={`font-mono text-[8px] tracking-wide ${
-                    isActive ? 'text-[#ede7dd]' : 'text-[#59544c]'
+                    isActive ? 'text-[#09090b]' : 'text-[#52525b]'
                   }`}>
                     {method.detail}
                   </span>
@@ -384,11 +384,11 @@ export const CheckoutProtocol: React.FC<CheckoutProtocolProps> = ({
           </div>
         </div>
 
-        <div className="bg-[#ede7dd] border border-[#d5cdc0] p-4 flex flex-col gap-2 font-mono text-xs">
-          <span className="text-[#7b6e54] text-[10px] uppercase font-bold">
+        <div className="bg-[#18181c] border border-[#242429] p-4 flex flex-col gap-2 font-mono text-xs">
+          <span className="text-[#c9a96e] text-[10px] uppercase font-bold">
             {paymentMethod === 'UPI' ? 'GENUINE UPI DIRECT DISPATCH // NPCI 0% MDR' : 'CASH ON DELIVERY'}
           </span>
-          <p className="text-[#1a1816] text-[11px]">
+          <p className="text-[#8e8e98] text-[11px]">
             {paymentMethod === 'UPI'
               ? 'Scan dynamic UPI QR or authorize via Google Pay, PhonePe, Paytm, or BHIM UPI. Payments are cryptographically verified by the server.'
               : 'Pay the delivery agent when your order arrives.'}
@@ -398,57 +398,57 @@ export const CheckoutProtocol: React.FC<CheckoutProtocolProps> = ({
         {/* FINANCIAL LEDGER / COST BREAKDOWN */}
         <div
           id="financial-ledger-breakdown"
-          className="bg-[#ede7dd] border border-[#d5cdc0] p-5 flex flex-col gap-3 font-mono text-[11px]"
+          className="bg-[#18181c] border border-[#242429] p-5 flex flex-col gap-3 font-mono text-[11px]"
         >
-          <div className="flex justify-between text-[#59544c]">
+          <div className="flex justify-between text-[#8e8e98]">
             <span className="tracking-wider">MERCHANDISE SUB-TOTAL</span>
-            <span className="text-[#1a1816] font-bold">
+            <span className="text-[#f4f4f6] font-bold">
               {formatCurrency(displayedSubtotal, currency)}
             </span>
           </div>
-          <div className="flex justify-between text-[#59544c]">
+          <div className="flex justify-between text-[#8e8e98]">
             <span className="tracking-wider">PRIORITY ARMORED FREIGHT</span>
-            <span className="text-[#7b6e54] font-bold">COMPLIMENTARY ({formatCurrency(0, currency)})</span>
+            <span className="text-[#c9a96e] font-bold">COMPLIMENTARY ({formatCurrency(0, currency)})</span>
           </div>
-          <div className="flex justify-between text-[#59544c]">
+          <div className="flex justify-between text-[#8e8e98]">
             <span className="tracking-wider">PRODUCT TAX</span>
-            <span className="text-[#1a1816]">INCLUDED IN LISTED PRICES</span>
+            <span className="text-[#f4f4f6]">INCLUDED IN LISTED PRICES</span>
           </div>
-          <div className="flex justify-between text-[#59544c]">
+          <div className="flex justify-between text-[#8e8e98]">
             <span className="tracking-wider">IMPORT DUTIES</span>
-            <span className="text-[#1a1816]">MAY BE DUE AT DESTINATION</span>
+            <span className="text-[#f4f4f6]">MAY BE DUE AT DESTINATION</span>
           </div>
 
           {/* Total Settlement Box */}
-          <div className="pt-4 mt-2 bg-[#e4ddcf] border border-[#d5cdc0] p-4 flex justify-between items-center">
+          <div className="pt-4 mt-2 bg-[#121215] border border-[#3a3a42] p-4 flex justify-between items-center">
             <div>
-              <span className="font-mono text-[11px] font-bold text-[#1a1816] uppercase block tracking-wider">
+              <span className="font-mono text-[11px] font-bold text-[#f4f4f6] uppercase block tracking-wider">
                 TOTAL SETTLEMENT
               </span>
-              <span className="font-mono text-[9px] text-[#59544c] tracking-wider">
+              <span className="font-mono text-[9px] text-[#8e8e98] tracking-wider">
                 TAX INCLUDED // IMPORT DUTIES MAY APPLY
               </span>
             </div>
             <span
               id="total-settlement-price"
-              className="font-headline text-[24px] md:text-[28px] text-[#1a1816] font-bold tracking-tight"
+              className="font-headline text-[24px] md:text-[28px] text-[#f4f4f6] font-bold tracking-tight"
             >
               {formatCurrency(totalSettlement, currency)}
             </span>
           </div>
           {isQuoteLoading && (
-            <p className="text-[10px] text-[#59544c]" role="status">LOADING COUNTRY CURRENCY QUOTE...</p>
+            <p className="text-[10px] text-[#8e8e98]" role="status">LOADING COUNTRY CURRENCY QUOTE...</p>
           )}
           {quoteError && (
-            <p className="text-[10px] text-red-800" role="alert">{quoteError}</p>
+            <p className="text-[10px] text-red-400" role="alert">{quoteError}</p>
           )}
           {paymentQuote && currency !== 'INR' && (
-            <p className="text-[10px] text-[#59544c]">
+            <p className="text-[10px] text-[#8e8e98]">
               Indicative exchange rate: 1 INR = {exchangeRate.toPrecision(5)} {currency}. Final amount is fixed when the order is created.
             </p>
           )}
           {paymentQuote && currency === 'INR' && (
-            <p className="text-[10px] text-[#59544c]">India shipping address // tax included in listed product prices.</p>
+            <p className="text-[10px] text-[#8e8e98]">India shipping address // tax included in listed product prices.</p>
           )}
         </div>
 
@@ -459,7 +459,7 @@ export const CheckoutProtocol: React.FC<CheckoutProtocolProps> = ({
             id="submit-order-btn"
             disabled={isOrderSubmitting || subtotal <= 0 || (authApi.hasSession() && (!paymentQuote || isQuoteLoading || Boolean(quoteError)))}
             onClick={() => onPlaceOrder(paymentMethod)}
-            className="w-full py-5 bg-[#141312] text-[#f5efe6] font-mono text-[12px] font-bold uppercase tracking-[0.2em] hover:bg-[#35322e] transition-all flex items-center justify-center gap-3 shadow-md active:scale-[0.99] cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed"
+            className="w-full py-5 bg-[#f4f4f6] text-[#09090b] font-mono text-[12px] font-bold uppercase tracking-[0.2em] hover:bg-[#c9a96e] transition-all flex items-center justify-center gap-3 shadow-lg active:scale-[0.99] cursor-pointer disabled:opacity-30 disabled:cursor-not-allowed"
           >
             {isOrderSubmitting ? (
               <span className="flex items-center gap-2">
@@ -474,8 +474,8 @@ export const CheckoutProtocol: React.FC<CheckoutProtocolProps> = ({
             )}
           </button>
 
-          <div className="flex items-center justify-center gap-2 text-center font-mono text-[10px] text-[#59544c] tracking-wider">
-            <Lock className="w-3.5 h-3.5 text-[#7b6e54]" />
+          <div className="flex items-center justify-center gap-2 text-center font-mono text-[10px] text-[#8e8e98] tracking-wider">
+            <Lock className="w-3.5 h-3.5 text-[#c9a96e]" />
             <span>TOKENIZED CRYPTOGRAPHIC PAYMENT CONFIRMATION</span>
           </div>
         </div>
@@ -484,16 +484,16 @@ export const CheckoutProtocol: React.FC<CheckoutProtocolProps> = ({
       {/* Return Guarantee Module */}
       <div
         id="return-guarantee-module"
-        className="bg-[#e4ddcf] border border-[#d5cdc0] p-5 flex items-center gap-4"
+        className="bg-[#121215] border border-[#242429] p-5 flex items-center gap-4"
       >
-        <div className="w-9 h-9 bg-[#ede7dd] border border-[#d5cdc0] flex items-center justify-center shrink-0">
-          <ShieldCheck className="w-5 h-5 text-[#7b6e54]" />
+        <div className="w-9 h-9 bg-[#18181c] border border-[#242429] flex items-center justify-center shrink-0">
+          <ShieldCheck className="w-5 h-5 text-[#c9a96e]" />
         </div>
         <div className="flex flex-col">
-          <span className="font-mono text-[11px] font-bold text-[#1a1816] uppercase tracking-wider">
+          <span className="font-mono text-[11px] font-bold text-[#f4f4f6] uppercase tracking-wider">
             CONCIERGE COMPLIMENTARY RETURN
           </span>
-          <span className="font-mono text-[11px] text-[#59544c] mt-0.5 leading-relaxed">
+          <span className="font-mono text-[11px] text-[#8e8e98] mt-0.5 leading-relaxed">
             14-day archival inspection period. Courier collection arranged at your convenience.
           </span>
         </div>

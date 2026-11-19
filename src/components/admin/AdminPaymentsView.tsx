@@ -216,7 +216,7 @@ export const AdminPaymentsView: React.FC<AdminPaymentsViewProps> = ({ onShowToas
         );
       default:
         return (
-          <span className="inline-flex items-center px-2 py-0.5 bg-[#e4ddcf] text-[#1a1816] font-mono text-[10px]">
+          <span className="inline-flex items-center px-2 py-0.5 bg-[#1e1e24] text-[#f4f4f6] font-mono text-[10px]">
             {status}
           </span>
         );
@@ -226,18 +226,18 @@ export const AdminPaymentsView: React.FC<AdminPaymentsViewProps> = ({ onShowToas
   return (
     <div className="p-6 md:p-8 flex flex-col gap-6 max-w-7xl mx-auto font-mono">
       {/* Top Section Header */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-[#d5cdc0] pb-6">
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-[#242429] pb-6">
         <div>
           <div className="flex items-center gap-2">
-            <span className="w-2.5 h-2.5 bg-[#1a1816]"></span>
-            <span className="font-mono text-[10px] font-bold text-[#7b6e54] uppercase tracking-widest">
+            <span className="w-2.5 h-2.5 bg-[#f4f4f6]"></span>
+            <span className="font-mono text-[10px] font-bold text-[#c9a96e] uppercase tracking-widest">
               FINANCIAL AUDIT ENGINE // COMMERCE ENCLAVE
             </span>
           </div>
-          <h1 className="font-headline text-2xl md:text-3xl font-bold text-[#1a1816] tracking-tight mt-1">
+          <h1 className="font-headline text-2xl md:text-3xl font-bold text-[#f4f4f6] tracking-tight mt-1">
             UPI PAYMENT GATEWAY &amp; AUDIT TRAIL
           </h1>
-          <p className="text-xs text-[#59544c] mt-1">
+          <p className="text-xs text-[#8e8e98] mt-1">
             Permanent transaction ledger, cryptographic provider webhook verification, and automated background reconciliation.
           </p>
         </div>
@@ -247,7 +247,7 @@ export const AdminPaymentsView: React.FC<AdminPaymentsViewProps> = ({ onShowToas
           <button
             onClick={handleRunReconciliation}
             disabled={isReconciling}
-            className="py-2.5 px-4 bg-[#ede7dd] border border-[#d5cdc0] text-[#1a1816] hover:bg-[#ded6c9] transition-colors text-[11px] font-bold uppercase tracking-wider flex items-center gap-2 cursor-pointer disabled:opacity-50"
+            className="py-2.5 px-4 bg-[#121215] border border-[#242429] text-[#f4f4f6] hover:bg-[#242429] transition-colors text-[11px] font-bold uppercase tracking-wider flex items-center gap-2 cursor-pointer disabled:opacity-50"
           >
             <RefreshCw className={`w-3.5 h-3.5 ${isReconciling ? 'animate-spin' : ''}`} />
             <span>{isReconciling ? 'RECONCILING...' : 'RUN WORKER PASS'}</span>
@@ -257,7 +257,7 @@ export const AdminPaymentsView: React.FC<AdminPaymentsViewProps> = ({ onShowToas
             href={adminApi.getPaymentsCsvExportUrl()}
             target="_blank"
             rel="noopener noreferrer"
-            className="py-2.5 px-4 bg-[#1a1816] text-[#ede7dd] hover:bg-[#35322e] transition-colors text-[11px] font-bold uppercase tracking-wider flex items-center gap-2 cursor-pointer shadow-sm"
+            className="py-2.5 px-4 bg-[#f4f4f6] text-[#121215] hover:bg-[#35322e] transition-colors text-[11px] font-bold uppercase tracking-wider flex items-center gap-2 cursor-pointer shadow-sm"
           >
             <Download className="w-3.5 h-3.5" />
             <span>EXPORT CSV</span>
@@ -267,18 +267,18 @@ export const AdminPaymentsView: React.FC<AdminPaymentsViewProps> = ({ onShowToas
 
       {/* KPI Overview Metric Cards */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-        <div className="bg-[#ede7dd] border border-[#d5cdc0] p-4 flex flex-col gap-1">
-          <span className="text-[10px] font-bold text-[#7b6e54] uppercase tracking-wider">
+        <div className="bg-[#121215] border border-[#242429] p-4 flex flex-col gap-1">
+          <span className="text-[10px] font-bold text-[#c9a96e] uppercase tracking-wider">
             TOTAL SETTLEMENTS
           </span>
-          <span className="font-headline text-2xl font-bold text-[#1a1816]">
+          <span className="font-headline text-2xl font-bold text-[#f4f4f6]">
             {totalCount}
           </span>
-          <span className="text-[9px] text-[#59544c]">LIFETIME ATTEMPTS</span>
+          <span className="text-[9px] text-[#8e8e98]">LIFETIME ATTEMPTS</span>
         </div>
 
-        <div className="bg-[#ede7dd] border border-[#d5cdc0] p-4 flex flex-col gap-1">
-          <span className="text-[10px] font-bold text-[#7b6e54] uppercase tracking-wider">
+        <div className="bg-[#121215] border border-[#242429] p-4 flex flex-col gap-1">
+          <span className="text-[10px] font-bold text-[#c9a96e] uppercase tracking-wider">
             VERIFIED VOLUME
           </span>
           <span className="font-headline text-2xl font-bold text-[#16a34a]">
@@ -289,43 +289,43 @@ export const AdminPaymentsView: React.FC<AdminPaymentsViewProps> = ({ onShowToas
               'INR'
             )}
           </span>
-          <span className="text-[9px] text-[#59544c]">PAGE SETTLED VALUE</span>
+          <span className="text-[9px] text-[#8e8e98]">PAGE SETTLED VALUE</span>
         </div>
 
-        <div className="bg-[#ede7dd] border border-[#d5cdc0] p-4 flex flex-col gap-1">
-          <span className="text-[10px] font-bold text-[#7b6e54] uppercase tracking-wider">
+        <div className="bg-[#121215] border border-[#242429] p-4 flex flex-col gap-1">
+          <span className="text-[10px] font-bold text-[#c9a96e] uppercase tracking-wider">
             GATEWAY PROTOCOL
           </span>
-          <span className="font-headline text-xl font-bold text-[#1a1816]">
+          <span className="font-headline text-xl font-bold text-[#f4f4f6]">
             CASHFREE UPI
           </span>
-          <span className="text-[9px] text-[#59544c]">NPCI 0% MDR // DYNAMIC QR</span>
+          <span className="text-[9px] text-[#8e8e98]">NPCI 0% MDR // DYNAMIC QR</span>
         </div>
 
-        <div className="bg-[#ede7dd] border border-[#d5cdc0] p-4 flex flex-col gap-1">
-          <span className="text-[10px] font-bold text-[#7b6e54] uppercase tracking-wider">
+        <div className="bg-[#121215] border border-[#242429] p-4 flex flex-col gap-1">
+          <span className="text-[10px] font-bold text-[#c9a96e] uppercase tracking-wider">
             SIGNATURE METHOD
           </span>
-          <span className="font-headline text-lg font-bold text-[#1a1816]">
+          <span className="font-headline text-lg font-bold text-[#f4f4f6]">
             HMAC-SHA256
           </span>
-          <span className="text-[9px] text-[#59544c]">TIMESTAMP REPLAY SHIELD</span>
+          <span className="text-[9px] text-[#8e8e98]">TIMESTAMP REPLAY SHIELD</span>
         </div>
       </div>
 
       {/* Filter and Search Bar */}
-      <div className="flex flex-col sm:flex-row gap-3 items-stretch justify-between bg-[#ede7dd] border border-[#d5cdc0] p-3">
-        <div className="flex items-center gap-2 bg-[#f5efe6] border border-[#d5cdc0] px-3 py-2 flex-1 max-w-md">
-          <Search className="w-4 h-4 text-[#7b6e54]" />
+      <div className="flex flex-col sm:flex-row gap-3 items-stretch justify-between bg-[#121215] border border-[#242429] p-3">
+        <div className="flex items-center gap-2 bg-[#18181c] border border-[#242429] px-3 py-2 flex-1 max-w-md">
+          <Search className="w-4 h-4 text-[#c9a96e]" />
           <input
             type="text"
             placeholder="Search order ID, payment ID, UTR, customer..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full bg-transparent text-xs text-[#1a1816] placeholder-[#8e8474] focus:outline-none"
+            className="w-full bg-transparent text-xs text-[#f4f4f6] placeholder-[#8e8e98] focus:outline-none"
           />
           {searchQuery && (
-            <button onClick={() => setSearchQuery('')} className="text-[#7b6e54] hover:text-[#1a1816]">
+            <button onClick={() => setSearchQuery('')} className="text-[#c9a96e] hover:text-[#f4f4f6]">
               <X className="w-3.5 h-3.5" />
             </button>
           )}
@@ -342,8 +342,8 @@ export const AdminPaymentsView: React.FC<AdminPaymentsViewProps> = ({ onShowToas
               }}
               className={`px-3 py-1.5 text-[10px] uppercase font-bold tracking-wider transition-colors cursor-pointer ${
                 selectedStatus === st
-                  ? 'bg-[#1a1816] text-[#ede7dd]'
-                  : 'bg-[#f5efe6] border border-[#d5cdc0] text-[#59544c] hover:text-[#1a1816]'
+                  ? 'bg-[#f4f4f6] text-[#121215]'
+                  : 'bg-[#18181c] border border-[#242429] text-[#8e8e98] hover:text-[#f4f4f6]'
               }`}
             >
               {st === 'SUCCESS' ? 'VERIFIED' : st}
@@ -353,10 +353,10 @@ export const AdminPaymentsView: React.FC<AdminPaymentsViewProps> = ({ onShowToas
       </div>
 
       {/* Payments Table */}
-      <div className="bg-[#ede7dd] border border-[#d5cdc0] overflow-x-auto shadow-sm">
+      <div className="bg-[#121215] border border-[#242429] overflow-x-auto shadow-sm">
         <table className="w-full text-left border-collapse">
           <thead>
-            <tr className="border-b border-[#d5cdc0] bg-[#e4ddcf] text-[10px] text-[#7b6e54] uppercase tracking-wider">
+            <tr className="border-b border-[#242429] bg-[#1e1e24] text-[10px] text-[#c9a96e] uppercase tracking-wider">
               <th className="py-3 px-4 font-bold">STATUS</th>
               <th className="py-3 px-4 font-bold">ORDER REF</th>
               <th className="py-3 px-4 font-bold">CUSTOMER</th>
@@ -368,36 +368,36 @@ export const AdminPaymentsView: React.FC<AdminPaymentsViewProps> = ({ onShowToas
               <th className="py-3 px-4 font-bold text-right">ACTIONS</th>
             </tr>
           </thead>
-          <tbody className="text-xs divide-y divide-[#d5cdc0]">
+          <tbody className="text-xs divide-y divide-[#242429]">
             {isLoading ? (
               <tr>
-                <td colSpan={9} className="py-12 text-center text-[#59544c]">
-                  <RefreshCw className="w-5 h-5 animate-spin mx-auto mb-2 text-[#7b6e54]" />
+                <td colSpan={9} className="py-12 text-center text-[#8e8e98]">
+                  <RefreshCw className="w-5 h-5 animate-spin mx-auto mb-2 text-[#c9a96e]" />
                   <span>READING PERMANENT POSTGRESQL TRANSACTION HISTORY...</span>
                 </td>
               </tr>
             ) : payments.length === 0 ? (
               <tr>
-                <td colSpan={9} className="py-12 text-center text-[#59544c]">
-                  <ShieldCheck className="w-8 h-8 mx-auto mb-2 opacity-40 text-[#7b6e54]" />
+                <td colSpan={9} className="py-12 text-center text-[#8e8e98]">
+                  <ShieldCheck className="w-8 h-8 mx-auto mb-2 opacity-40 text-[#c9a96e]" />
                   <span className="block font-bold">NO MATCHING TRANSACTIONS FOUND</span>
-                  <span className="text-[11px] text-[#8e8474]">Try adjusting the query filters or order reference.</span>
+                  <span className="text-[11px] text-[#8e8e98]">Try adjusting the query filters or order reference.</span>
                 </td>
               </tr>
             ) : (
               payments.map((p) => (
-                <tr key={p.id} className="hover:bg-[#f5efe6]/70 transition-colors">
+                <tr key={p.id} className="hover:bg-[#18181c]/70 transition-colors">
                   <td className="py-3.5 px-4">{renderStatusBadge(p.status)}</td>
                   <td className="py-3.5 px-4">
-                    <span className="font-bold text-[#1a1816] block">{p.order?.displayId || p.orderId}</span>
-                    <span className="text-[10px] text-[#7b6e54]">#{p.id.slice(-8)}</span>
+                    <span className="font-bold text-[#f4f4f6] block">{p.order?.displayId || p.orderId}</span>
+                    <span className="text-[10px] text-[#c9a96e]">#{p.id.slice(-8)}</span>
                   </td>
-                  <td className="py-3.5 px-4 text-[#59544c]">
-                    <span className="block text-[#1a1816] font-medium">{p.order?.user?.name || 'Customer'}</span>
-                    <span className="text-[10px] text-[#7b6e54]">{p.order?.user?.email || 'N/A'}</span>
+                  <td className="py-3.5 px-4 text-[#8e8e98]">
+                    <span className="block text-[#f4f4f6] font-medium">{p.order?.user?.name || 'Customer'}</span>
+                    <span className="text-[10px] text-[#c9a96e]">{p.order?.user?.email || 'N/A'}</span>
                   </td>
                   <td className="py-3.5 px-4">
-                    <span className="font-bold text-[#1a1816]">
+                    <span className="font-bold text-[#f4f4f6]">
                       {formatCurrency(Number(p.amount), p.currency)}
                     </span>
                     {p.amountReceived && Number(p.amountReceived) !== Number(p.amount) && (
@@ -407,32 +407,32 @@ export const AdminPaymentsView: React.FC<AdminPaymentsViewProps> = ({ onShowToas
                     )}
                   </td>
                   <td className="py-3.5 px-4">
-                    <span className="text-[10px] bg-[#ded6c9] px-2 py-0.5 text-[#1a1816] font-bold tracking-wide">
+                    <span className="text-[10px] bg-[#242429] px-2 py-0.5 text-[#f4f4f6] font-bold tracking-wide">
                       {p.provider} // {p.paymentMethod}
                     </span>
                   </td>
                   <td className="py-3.5 px-4 font-mono text-[11px]">
                     {p.upiUtr ? (
                       <div className="flex items-center gap-1.5">
-                        <span className="font-bold text-[#1a1816]">{p.upiUtr}</span>
+                        <span className="font-bold text-[#f4f4f6]">{p.upiUtr}</span>
                         <button
                           onClick={() => copyToClipboard(p.upiUtr!, 'UTR')}
-                          className="text-[#7b6e54] hover:text-[#1a1816]"
+                          className="text-[#c9a96e] hover:text-[#f4f4f6]"
                           title="Copy UTR"
                         >
                           <Copy className="w-3 h-3" />
                         </button>
                       </div>
                     ) : (
-                      <span className="text-[#8e8474]">Pending</span>
+                      <span className="text-[#8e8e98]">Pending</span>
                     )}
                   </td>
                   <td className="py-3.5 px-4">
-                    <span className="text-[10px] text-[#59544c]">
+                    <span className="text-[10px] text-[#8e8e98]">
                       {p.verificationSource || (p.status === 'SUCCESS' ? 'AUTOMATIC' : 'Awaiting')}
                     </span>
                   </td>
-                  <td className="py-3.5 px-4 text-[10px] text-[#59544c]">
+                  <td className="py-3.5 px-4 text-[10px] text-[#8e8e98]">
                     {new Date(p.createdAt).toLocaleDateString('en-GB', {
                       day: '2-digit',
                       month: 'short',
@@ -445,7 +445,7 @@ export const AdminPaymentsView: React.FC<AdminPaymentsViewProps> = ({ onShowToas
                     <div className="flex items-center justify-end gap-1.5">
                       <button
                         onClick={() => handleOpenDetail(p)}
-                        className="py-1 px-2.5 bg-[#f5efe6] border border-[#d5cdc0] text-[#1a1816] hover:bg-[#ded6c9] text-[10px] font-bold uppercase transition-colors cursor-pointer"
+                        className="py-1 px-2.5 bg-[#18181c] border border-[#242429] text-[#f4f4f6] hover:bg-[#242429] text-[10px] font-bold uppercase transition-colors cursor-pointer"
                         title="Inspect full audit trail"
                       >
                         INSPECT
@@ -454,7 +454,7 @@ export const AdminPaymentsView: React.FC<AdminPaymentsViewProps> = ({ onShowToas
                       {p.status === 'PENDING' && (
                         <button
                           onClick={() => handleReconcileSingle(p.id)}
-                          className="py-1 px-2.5 bg-[#1a1816] text-[#ede7dd] hover:bg-[#35322e] text-[10px] font-bold uppercase transition-colors cursor-pointer"
+                          className="py-1 px-2.5 bg-[#f4f4f6] text-[#121215] hover:bg-[#35322e] text-[10px] font-bold uppercase transition-colors cursor-pointer"
                           title="Query status from provider API"
                         >
                           RECONCILE
@@ -468,7 +468,7 @@ export const AdminPaymentsView: React.FC<AdminPaymentsViewProps> = ({ onShowToas
                           setAdjustReason('');
                           setIsAdjustModalOpen(true);
                         }}
-                        className="py-1 px-2 bg-[#e4ddcf] text-[#59544c] hover:text-[#1a1816] text-[10px] transition-colors cursor-pointer"
+                        className="py-1 px-2 bg-[#1e1e24] text-[#8e8e98] hover:text-[#f4f4f6] text-[10px] transition-colors cursor-pointer"
                         title="Exceptional manual admin adjustment"
                       >
                         <Edit3 className="w-3 h-3" />
@@ -483,22 +483,22 @@ export const AdminPaymentsView: React.FC<AdminPaymentsViewProps> = ({ onShowToas
 
         {/* Pagination controls */}
         {totalPages > 1 && (
-          <div className="flex items-center justify-between p-3 border-t border-[#d5cdc0] bg-[#e4ddcf] text-xs">
-            <span className="text-[#59544c]">
+          <div className="flex items-center justify-between p-3 border-t border-[#242429] bg-[#1e1e24] text-xs">
+            <span className="text-[#8e8e98]">
               Page {currentPage} of {totalPages} ({totalCount} total records)
             </span>
             <div className="flex items-center gap-2">
               <button
                 disabled={currentPage <= 1}
                 onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
-                className="py-1 px-3 bg-[#ede7dd] border border-[#d5cdc0] disabled:opacity-40 cursor-pointer"
+                className="py-1 px-3 bg-[#121215] border border-[#242429] disabled:opacity-40 cursor-pointer"
               >
                 PREVIOUS
               </button>
               <button
                 disabled={currentPage >= totalPages}
                 onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
-                className="py-1 px-3 bg-[#ede7dd] border border-[#d5cdc0] disabled:opacity-40 cursor-pointer"
+                className="py-1 px-3 bg-[#121215] border border-[#242429] disabled:opacity-40 cursor-pointer"
               >
                 NEXT
               </button>
@@ -510,20 +510,20 @@ export const AdminPaymentsView: React.FC<AdminPaymentsViewProps> = ({ onShowToas
       {/* DETAIL AUDIT TRAIL MODAL */}
       {selectedPayment && (
         <div
-          className="fixed inset-0 z-50 bg-[#1a1816]/75 backdrop-blur-sm flex items-center justify-center p-4 overflow-y-auto"
+          className="fixed inset-0 z-50 bg-[#f4f4f6]/75 backdrop-blur-sm flex items-center justify-center p-4 overflow-y-auto"
           role="dialog"
           aria-modal="true"
         >
-          <div className="bg-[#f5efe6] border border-[#d5cdc0] max-w-2xl w-full p-6 sm:p-8 flex flex-col gap-6 shadow-2xl max-h-[90vh] overflow-y-auto">
-            <div className="flex items-start justify-between border-b border-[#d5cdc0] pb-4">
+          <div className="bg-[#18181c] border border-[#242429] max-w-2xl w-full p-6 sm:p-8 flex flex-col gap-6 shadow-2xl max-h-[90vh] overflow-y-auto">
+            <div className="flex items-start justify-between border-b border-[#242429] pb-4">
               <div>
-                <span className="font-mono text-[10px] font-bold text-[#7b6e54] uppercase tracking-widest block">
+                <span className="font-mono text-[10px] font-bold text-[#c9a96e] uppercase tracking-widest block">
                   IMMUTABLE AUDIT TRAIL // TRANSACTION ENCLAVE
                 </span>
-                <h3 className="font-headline text-xl font-bold text-[#1a1816]">
+                <h3 className="font-headline text-xl font-bold text-[#f4f4f6]">
                   PAYMENT #{selectedPayment.id}
                 </h3>
-                <span className="text-xs text-[#59544c]">
+                <span className="text-xs text-[#8e8e98]">
                   Order: {selectedPayment.order?.displayId || selectedPayment.orderId}
                 </span>
               </div>
@@ -532,95 +532,95 @@ export const AdminPaymentsView: React.FC<AdminPaymentsViewProps> = ({ onShowToas
                   setSelectedPayment(null);
                   setPaymentDetailData(null);
                 }}
-                className="p-1.5 hover:bg-[#ede7dd] text-[#59544c] hover:text-[#1a1816]"
+                className="p-1.5 hover:bg-[#121215] text-[#8e8e98] hover:text-[#f4f4f6]"
               >
                 <X className="w-5 h-5" />
               </button>
             </div>
 
             {isDetailLoading ? (
-              <div className="py-12 text-center text-[#59544c]">
-                <RefreshCw className="w-5 h-5 animate-spin mx-auto mb-2 text-[#7b6e54]" />
+              <div className="py-12 text-center text-[#8e8e98]">
+                <RefreshCw className="w-5 h-5 animate-spin mx-auto mb-2 text-[#c9a96e]" />
                 <span>QUERYING AUDIT TRAIL &amp; EVENT LOGS...</span>
               </div>
             ) : (
               <div className="flex flex-col gap-6">
                 {/* Status and Verification Badge */}
-                <div className="bg-[#ede7dd] border border-[#d5cdc0] p-4 grid grid-cols-2 sm:grid-cols-4 gap-3 text-xs">
+                <div className="bg-[#121215] border border-[#242429] p-4 grid grid-cols-2 sm:grid-cols-4 gap-3 text-xs">
                   <div>
-                    <span className="text-[10px] text-[#7b6e54] block">STATUS</span>
+                    <span className="text-[10px] text-[#c9a96e] block">STATUS</span>
                     {renderStatusBadge(selectedPayment.status)}
                   </div>
                   <div>
-                    <span className="text-[10px] text-[#7b6e54] block">EXPECTED AMOUNT</span>
-                    <span className="font-bold text-[#1a1816]">
+                    <span className="text-[10px] text-[#c9a96e] block">EXPECTED AMOUNT</span>
+                    <span className="font-bold text-[#f4f4f6]">
                       {formatCurrency(Number(selectedPayment.amount), selectedPayment.currency)}
                     </span>
                   </div>
                   <div>
-                    <span className="text-[10px] text-[#7b6e54] block">VERIFIED RECEIVED</span>
-                    <span className="font-bold text-[#1a1816]">
+                    <span className="text-[10px] text-[#c9a96e] block">VERIFIED RECEIVED</span>
+                    <span className="font-bold text-[#f4f4f6]">
                       {selectedPayment.amountReceived
                         ? formatCurrency(Number(selectedPayment.amountReceived), selectedPayment.currency)
                         : '--'}
                     </span>
                   </div>
                   <div>
-                    <span className="text-[10px] text-[#7b6e54] block">VERIFICATION SOURCE</span>
-                    <span className="font-bold text-[#1a1816]">
+                    <span className="text-[10px] text-[#c9a96e] block">VERIFICATION SOURCE</span>
+                    <span className="font-bold text-[#f4f4f6]">
                       {selectedPayment.verificationSource || 'None'}
                     </span>
                   </div>
                 </div>
 
                 {/* Identifiers Grid */}
-                <div className="bg-[#ede7dd] border border-[#d5cdc0] p-4 flex flex-col gap-2 text-xs">
-                  <div className="flex justify-between py-1 border-b border-[#d5cdc0]">
-                    <span className="text-[#59544c]">Bank UTR / Transaction Reference:</span>
-                    <span className="font-bold text-[#1a1816]">{selectedPayment.upiUtr || 'N/A'}</span>
+                <div className="bg-[#121215] border border-[#242429] p-4 flex flex-col gap-2 text-xs">
+                  <div className="flex justify-between py-1 border-b border-[#242429]">
+                    <span className="text-[#8e8e98]">Bank UTR / Transaction Reference:</span>
+                    <span className="font-bold text-[#f4f4f6]">{selectedPayment.upiUtr || 'N/A'}</span>
                   </div>
-                  <div className="flex justify-between py-1 border-b border-[#d5cdc0]">
-                    <span className="text-[#59544c]">Provider Internal ID:</span>
-                    <span className="font-bold text-[#1a1816]">{selectedPayment.providerPaymentId || 'N/A'}</span>
+                  <div className="flex justify-between py-1 border-b border-[#242429]">
+                    <span className="text-[#8e8e98]">Provider Internal ID:</span>
+                    <span className="font-bold text-[#f4f4f6]">{selectedPayment.providerPaymentId || 'N/A'}</span>
                   </div>
-                  <div className="flex justify-between py-1 border-b border-[#d5cdc0]">
-                    <span className="text-[#59544c]">Provider Order ID:</span>
-                    <span className="font-bold text-[#1a1816]">{selectedPayment.providerOrderId || 'N/A'}</span>
+                  <div className="flex justify-between py-1 border-b border-[#242429]">
+                    <span className="text-[#8e8e98]">Provider Order ID:</span>
+                    <span className="font-bold text-[#f4f4f6]">{selectedPayment.providerOrderId || 'N/A'}</span>
                   </div>
                   <div className="flex justify-between py-1">
-                    <span className="text-[#59544c]">Reconciliation Attempts:</span>
-                    <span className="font-bold text-[#1a1816]">{selectedPayment.reconcileAttempts}</span>
+                    <span className="text-[#8e8e98]">Reconciliation Attempts:</span>
+                    <span className="font-bold text-[#f4f4f6]">{selectedPayment.reconcileAttempts}</span>
                   </div>
                 </div>
 
                 {/* Audit History Timeline */}
                 <div className="flex flex-col gap-3">
-                  <h4 className="text-[11px] font-bold text-[#7b6e54] uppercase tracking-wider">
+                  <h4 className="text-[11px] font-bold text-[#c9a96e] uppercase tracking-wider">
                     IMMUTABLE AUDIT STATE TRANSITIONS
                   </h4>
-                  <div className="flex flex-col gap-2 border border-[#d5cdc0] bg-[#ede7dd] p-3 max-h-48 overflow-y-auto">
+                  <div className="flex flex-col gap-2 border border-[#242429] bg-[#121215] p-3 max-h-48 overflow-y-auto">
                     {paymentDetailData?.auditLogs?.length ? (
                       paymentDetailData.auditLogs.map((log: any) => (
                         <div
                           key={log.id}
-                          className="flex flex-col gap-1 p-2 bg-[#f5efe6] border border-[#d5cdc0] text-xs"
+                          className="flex flex-col gap-1 p-2 bg-[#18181c] border border-[#242429] text-xs"
                         >
                           <div className="flex items-center justify-between">
-                            <span className="font-bold text-[#1a1816]">
+                            <span className="font-bold text-[#f4f4f6]">
                               {log.action} ({log.fromStatus || 'START'} → {log.toStatus})
                             </span>
-                            <span className="text-[10px] text-[#7b6e54]">
+                            <span className="text-[10px] text-[#c9a96e]">
                               {new Date(log.createdAt).toLocaleString('en-GB')}
                             </span>
                           </div>
-                          <span className="text-[10px] text-[#59544c]">
-                            Actor: <strong className="text-[#1a1816]">{log.actorType}</strong> ({log.actorId || 'system'})
+                          <span className="text-[10px] text-[#8e8e98]">
+                            Actor: <strong className="text-[#f4f4f6]">{log.actorType}</strong> ({log.actorId || 'system'})
                           </span>
-                          {log.reason && <p className="text-[11px] text-[#1a1816] mt-0.5">{log.reason}</p>}
+                          {log.reason && <p className="text-[11px] text-[#f4f4f6] mt-0.5">{log.reason}</p>}
                         </div>
                       ))
                     ) : (
-                      <span className="text-xs text-[#59544c] py-2 text-center">No audit transitions recorded.</span>
+                      <span className="text-xs text-[#8e8e98] py-2 text-center">No audit transitions recorded.</span>
                     )}
                   </div>
                 </div>
@@ -628,22 +628,22 @@ export const AdminPaymentsView: React.FC<AdminPaymentsViewProps> = ({ onShowToas
                 {/* Associated Webhook Events */}
                 {paymentDetailData?.webhookEvents?.length > 0 && (
                   <div className="flex flex-col gap-3">
-                    <h4 className="text-[11px] font-bold text-[#7b6e54] uppercase tracking-wider">
+                    <h4 className="text-[11px] font-bold text-[#c9a96e] uppercase tracking-wider">
                       SIGNED WEBHOOK EVENTS PROCESSED ({paymentDetailData.webhookEvents.length})
                     </h4>
-                    <div className="flex flex-col gap-2 border border-[#d5cdc0] bg-[#ede7dd] p-3 max-h-48 overflow-y-auto">
+                    <div className="flex flex-col gap-2 border border-[#242429] bg-[#121215] p-3 max-h-48 overflow-y-auto">
                       {paymentDetailData.webhookEvents.map((evt: any) => (
                         <div
                           key={evt.id}
-                          className="p-2 bg-[#f5efe6] border border-[#d5cdc0] text-xs flex flex-col gap-1"
+                          className="p-2 bg-[#18181c] border border-[#242429] text-xs flex flex-col gap-1"
                         >
                           <div className="flex items-center justify-between">
-                            <span className="font-bold text-[#1a1816]">{evt.eventType}</span>
-                            <span className="text-[10px] text-[#7b6e54]">
+                            <span className="font-bold text-[#f4f4f6]">{evt.eventType}</span>
+                            <span className="text-[10px] text-[#c9a96e]">
                               {new Date(evt.createdAt).toLocaleString('en-GB')}
                             </span>
                           </div>
-                          <div className="text-[10px] text-[#59544c]">
+                          <div className="text-[10px] text-[#8e8e98]">
                             Event ID: {evt.eventId} // Status: <strong>{evt.status}</strong>
                           </div>
                         </div>
@@ -660,44 +660,44 @@ export const AdminPaymentsView: React.FC<AdminPaymentsViewProps> = ({ onShowToas
       {/* EXCEPTIONAL MANUAL ADJUSTMENT MODAL */}
       {isAdjustModalOpen && adjustTargetPayment && (
         <div
-          className="fixed inset-0 z-50 bg-[#1a1816]/75 backdrop-blur-sm flex items-center justify-center p-4 overflow-y-auto"
+          className="fixed inset-0 z-50 bg-[#f4f4f6]/75 backdrop-blur-sm flex items-center justify-center p-4 overflow-y-auto"
           role="dialog"
           aria-modal="true"
         >
-          <div className="bg-[#f5efe6] border border-[#d5cdc0] max-w-md w-full p-6 sm:p-8 flex flex-col gap-5 shadow-2xl">
-            <div className="flex items-start justify-between border-b border-[#d5cdc0] pb-3">
+          <div className="bg-[#18181c] border border-[#242429] max-w-md w-full p-6 sm:p-8 flex flex-col gap-5 shadow-2xl">
+            <div className="flex items-start justify-between border-b border-[#242429] pb-3">
               <div>
                 <span className="font-mono text-[10px] font-bold text-red-800 uppercase tracking-widest block">
                   SECURITY OVERRIDE PROTOCOL
                 </span>
-                <h3 className="font-headline text-lg font-bold text-[#1a1816]">
+                <h3 className="font-headline text-lg font-bold text-[#f4f4f6]">
                   EXCEPTIONAL MANUAL ADJUSTMENT
                 </h3>
               </div>
               <button
                 onClick={() => setIsAdjustModalOpen(false)}
-                className="p-1 hover:bg-[#ede7dd] text-[#59544c]"
+                className="p-1 hover:bg-[#121215] text-[#8e8e98]"
               >
                 <X className="w-4 h-4" />
               </button>
             </div>
 
-            <div className="bg-[#ede7dd] border border-[#d5cdc0] p-3 text-xs flex flex-col gap-1">
-              <div>Payment ID: <strong className="text-[#1a1816]">#{adjustTargetPayment.id}</strong></div>
-              <div>Current Status: <strong className="text-[#1a1816]">{adjustTargetPayment.status}</strong></div>
-              <div>Order: <strong className="text-[#1a1816]">{adjustTargetPayment.order?.displayId}</strong></div>
-              <div>Amount: <strong className="text-[#1a1816]">₹{Number(adjustTargetPayment.amount)}</strong></div>
+            <div className="bg-[#121215] border border-[#242429] p-3 text-xs flex flex-col gap-1">
+              <div>Payment ID: <strong className="text-[#f4f4f6]">#{adjustTargetPayment.id}</strong></div>
+              <div>Current Status: <strong className="text-[#f4f4f6]">{adjustTargetPayment.status}</strong></div>
+              <div>Order: <strong className="text-[#f4f4f6]">{adjustTargetPayment.order?.displayId}</strong></div>
+              <div>Amount: <strong className="text-[#f4f4f6]">₹{Number(adjustTargetPayment.amount)}</strong></div>
             </div>
 
             <form onSubmit={handleAdjustSubmit} className="flex flex-col gap-4 text-xs">
               <div className="flex flex-col gap-1.5">
-                <label className="font-bold text-[#1a1816] uppercase text-[10px]">
+                <label className="font-bold text-[#f4f4f6] uppercase text-[10px]">
                   NEW ADJUSTED STATUS
                 </label>
                 <select
                   value={adjustStatus}
                   onChange={(e) => setAdjustStatus(e.target.value)}
-                  className="bg-[#ede7dd] border border-[#d5cdc0] p-2 text-[#1a1816] font-mono text-xs focus:outline-none"
+                  className="bg-[#121215] border border-[#242429] p-2 text-[#f4f4f6] font-mono text-xs focus:outline-none"
                 >
                   <option value="SUCCESS">SUCCESS (Mark Order Paid &amp; Confirmed)</option>
                   <option value="FAILED">FAILED (Mark Payment Failed)</option>
@@ -708,7 +708,7 @@ export const AdminPaymentsView: React.FC<AdminPaymentsViewProps> = ({ onShowToas
               </div>
 
               <div className="flex flex-col gap-1.5">
-                <label className="font-bold text-[#1a1816] uppercase text-[10px]">
+                <label className="font-bold text-[#f4f4f6] uppercase text-[10px]">
                   MANDATORY AUDIT REASON / EXPLANATION *
                 </label>
                 <textarea
@@ -717,7 +717,7 @@ export const AdminPaymentsView: React.FC<AdminPaymentsViewProps> = ({ onShowToas
                   value={adjustReason}
                   onChange={(e) => setAdjustReason(e.target.value)}
                   placeholder="State the administrative justification, bank ticket number, or manual proof..."
-                  className="bg-[#ede7dd] border border-[#d5cdc0] p-2.5 text-[#1a1816] font-mono text-xs focus:outline-none"
+                  className="bg-[#121215] border border-[#242429] p-2.5 text-[#f4f4f6] font-mono text-xs focus:outline-none"
                 />
               </div>
 
@@ -729,14 +729,14 @@ export const AdminPaymentsView: React.FC<AdminPaymentsViewProps> = ({ onShowToas
                 <button
                   type="button"
                   onClick={() => setIsAdjustModalOpen(false)}
-                  className="py-2 px-4 bg-[#ede7dd] border border-[#d5cdc0] text-[#1a1816] hover:bg-[#ded6c9] font-bold uppercase text-[10px]"
+                  className="py-2 px-4 bg-[#121215] border border-[#242429] text-[#f4f4f6] hover:bg-[#242429] font-bold uppercase text-[10px]"
                 >
                   CANCEL
                 </button>
                 <button
                   type="submit"
                   disabled={isAdjustSubmitting || !adjustReason.trim()}
-                  className="py-2 px-5 bg-[#1a1816] text-[#ede7dd] hover:bg-[#35322e] font-bold uppercase text-[10px] disabled:opacity-50 cursor-pointer"
+                  className="py-2 px-5 bg-[#f4f4f6] text-[#121215] hover:bg-[#35322e] font-bold uppercase text-[10px] disabled:opacity-50 cursor-pointer"
                 >
                   {isAdjustSubmitting ? 'SIGNING OVERRIDE...' : 'COMMIT AUDITED OVERRIDE'}
                 </button>
