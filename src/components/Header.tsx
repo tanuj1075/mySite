@@ -117,8 +117,11 @@ export const Header: React.FC<HeaderProps> = ({
             onClick={() => onSelectNav('COLLECTIONS')}
             className="flex items-center gap-2.5 text-left group focus:outline-none cursor-pointer"
           >
-            <span className="font-headline text-2xl sm:text-3xl font-bold tracking-tight uppercase text-[#1a1816] hover:opacity-80 transition-opacity">
+            <span className="font-headline text-2xl sm:text-3xl font-extrabold tracking-tight uppercase text-[#1a1816] group-hover:tracking-wider transition-all duration-300">
               VANTA
+            </span>
+            <span className="hidden sm:inline-block font-mono text-[9px] uppercase tracking-[0.25em] text-[#7b6e54] border-l border-[#d5cdc0] pl-2.5 py-0.5">
+              ARCHIVE // ATELIER
             </span>
           </button>
         </div>

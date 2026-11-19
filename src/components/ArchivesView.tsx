@@ -215,7 +215,7 @@ export const ArchivesView: React.FC<ArchivesViewProps> = ({
                 <div className="grid grid-cols-2 gap-3 pt-2">
                   <button
                     onClick={() => onInspectSpecimen(specimen)}
-                    className="py-3 bg-[#ede7dd] hover:bg-[#e4ddcf] text-[#1a1816] border border-[#d5cdc0] hover:border-[#1a1816] text-[10px] font-bold uppercase tracking-widest flex items-center justify-center gap-2 transition-colors cursor-pointer"
+                    className="btn-tactile py-3 bg-[#ede7dd] hover:bg-[#e4ddcf] text-[#1a1816] border border-[#d5cdc0] hover:border-[#1a1816] text-[10px] font-bold uppercase tracking-widest flex items-center justify-center gap-2 transition-colors cursor-pointer"
                   >
                     <Eye className="w-3.5 h-3.5" />
                     <span>INSPECT SPEC</span>
@@ -223,7 +223,7 @@ export const ArchivesView: React.FC<ArchivesViewProps> = ({
 
                   <button
                     onClick={() => onRequestAccess(specimen)}
-                    className="py-3 bg-[#141312] hover:bg-[#35322e] text-[#f5efe6] text-[10px] font-bold uppercase tracking-widest flex items-center justify-center gap-2 transition-colors cursor-pointer group"
+                    className="btn-tactile py-3 bg-[#141312] hover:bg-[#35322e] text-[#f5efe6] text-[10px] font-bold uppercase tracking-widest flex items-center justify-center gap-2 transition-colors cursor-pointer group"
                   >
                     <span>REQUEST ACCESS</span>
                     <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform" />

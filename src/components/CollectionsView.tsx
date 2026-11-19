@@ -21,6 +21,79 @@ export const CollectionsView: React.FC<CollectionsViewProps> = ({
   // Hero slide index
   const [heroSlide, setHeroSlide] = useState(0);
 
+  const heroSlides = [
+    {
+      id: '01',
+      title: 'BUILT TO',
+      highlight: 'MOVE',
+      tag: '[ SPECIMEN CLASSIFICATION // ATELIER CRAFTSMANSHIP ]',
+      description: 'Performance refined through simplicity. Artisanal saddle stitching on vegetable-tanned cream calfskin and natural crepe.',
+      protocol: 'SYSTEM PROTOCOL: 8-TIER FABRICATION',
+      matrix: 'BASE MATRIX: NATURAL TANNED LEATHER',
+      provenance: 'PROVENANCE: MONTEBELLUNA, ITALY',
+      image: '/assets/images/hero_welt_macro_1788842274475.jpg',
+      alt: 'Macro detail of artisan saddle stitching and welt on cream leather runner',
+      caption: 'CHOPPED CORK WEDGE // NATURAL CALF REINFORCEMENT',
+      calloutTopLeft: '[ MACRO ATELIER // REINFORCED SADDLE STITCH ]',
+      calloutTopRight: '[ TEXTURE: VEG-TANNED GRAIN ]',
+      calloutBottomLeft: '[ POINT A: HAND-WELTED NATURAL CREPE ]',
+      calloutBottomRight: '[ POINT B: 360° TEXTURED SUEDE RIM ]',
+    },
+    {
+      id: '02',
+      title: 'TRAVERTINE',
+      highlight: 'PEDESTAL',
+      tag: '[ ARCHITECTURAL ARCHIVE // EDITION 01 ]',
+      description: 'X-01 Architectural Runner staged on untreated Roman travertine limestone. Dual-density foam core engineered for timeless ergonomics.',
+      protocol: 'DENSITY WEDGE: 52 SHORE C',
+      matrix: 'BASE MATRIX: FULL GRAIN CALFSKIN',
+      provenance: 'PROVENANCE: CIVITANOVA MARCHE, ITALY',
+      image: '/assets/images/cream_runner_pedestal_1788842341279.jpg',
+      alt: 'Cream runner on travertine stone pedestal',
+      caption: 'TRAVERTINE CREAM // RUNNER SPECIMEN X-01',
+      calloutTopLeft: '[ SCULPTURAL PEDESTAL // ROMAN TRAVERTINE ]',
+      calloutTopRight: '[ CHASSIS: 1.8MM CALFSKIN ]',
+      calloutBottomLeft: '[ DUAL FOAM CUSHION MATRIX ]',
+      calloutBottomRight: '[ UNIT WEIGHT: 395G PER HALF-PAIR ]',
+    },
+    {
+      id: '03',
+      title: 'MINERAL',
+      highlight: 'TAUPE',
+      tag: '[ RAW LIMESTONE // SERIES 02 ]',
+      description: 'Tactile suede chassis resting on calcified mineral stone. Low-profile silhouette inspired by brutalist facades and mid-century speed.',
+      protocol: 'SUEDE: TUSCAN ARTISANAL TANNING',
+      matrix: 'BASE MATRIX: UNLINED ORGANIC SUEDE',
+      provenance: 'PROVENANCE: TUSCANY, ITALY',
+      image: '/assets/images/taupe_runner_pedestal_1788842355799.jpg',
+      alt: 'Archival low runner in mineral taupe suede on limestone',
+      caption: 'SERIES 02 // MINERAL TAUPE SUEDE CHASSIS',
+      calloutTopLeft: '[ TACTILE TUSCAN SUEDE CHASSIS ]',
+      calloutTopRight: '[ LIMESTONE MONOLITH REST ]',
+      calloutBottomLeft: '[ CONTOURED HEEL COUNTER ]',
+      calloutBottomRight: '[ TRACTION: GEOMETRIC SIPING ]',
+    },
+    {
+      id: '04',
+      title: 'BLUEPRINT',
+      highlight: 'ANATOMY',
+      tag: '[ SCHEMATIC DECONSTRUCT // FIG 4.2B ]',
+      description: 'Exploded engineering blueprint schematic. Discarding petrochemical plastics for organic cork beds, 3K carbon plates, and biodegradable Hevea latex.',
+      protocol: 'SHANK: 2800 TITANIUM REINFORCED',
+      matrix: 'BASE MATRIX: 1.2MM 3K CARBON WEAVE',
+      provenance: 'PROVENANCE: RESEARCH LAB 01',
+      image: '/assets/images/blueprint_deconstruct_1788842375340.jpg',
+      alt: 'Vintage architectural exploded blueprint schematic of shoe construction',
+      caption: 'ANATOMY & WATERPROOF // EXPLODED ELEVATION',
+      calloutTopLeft: '[ COMPONENT 01 // 3K CARBON WEAVE ]',
+      calloutTopRight: '[ COMPONENT 02 // GRANULATED CORK CORE ]',
+      calloutBottomLeft: '[ COMPONENT 03 // VEG-TANNED FOOTBED ]',
+      calloutBottomRight: '[ COMPONENT 04 // VULCANIZED OUTSOLE ]',
+    },
+  ];
+
+  const currentHero = heroSlides[heroSlide] || heroSlides[0];
+
   // Active category in Curated Editions
   const [curatedCategory, setCuratedCategory] = useState<'ALL' | 'FOOTWEAR' | 'OUTERWEAR' | 'COMPOSITES'>('ALL');
 
@@ -118,6 +191,115 @@ export const CollectionsView: React.FC<CollectionsViewProps> = ({
     onQuickAddProduct(overcoatItem);
   };
 
+  const curatedSpecimens = [
+    {
+      id: 'vn-runner-x01',
+      category: 'FOOTWEAR',
+      code: 'SPEC_01',
+      specCode: 'RUNNER_X01',
+      name: 'X-01 ARCHITECTURAL RUNNER',
+      edition: 'EDITION 01 // CREAM LEATHER & TRAVERTINE',
+      badge: 'VAULTED',
+      era: '2023 - MONOLITH',
+      year: '2023',
+      price: 480,
+      image: '/assets/images/cream_runner_pedestal_1788842341279.jpg',
+      composition: 'Tuscan Veg-Tanned Calfskin, Natural Crepe Rubber',
+      outsoleOrChassis: 'Dual-Density Cold Cure Foam',
+      description: 'Artisanal saddle stitching on vegetable-tanned cream calfskin and natural crepe. Precision-sculpted wedge on curved travertine.',
+      dimensions: '310 × 115 × 128 mm',
+      weight: '395g per half-pair',
+      tensileStrength: '16,200 N/m²',
+      avail: '39 - 46 (EU) | INCLUDES ARCHIVE BOX',
+      allotment: '4/50 UNITS',
+    },
+    {
+      id: 'vn-runner-taupe-02',
+      category: 'FOOTWEAR',
+      code: 'SPEC_02',
+      specCode: 'RUNNER_TAUPE_02',
+      name: 'ARCHIVAL LOW RUNNER',
+      edition: 'SERIES 02 // TAUPE SUEDE CHASSIS',
+      badge: 'PROTOTYPE',
+      era: '2024 - VOID CORE',
+      year: '2024',
+      price: 520,
+      image: '/assets/images/taupe_runner_pedestal_1788842355799.jpg',
+      composition: 'Italian Tuscan Suede, Raw Limestone Finish',
+      outsoleOrChassis: 'Vibram Morflex Compound',
+      description: 'Sand beige and tactile taupe suede chassis with dual-density foam wedge on curved travertino. Siped flex grooves for natural articulation.',
+      dimensions: '305 × 112 × 124 mm',
+      weight: '380g per half-pair',
+      tensileStrength: '15,800 N/m²',
+      avail: '40 - 45 (EU) | ITALIAN TUSCAN SUEDE',
+      allotment: 'LIMITED ALLOTMENT',
+    },
+    {
+      id: 'vn-overcoat-01',
+      category: 'OUTERWEAR',
+      code: 'SPEC_03',
+      specCode: 'COAT_01',
+      name: 'OVERSIZED TAILORED OVERCOAT',
+      edition: 'CHAPTER 01 // HEAVY WOOL & STONE WEAVE',
+      badge: 'LIMITED',
+      era: '2024 - VOID CORE',
+      year: '2024',
+      price: 890,
+      image: '/assets/images/overcoat_model_1788842290581.jpg',
+      composition: '100% Heavy Virgin Wool & Stone Fiber Weave',
+      outsoleOrChassis: 'Structural Double-Faced Architecture',
+      description: 'Oversized tailored technical overcoat paired with relaxed stone trousers. Horn buttons and unlined brutalist drape.',
+      dimensions: 'Length 118cm / Drop 8',
+      weight: '1420g total garment',
+      tensileStrength: '22,000 N/m²',
+      avail: 'Size 46 - 52 | Virgin Wool',
+      allotment: 'IN STOCK // 12 UNITS',
+    },
+    {
+      id: 'vn-composite-01',
+      category: 'COMPOSITES',
+      code: 'SPEC_04',
+      specCode: 'COMP_01',
+      name: '3K CARBON MIDSOLE INTEGRITY SHANK',
+      edition: 'LAB SPEC 04 // 3K AEROSPACE COMPOSITE',
+      badge: 'PROTOTYPE',
+      era: '2025 - PROTOTYPES',
+      year: '2025',
+      price: 310,
+      image: '/assets/images/blueprint_deconstruct_1788842375340.jpg',
+      composition: 'High-Modulus Carbon Fiber Prepreg, Titanium Hardware',
+      outsoleOrChassis: 'Torsional Carbon Bridge',
+      description: 'Precision-milled aerospace composite embedded between split dual-density foam wedges. 98g total shank transmitting dynamic stride stability.',
+      dimensions: '220 × 65 × 1.2 mm',
+      weight: '98g per plate',
+      tensileStrength: '34,000 N/m²',
+      avail: 'Universal Atelier Shank Specification',
+      allotment: 'LAB RESERVATION ONLY',
+    },
+  ];
+
+  const filteredCuratedSpecimens = curatedSpecimens.filter((spec) => {
+    if (curatedCategory === 'ALL') return true;
+    return spec.category === curatedCategory;
+  });
+
+  const handleAcquireSpecimenItem = (spec: typeof curatedSpecimens[0]) => {
+    const cartItem: CartItem = {
+      id: spec.id,
+      code: spec.specCode,
+      name: spec.name,
+      edition: spec.edition,
+      price: spec.price,
+      image: spec.image,
+      colorway: spec.category === 'FOOTWEAR' ? 'Cream & Stone' : 'Atelier Natural',
+      specification: spec.avail,
+      availableSizes: ['EU 40', 'EU 41', 'EU 42', 'EU 43', 'EU 44', 'EU 45'],
+      allocationStatus: `Allocated // ${spec.allotment}`,
+      quantity: 1,
+    };
+    onQuickAddProduct(cartItem);
+  };
+
   const blueprintLayers = [
     {
       id: '01',
@@ -181,15 +363,19 @@ export const CollectionsView: React.FC<CollectionsViewProps> = ({
         className="w-full bg-[#e4ddcf] border-b border-[#d5cdc0] px-4 sm:px-8 py-2 text-[10px] font-mono tracking-wider text-[#59544c] flex flex-wrap justify-between items-center gap-2"
       >
         <div className="flex items-center gap-2">
-          <span className="inline-block w-2 h-2 bg-[#1a1816]"></span>
-          <span>SPECIFICATION: TRAVERTINE // PROTOTYPE EDITION // STASIS_BUILD: V4.2</span>
+          <span className="inline-block w-2 h-2 rounded-full bg-[#1a1816] animate-pulse"></span>
+          <span className="font-bold text-[#1a1816]">ATELIER STASIS: ACTIVE</span>
+          <span className="text-[#8e8474]">//</span>
+          <span>MONTEBELLUNA & CIVITANOVA MARCHE, ITALY</span>
+          <span className="text-[#8e8474] hidden sm:inline">//</span>
+          <span className="hidden sm:inline">SPEC_TIER: ARCHIVAL V4.2</span>
         </div>
-        <div className="hidden md:flex items-center gap-4">
-          <span>LAT: 52.5200° N</span>
+        <div className="hidden md:flex items-center gap-4 text-[10px]">
+          <span>LAT: 45.7760° N</span>
           <span>|</span>
-          <span>LONG: 13.4050° E</span>
+          <span>LON: 12.0460° E</span>
           <span>|</span>
-          <span className="text-[#1a1816] font-bold">CALIBRATION: ACTIVE / 100% PRESERVATION</span>
+          <span className="text-[#1a1816] font-bold">CRYPTOGRAPHIC PROVENANCE: 100% VERIFIED</span>
         </div>
       </div>
 
@@ -201,28 +387,28 @@ export const CollectionsView: React.FC<CollectionsViewProps> = ({
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-12 items-end pb-8 border-b border-[#d5cdc0]">
             <div className="lg:col-span-8 space-y-3">
               <div className="font-mono text-[11px] uppercase tracking-[0.2em] text-[#7b6e54] font-bold flex items-center gap-2">
-                <span>[ SPECIMEN CLASSIFICATION // ATELIER CRAFTSMANSHIP ]</span>
+                <span>{currentHero.tag}</span>
               </div>
               <h1 className="font-headline text-5xl sm:text-7xl lg:text-8xl tracking-tight text-[#1a1816] leading-[0.95]">
-                BUILT TO <span className="italic font-normal">MOVE</span>
+                {currentHero.title} <span className="italic font-normal">{currentHero.highlight}</span>
               </h1>
               <p className="font-mono text-xs sm:text-sm text-[#59544c] max-w-xl leading-relaxed pt-2">
-                Performance refined through simplicity. Artisanal saddle stitching on vegetable-tanned cream calfskin and natural crepe.
+                {currentHero.description}
               </p>
             </div>
 
             {/* Right metadata box & CTA buttons */}
             <div className="lg:col-span-4 space-y-4 lg:text-right">
               <div className="font-mono text-[11px] text-[#59544c] space-y-1">
-                <div>SYSTEM PROTOCOL: 8-TIER FABRICATION</div>
-                <div>BASE MATRIX: NATURAL TANNED LEATHER</div>
-                <div>PROVENANCE: MONTEBELLUNA, ITALY</div>
+                <div>{currentHero.protocol}</div>
+                <div>{currentHero.matrix}</div>
+                <div>{currentHero.provenance}</div>
               </div>
               <div className="flex items-center lg:justify-end gap-3 pt-2">
                 <button
                   id="hero-view-catalog-btn"
                   onClick={() => onNavigate('SHOP')}
-                  className="bg-[#141312] text-[#f5efe6] px-5 py-2.5 font-mono text-xs font-bold tracking-wider hover:bg-[#35322e] transition-colors cursor-pointer"
+                  className="btn-tactile bg-[#141312] text-[#f5efe6] px-5 py-2.5 font-mono text-xs font-bold tracking-wider hover:bg-[#35322e] transition-colors cursor-pointer"
                 >
                   VIEW CATALOG →
                 </button>
@@ -232,7 +418,7 @@ export const CollectionsView: React.FC<CollectionsViewProps> = ({
                     const el = document.getElementById('blueprint-section');
                     el?.scrollIntoView({ behavior: 'smooth' });
                   }}
-                  className="border border-[#141312] bg-transparent text-[#141312] px-4 py-2.5 font-mono text-xs font-bold tracking-wider hover:bg-[#ded6c9] transition-colors cursor-pointer"
+                  className="btn-tactile border border-[#141312] bg-transparent text-[#141312] px-4 py-2.5 font-mono text-xs font-bold tracking-wider hover:bg-[#ded6c9] transition-colors cursor-pointer"
                 >
                   SPECIFICATIONS
                 </button>
@@ -244,80 +430,70 @@ export const CollectionsView: React.FC<CollectionsViewProps> = ({
           <div className="mt-8 relative border border-[#d5cdc0] bg-[#e4ddcf] overflow-hidden group">
             <div className="relative aspect-[16/9] sm:aspect-[21/10] w-full max-h-[640px] overflow-hidden">
               <img
-                src="/assets/images/hero_welt_macro_1788842274475.jpg"
-                alt="Macro detail of artisan saddle stitching and welt on cream leather runner"
+                key={currentHero.image}
+                src={currentHero.image}
+                alt={currentHero.alt}
                 className="w-full h-full object-cover object-center transform transition-transform duration-700 group-hover:scale-105"
               />
               <div className="absolute inset-0 bg-gradient-to-t from-[#1a1816]/30 via-transparent to-transparent pointer-events-none"></div>
 
               {/* Callout Badge 1: Top Left */}
               <div className="absolute top-4 left-4 sm:top-6 sm:left-6 bg-[#ede7dd]/90 backdrop-blur-sm border border-[#d5cdc0] px-3 py-1.5 font-mono text-[10px] sm:text-xs text-[#1a1816] tracking-wider">
-                [ MACRO ATELIER // REINFORCED SADDLE STITCH ]
+                {currentHero.calloutTopLeft}
               </div>
 
               {/* Callout Badge 2: Top Right */}
               <div className="absolute top-4 right-4 sm:top-6 sm:right-6 bg-[#ede7dd]/90 backdrop-blur-sm border border-[#d5cdc0] px-3 py-1.5 font-mono text-[10px] sm:text-xs text-[#1a1816] tracking-wider">
-                [ TEXTURE: VEG-TANNED GRAIN ]
+                {currentHero.calloutTopRight}
               </div>
 
               {/* Callout Badge 3: Bottom Left */}
               <div className="absolute bottom-4 left-4 sm:bottom-6 sm:left-6 bg-[#ede7dd]/90 backdrop-blur-sm border border-[#d5cdc0] px-3 py-1.5 font-mono text-[10px] sm:text-xs text-[#1a1816] tracking-wider">
-                [ POINT A: HAND-WELTED NATURAL CREPE ]
+                {currentHero.calloutBottomLeft}
               </div>
 
               {/* Callout Badge 4: Bottom Right */}
               <div className="absolute bottom-4 right-4 sm:bottom-6 sm:right-6 bg-[#ede7dd]/90 backdrop-blur-sm border border-[#d5cdc0] px-3 py-1.5 font-mono text-[10px] sm:text-xs text-[#1a1816] tracking-wider">
-                [ POINT B: 360° TEXTURED SUEDE RIM ]
+                {currentHero.calloutBottomRight}
               </div>
             </div>
 
             {/* Sub-hero pagination bar */}
             <div className="flex items-center justify-between px-4 sm:px-6 py-3 border-t border-[#d5cdc0] bg-[#ede7dd] font-mono text-xs">
               <div className="flex items-center gap-3 text-[#59544c]">
-                <span className="font-bold text-[#1a1816]">01</span>
+                <span className="font-bold text-[#1a1816]">{currentHero.id}</span>
                 <span>/</span>
                 <span>04</span>
                 <span className="hidden sm:inline-block pl-2 border-l border-[#d5cdc0] text-[10px]">
-                  CHOPPED CORK WEDGE // NATURAL CALF REINFORCEMENT
+                  {currentHero.caption}
                 </span>
               </div>
               <div className="flex items-center gap-1.5">
-                <button
-                  onClick={() => setHeroSlide(0)}
-                  className={`w-7 h-7 text-xs flex items-center justify-center font-bold border transition-colors cursor-pointer ${
-                    heroSlide === 0 ? 'bg-[#1a1816] text-[#ede7dd] border-[#1a1816]' : 'border-[#d5cdc0] text-[#59544c] hover:bg-[#ded6c9]'
-                  }`}
-                >
-                  01
-                </button>
-                <button
-                  onClick={() => setHeroSlide(1)}
-                  className={`w-7 h-7 text-xs flex items-center justify-center font-bold border transition-colors cursor-pointer ${
-                    heroSlide === 1 ? 'bg-[#1a1816] text-[#ede7dd] border-[#1a1816]' : 'border-[#d5cdc0] text-[#59544c] hover:bg-[#ded6c9]'
-                  }`}
-                >
-                  02
-                </button>
-                <button
-                  onClick={() => setHeroSlide(2)}
-                  className={`w-7 h-7 text-xs flex items-center justify-center font-bold border transition-colors cursor-pointer ${
-                    heroSlide === 2 ? 'bg-[#1a1816] text-[#ede7dd] border-[#1a1816]' : 'border-[#d5cdc0] text-[#59544c] hover:bg-[#ded6c9]'
-                  }`}
-                >
-                  03
-                </button>
+                {[0, 1, 2, 3].map((idx) => (
+                  <button
+                    key={idx}
+                    onClick={() => setHeroSlide(idx)}
+                    className={`w-7 h-7 text-xs flex items-center justify-center font-bold border transition-colors cursor-pointer ${
+                      heroSlide === idx
+                        ? 'bg-[#1a1816] text-[#ede7dd] border-[#1a1816]'
+                        : 'border-[#d5cdc0] text-[#59544c] hover:bg-[#ded6c9]'
+                    }`}
+                  >
+                    0{idx + 1}
+                  </button>
+                ))}
                 <div className="w-[1px] h-4 bg-[#d5cdc0] mx-1"></div>
                 <button
-                  onClick={() => setHeroSlide((s) => (s > 0 ? s - 1 : 2))}
+                  onClick={() => setHeroSlide((s) => (s > 0 ? s - 1 : 3))}
                   className="w-7 h-7 text-xs flex items-center justify-center border border-[#d5cdc0] text-[#59544c] hover:bg-[#ded6c9] transition-colors cursor-pointer"
-                  title="Previous"
+                  title="Previous Slide"
                 >
                   <ChevronLeft className="w-3.5 h-3.5" />
                 </button>
                 <button
-                  onClick={() => setHeroSlide((s) => (s < 2 ? s + 1 : 0))}
+                  onClick={() => setHeroSlide((s) => (s < 3 ? s + 1 : 0))}
                   className="w-7 h-7 text-xs flex items-center justify-center border border-[#d5cdc0] text-[#59544c] hover:bg-[#ded6c9] transition-colors cursor-pointer"
-                  title="Next"
+                  title="Next Slide"
                 >
                   <ChevronRight className="w-3.5 h-3.5" />
                 </button>
@@ -725,79 +901,73 @@ export const CollectionsView: React.FC<CollectionsViewProps> = ({
 
           {/* Product Cards Row */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-            {/* Product 1: Cream Runner on Travertine */}
-            <div className="border border-[#d5cdc0] bg-[#f5efe6] p-6 space-y-4 group hover:border-[#1a1816] transition-colors">
-              <div className="flex justify-between items-center font-mono text-[10px] text-[#59544c] border-b border-[#d5cdc0] pb-2">
-                <span>SPECIMEN SPECIFICATION // 01 TRAVERTINE CREAM</span>
-                <span className="font-bold text-[#1a1816] text-xs">{formatCurrency(480)}</span>
-              </div>
-              <div className="aspect-[4/3] bg-[#ede7dd] border border-[#d5cdc0] overflow-hidden relative">
-                <img
-                  src="/assets/images/cream_runner_pedestal_1788842341279.jpg"
-                  alt="Cream runner on travertine stone pedestal"
-                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                />
-                <span className="absolute bottom-3 right-3 bg-[#ede7dd]/90 font-mono text-[10px] px-2 py-0.5 border border-[#d5cdc0]">
-                  4/50 UNITS
-                </span>
-              </div>
-              <div className="space-y-2">
-                <h3 className="font-headline text-2xl font-bold text-[#1a1816]">
-                  X-01 ARCHITECTURAL RUNNER
-                </h3>
-                <div className="font-mono text-xs text-[#59544c]">
-                  EDITION: 01 // CREAM LEATHER & TRAVERTINE
-                </div>
-                <div className="font-mono text-[10px] text-[#7b6e54]">
-                  AVAIL: 39 - 46 (EU) | INCLUDES ARCHIVE BOX
-                </div>
-              </div>
-              <div className="pt-2">
-                <button
-                  onClick={handleAcquireRunner}
-                  className="w-full bg-[#141312] text-[#f5efe6] py-3 font-mono text-xs font-bold tracking-wider hover:bg-[#35322e] transition-colors flex justify-center items-center gap-2 cursor-pointer"
-                >
-                  ACQUIRE SPECIMEN +
-                </button>
-              </div>
-            </div>
+            {filteredCuratedSpecimens.map((spec) => (
+              <div
+                key={spec.id}
+                className="border border-[#d5cdc0] bg-[#f5efe6] p-6 space-y-4 group hover:border-[#1a1816] transition-all duration-300 flex flex-col justify-between"
+              >
+                <div className="space-y-4">
+                  <div className="flex justify-between items-center font-mono text-[10px] text-[#59544c] border-b border-[#d5cdc0] pb-2">
+                    <span className="font-bold text-[#7b6e54]">
+                      {spec.code} // {spec.category}
+                    </span>
+                    <span className="font-bold text-[#1a1816] text-xs">
+                      {formatCurrency(spec.price)}
+                    </span>
+                  </div>
 
-            {/* Product 2: Taupe Runner on Limestone */}
-            <div className="border border-[#d5cdc0] bg-[#f5efe6] p-6 space-y-4 group hover:border-[#1a1816] transition-colors">
-              <div className="flex justify-between items-center font-mono text-[10px] text-[#59544c] border-b border-[#d5cdc0] pb-2">
-                <span>SPECIMEN // 02 MINERAL TAUPE</span>
-                <span className="font-bold text-[#1a1816] text-xs">{formatCurrency(520)}</span>
-              </div>
-              <div className="aspect-[4/3] bg-[#ede7dd] border border-[#d5cdc0] overflow-hidden relative">
-                <img
-                  src="/assets/images/taupe_runner_pedestal_1788842355799.jpg"
-                  alt="Archival low runner in mineral taupe suede on limestone"
-                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                />
-                <span className="absolute bottom-3 right-3 bg-[#ede7dd]/90 font-mono text-[10px] px-2 py-0.5 border border-[#d5cdc0]">
-                  LIMITED ALLOTMENT
-                </span>
-              </div>
-              <div className="space-y-2">
-                <h3 className="font-headline text-2xl font-bold text-[#1a1816]">
-                  ARCHIVAL LOW RUNNER
-                </h3>
-                <div className="font-mono text-xs text-[#59544c]">
-                  SERIES 02 // TAUPE SUEDE CHASSIS
+                  <div className="aspect-[4/3] bg-[#ede7dd] border border-[#d5cdc0] overflow-hidden relative">
+                    <img
+                      src={spec.image}
+                      alt={spec.name}
+                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
+                    />
+                    <span className="absolute top-3 left-3 bg-[#141312] text-[#f5efe6] font-mono text-[9px] px-2 py-0.5 tracking-wider uppercase font-bold">
+                      {spec.badge}
+                    </span>
+                    <span className="absolute bottom-3 right-3 bg-[#ede7dd]/90 font-mono text-[10px] px-2 py-0.5 border border-[#d5cdc0]">
+                      {spec.allotment}
+                    </span>
+                  </div>
+
+                  <div className="space-y-2">
+                    <h3 className="font-headline text-2xl font-bold text-[#1a1816]">
+                      {spec.name}
+                    </h3>
+                    <div className="font-mono text-xs text-[#59544c]">
+                      {spec.edition}
+                    </div>
+                    <p className="font-mono text-[11px] text-[#59544c] leading-relaxed line-clamp-2">
+                      {spec.description}
+                    </p>
+                    <div className="font-mono text-[10px] text-[#7b6e54] pt-1">
+                      {spec.avail}
+                    </div>
+                  </div>
                 </div>
-                <div className="font-mono text-[10px] text-[#7b6e54]">
-                  AVAIL: 40 - 45 (EU) | ITALIAN TUSCAN SUEDE
+
+                <div className="grid grid-cols-2 gap-2 pt-3 border-t border-[#d5cdc0]">
+                  <button
+                    onClick={() => {
+                      if (onInspectSpecimen) {
+                        onInspectSpecimen(spec);
+                      } else {
+                        onNavigate('SHOP');
+                      }
+                    }}
+                    className="btn-tactile py-2.5 px-2 bg-[#ede7dd] hover:bg-[#ded6c9] text-[#1a1816] border border-[#d5cdc0] hover:border-[#1a1816] text-[10px] font-bold uppercase tracking-wider flex items-center justify-center gap-1.5 cursor-pointer transition-colors"
+                  >
+                    <span>INSPECT SPEC</span>
+                  </button>
+                  <button
+                    onClick={() => handleAcquireSpecimenItem(spec)}
+                    className="btn-tactile py-2.5 px-2 bg-[#141312] text-[#f5efe6] hover:bg-[#35322e] text-[10px] font-bold uppercase tracking-wider flex items-center justify-center gap-1.5 cursor-pointer transition-colors"
+                  >
+                    <span>ACQUIRE +</span>
+                  </button>
                 </div>
               </div>
-              <div className="pt-2">
-                <button
-                  onClick={handleAcquireTaupe}
-                  className="w-full bg-[#141312] text-[#f5efe6] py-3 font-mono text-xs font-bold tracking-wider hover:bg-[#35322e] transition-colors flex justify-center items-center gap-2 cursor-pointer"
-                >
-                  ACQUIRE SPECIMEN +
-                </button>
-              </div>
-            </div>
+            ))}
           </div>
         </section>
 

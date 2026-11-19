@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   Star,
   Check,
@@ -11,11 +11,15 @@ import {
   Scale,
   ShoppingBag,
   ArrowRight,
+  ChevronLeft,
   ChevronRight,
   Camera,
   ThumbsUp,
   MapPin,
   Bell,
+  Play,
+  Pause,
+  RefreshCw,
 } from 'lucide-react';
 import { ShoeProduct, CartItem, ReviewItem } from '../types';
 import { INITIAL_REVIEWS } from '../data/footwearCatalog';
@@ -55,6 +59,7 @@ export const ProductDetailsView: React.FC<ProductDetailsViewProps> = ({
 
   // Active angle in gallery
   const [activeAngle, setActiveAngle] = useState<'front' | 'side' | 'back' | 'top' | 'sole' | 'lifestyle'>('front');
+  const [isAutoRotating, setIsAutoRotating] = useState(false);
 
   // Selected size state
   const [selectedSize, setSelectedSize] = useState<string | null>(null);
@@ -75,6 +80,47 @@ export const ProductDetailsView: React.FC<ProductDetailsViewProps> = ({
   const [newReviewRating, setNewReviewRating] = useState(5);
   const [newReviewFit, setNewReviewFit] = useState<'Runs Small' | 'True to Size' | 'Runs Large'>('True to Size');
   const [newReviewComment, setNewReviewComment] = useState('');
+
+  // Angle image list
+  const angleKeys: Array<'front' | 'side' | 'back' | 'top' | 'sole' | 'lifestyle'> = [
+    'front',
+    'side',
+    'back',
+    'top',
+    'sole',
+    'lifestyle',
+  ];
+
+  // Auto-rotation effect for 360 Turntable Simulator
+  useEffect(() => {
+    if (!isAutoRotating) return;
+    const interval = setInterval(() => {
+      setActiveAngle((prev) => {
+        const available = angleKeys.filter((k) => !!activeColor.images[k]);
+        if (available.length <= 1) return prev;
+        const curIdx = available.indexOf(prev);
+        const nextIdx = (curIdx + 1) % available.length;
+        return available[nextIdx];
+      });
+    }, 2000);
+    return () => clearInterval(interval);
+  }, [isAutoRotating, activeColor]);
+
+  const handleNextAngle = () => {
+    const available = angleKeys.filter((k) => !!activeColor.images[k]);
+    if (available.length <= 1) return;
+    const curIdx = available.indexOf(activeAngle);
+    const nextIdx = (curIdx + 1) % available.length;
+    setActiveAngle(available[nextIdx]);
+  };
+
+  const handlePrevAngle = () => {
+    const available = angleKeys.filter((k) => !!activeColor.images[k]);
+    if (available.length <= 1) return;
+    const curIdx = available.indexOf(activeAngle);
+    const prevIdx = (curIdx - 1 + available.length) % available.length;
+    setActiveAngle(available[prevIdx]);
+  };
 
   // Get sizes and stocks for current selected color
   const sizeStockList = product.sizeInventory[activeColor.name] || [
@@ -187,16 +233,6 @@ export const ProductDetailsView: React.FC<ProductDetailsViewProps> = ({
     onShowToast('CLIENT SPECIFICATION REVIEW SUBMITTED');
   };
 
-  // Angle image list
-  const angleKeys: Array<'front' | 'side' | 'back' | 'top' | 'sole' | 'lifestyle'> = [
-    'front',
-    'side',
-    'back',
-    'top',
-    'sole',
-    'lifestyle',
-  ];
-
   return (
     <div className="w-full bg-[#ede7dd] text-[#1a1816] font-mono pb-24">
       <div className="max-w-[1440px] mx-auto px-4 sm:px-8 lg:px-12 pt-6">
@@ -219,7 +255,7 @@ export const ProductDetailsView: React.FC<ProductDetailsViewProps> = ({
         {/* Top Product Layout: Left Gallery (7 cols) + Right Details (5 cols) */}
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-14 items-start pb-16 border-b border-[#d5cdc0]">
           
-          {/* LEFT: Multi-Angle Interactive Product Gallery */}
+          {/* LEFT: Multi-Angle Interactive Product Gallery (VANTA 360° LAB) */}
           <div className="lg:col-span-7 space-y-4">
             {/* Main Stage Display */}
             <div className="relative aspect-[4/3] bg-[#f5efe6] border border-[#d5cdc0] overflow-hidden group">
@@ -235,9 +271,12 @@ export const ProductDetailsView: React.FC<ProductDetailsViewProps> = ({
                 className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
               />
 
-              {/* Angle Tag Badge */}
-              <div className="absolute top-4 left-4 bg-[#ede7dd]/90 backdrop-blur-sm border border-[#d5cdc0] px-3 py-1 text-[10px] font-bold uppercase tracking-wider text-[#1a1816]">
-                ANGLE: {activeAngle.toUpperCase()} VIEW
+              {/* Angle Tag Badge & 360 Indicator */}
+              <div className="absolute top-4 left-4 flex items-center gap-2">
+                <div className="bg-[#ede7dd]/95 backdrop-blur-sm border border-[#d5cdc0] px-3 py-1 text-[10px] font-bold uppercase tracking-wider text-[#1a1816] flex items-center gap-1.5">
+                  <span className={`w-1.5 h-1.5 rounded-full ${isAutoRotating ? 'bg-emerald-500 animate-ping' : 'bg-[#1a1816]'}`}></span>
+                  <span>VANTA 360° LAB // {activeAngle.toUpperCase()}</span>
+                </div>
               </div>
 
               {/* Wishlist & Compare floating actions */}
@@ -266,9 +305,46 @@ export const ProductDetailsView: React.FC<ProductDetailsViewProps> = ({
                 </button>
               </div>
 
-              {/* Macro inspection hint */}
-              <div className="absolute bottom-4 left-4 bg-[#ede7dd]/90 backdrop-blur-sm border border-[#d5cdc0] px-2.5 py-1 text-[9px] text-[#7b6e54]">
-                ARCHIVAL RESOLUTION // ATELIER VERIFIED
+              {/* Interactive Left / Right 360 Scrubber Overlay Arrows */}
+              <button
+                onClick={handlePrevAngle}
+                className="absolute left-3 top-1/2 -translate-y-1/2 w-8 h-8 bg-[#ede7dd]/85 hover:bg-[#ede7dd] border border-[#d5cdc0] text-[#1a1816] flex items-center justify-center transition-all opacity-0 group-hover:opacity-100 cursor-pointer shadow-sm"
+                title="Rotate to previous angle"
+                aria-label="Previous angle"
+              >
+                <ChevronLeft className="w-4 h-4" />
+              </button>
+              <button
+                onClick={handleNextAngle}
+                className="absolute right-3 top-1/2 -translate-y-1/2 w-8 h-8 bg-[#ede7dd]/85 hover:bg-[#ede7dd] border border-[#d5cdc0] text-[#1a1816] flex items-center justify-center transition-all opacity-0 group-hover:opacity-100 cursor-pointer shadow-sm"
+                title="Rotate to next angle"
+                aria-label="Next angle"
+              >
+                <ChevronRight className="w-4 h-4" />
+              </button>
+
+              {/* Bottom 360 Controls & Resolution Tag */}
+              <div className="absolute bottom-4 left-4 right-4 flex items-center justify-between pointer-events-none">
+                <div className="bg-[#ede7dd]/90 backdrop-blur-sm border border-[#d5cdc0] px-2.5 py-1 text-[9px] text-[#7b6e54] pointer-events-auto">
+                  ARCHIVAL RESOLUTION // ATELIER VERIFIED
+                </div>
+
+                <button
+                  onClick={() => setIsAutoRotating(!isAutoRotating)}
+                  className="pointer-events-auto bg-[#141312] hover:bg-[#35322e] text-[#f5efe6] border border-[#141312] px-3 py-1 font-mono text-[9px] font-bold tracking-wider uppercase flex items-center gap-1.5 transition-colors cursor-pointer"
+                >
+                  {isAutoRotating ? (
+                    <>
+                      <Pause className="w-3 h-3" />
+                      <span>PAUSE 360°</span>
+                    </>
+                  ) : (
+                    <>
+                      <Play className="w-3 h-3" />
+                      <span>AUTO-ROTATE 360°</span>
+                    </>
+                  )}
+                </button>
               </div>
             </div>
 
@@ -281,7 +357,10 @@ export const ProductDetailsView: React.FC<ProductDetailsViewProps> = ({
                 return (
                   <button
                     key={ang}
-                    onClick={() => setActiveAngle(ang)}
+                    onClick={() => {
+                      setIsAutoRotating(false);
+                      setActiveAngle(ang);
+                    }}
                     className={`border p-1 bg-[#f5efe6] transition-all cursor-pointer flex flex-col items-center gap-1 ${
                       isCurrent
                         ? 'border-[#1a1816] ring-1 ring-[#1a1816]'
@@ -455,14 +534,14 @@ export const ProductDetailsView: React.FC<ProductDetailsViewProps> = ({
               <div className="grid grid-cols-2 gap-3">
                 <button
                   onClick={handleAddToCartClick}
-                  className="w-full py-4 bg-[#ede7dd] hover:bg-[#ded6c9] text-[#1a1816] border border-[#141312] text-xs font-bold uppercase tracking-[0.15em] flex items-center justify-center gap-2 cursor-pointer transition-colors"
+                  className="btn-tactile w-full py-4 bg-[#ede7dd] hover:bg-[#ded6c9] text-[#1a1816] border border-[#141312] text-xs font-bold uppercase tracking-[0.15em] flex items-center justify-center gap-2 cursor-pointer transition-colors"
                 >
                   <ShoppingBag className="w-4 h-4" />
                   <span>ADD TO BAG</span>
                 </button>
                 <button
                   onClick={handleBuyNowClick}
-                  className="w-full py-4 bg-[#141312] hover:bg-[#35322e] text-[#f5efe6] text-xs font-bold uppercase tracking-[0.15em] flex items-center justify-center gap-2 cursor-pointer transition-colors"
+                  className="btn-tactile w-full py-4 bg-[#141312] hover:bg-[#35322e] text-[#f5efe6] text-xs font-bold uppercase tracking-[0.15em] flex items-center justify-center gap-2 cursor-pointer transition-colors"
                 >
                   <span>BUY NOW</span>
                   <ArrowRight className="w-4 h-4" />

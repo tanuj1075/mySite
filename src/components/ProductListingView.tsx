@@ -588,6 +588,13 @@ export const ProductListingView: React.FC<ProductListingViewProps> = ({
                     )
                   ).sort((a, b) => Number(a) - Number(b));
 
+                  const totalStock = ((Object.values(shoe.sizeInventory) as SizeStock[][]))
+                    .flat()
+                    .reduce((sum, s) => sum + s.stock, 0);
+
+                  const frontImg = shoe.colors[0]?.images.front;
+                  const sideImg = shoe.colors[0]?.images.side || shoe.colors[0]?.images.lifestyle || frontImg;
+
                   return (
                     <div
                       key={shoe.id}
@@ -627,13 +634,14 @@ export const ProductListingView: React.FC<ProductListingViewProps> = ({
                           </div>
                         </div>
 
-                        {/* Image Preview with Hover Scale */}
+                        {/* Image Preview with Dual-Angle Hover Reveal */}
                         <div
                           onClick={() => onSelectProduct(shoe)}
                           className="relative aspect-[4/3] bg-[#ede7dd] border border-[#d5cdc0] overflow-hidden mb-4 cursor-pointer"
                         >
+                          {/* Primary Front Angle */}
                           <img
-                            src={shoe.colors[0]?.images.front}
+                            src={frontImg}
                             alt={shoe.name}
                             onError={(e) => {
                               const target = e.target as HTMLImageElement;
@@ -641,8 +649,24 @@ export const ProductListingView: React.FC<ProductListingViewProps> = ({
                                 target.src = '/assets/images/cream_runner_pedestal_1788842341279.jpg';
                               }
                             }}
-                            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
+                            className={`w-full h-full object-cover transition-all duration-700 ${
+                              sideImg !== frontImg ? 'group-hover:opacity-0' : 'group-hover:scale-105'
+                            }`}
                           />
+
+                          {/* Secondary Side Angle on Hover */}
+                          {sideImg && sideImg !== frontImg && (
+                            <img
+                              src={sideImg}
+                              alt={`${shoe.name} side profile`}
+                              onError={(e) => {
+                                const target = e.target as HTMLImageElement;
+                                target.style.display = 'none';
+                              }}
+                              className="w-full h-full object-cover absolute inset-0 opacity-0 group-hover:opacity-100 transition-all duration-700 group-hover:scale-105"
+                            />
+                          )}
+
                           {shoe.discountPercent > 0 && (
                             <div className="absolute top-2 left-2 bg-[#141312] text-[#f5efe6] px-2 py-0.5 text-[9px] font-bold tracking-wider uppercase">
                               {shoe.discountPercent}% OFF
@@ -651,6 +675,11 @@ export const ProductListingView: React.FC<ProductListingViewProps> = ({
                           {shoe.isLimitedDrop && (
                             <div className="absolute bottom-2 left-2 bg-[#ede7dd]/90 border border-[#d5cdc0] px-2 py-0.5 text-[9px] font-bold text-[#1a1816]">
                               LIMITED DROP
+                            </div>
+                          )}
+                          {totalStock > 0 && totalStock <= 10 && (
+                            <div className="absolute top-2 right-2 bg-[#b83b3b] text-[#f5efe6] px-2 py-0.5 text-[8px] font-bold tracking-wider uppercase animate-pulse">
+                              ONLY {totalStock} LEFT
                             </div>
                           )}
                         </div>
@@ -691,6 +720,23 @@ export const ProductListingView: React.FC<ProductListingViewProps> = ({
                           </span>
                         </div>
 
+                        {/* Colorway Swatches Preview */}
+                        {shoe.colors && shoe.colors.length > 1 && (
+                          <div className="flex items-center gap-1.5 mb-3">
+                            <span className="text-[8px] uppercase tracking-wider text-[#7b6e54] font-bold mr-1">
+                              {shoe.colors.length} TONES:
+                            </span>
+                            {shoe.colors.map((c) => (
+                              <span
+                                key={c.name}
+                                title={c.name}
+                                className="w-2.5 h-2.5 rounded-full border border-[#d5cdc0]"
+                                style={{ backgroundColor: c.hex }}
+                              />
+                            ))}
+                          </div>
+                        )}
+
                         {/* Available Sizes List */}
                         <div className="space-y-1 pt-2 border-t border-[#d5cdc0]">
                           <span className="text-[9px] font-bold text-[#7b6e54] uppercase block">
@@ -713,14 +759,14 @@ export const ProductListingView: React.FC<ProductListingViewProps> = ({
                       <div className="grid grid-cols-2 gap-2 p-4 pt-0">
                         <button
                           onClick={() => onSelectProduct(shoe)}
-                          className="py-2 bg-[#ede7dd] hover:bg-[#ded6c9] text-[#1a1816] border border-[#d5cdc0] hover:border-[#1a1816] text-[10px] font-bold uppercase tracking-wider flex items-center justify-center gap-1 cursor-pointer transition-colors"
+                          className="btn-tactile py-2 bg-[#ede7dd] hover:bg-[#ded6c9] text-[#1a1816] border border-[#d5cdc0] hover:border-[#1a1816] text-[10px] font-bold uppercase tracking-wider flex items-center justify-center gap-1 cursor-pointer transition-colors"
                         >
                           <Eye className="w-3.5 h-3.5" />
                           <span>DETAILS</span>
                         </button>
                         <button
                           onClick={() => onSelectProduct(shoe)}
-                          className="py-2 bg-[#141312] hover:bg-[#35322e] text-[#f5efe6] text-[10px] font-bold uppercase tracking-wider flex items-center justify-center gap-1 cursor-pointer transition-colors"
+                          className="btn-tactile py-2 bg-[#141312] hover:bg-[#35322e] text-[#f5efe6] text-[10px] font-bold uppercase tracking-wider flex items-center justify-center gap-1 cursor-pointer transition-colors"
                         >
                           <ShoppingBag className="w-3.5 h-3.5" />
                           <span>SELECT SIZE</span>
