@@ -267,8 +267,36 @@
 }
 
 /* LIGHT THEME SYSTEM OVERRIDES */
+html.light, html.light body {
+  background-color: #F7F5F0 !important;
+  background-image: 
+    radial-gradient(circle at 50% -10%, rgba(201, 169, 110, 0.12) 0%, transparent 55%),
+    radial-gradient(circle at 90% 25%, rgba(201, 169, 110, 0.07) 0%, transparent 40%),
+    radial-gradient(circle at 10% 70%, rgba(140, 115, 80, 0.06) 0%, transparent 45%),
+    linear-gradient(rgba(201, 169, 110, 0.05) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(201, 169, 110, 0.05) 1px, transparent 1px) !important;
+  color: #121215 !important;
+}
+
 html.light * {
   border-color: #DDD5C7;
+}
+
+html.light input,
+html.light select,
+html.light textarea {
+  background-color: #FFFFFF !important;
+  color: #121215 !important;
+  border-color: #DDD5C7 !important;
+}
+html.light input::placeholder,
+html.light textarea::placeholder {
+  color: #8E8E98 !important;
+}
+html.light input:focus,
+html.light select:focus,
+html.light textarea:focus {
+  border-color: #C9A96E !important;
 }
 
 html.light ::-webkit-scrollbar-track {
@@ -282,7 +310,7 @@ html.light ::-webkit-scrollbar-thumb:hover {
 }
 
 html.light header {
-  background-color: rgba(247, 245, 240, 0.94) !important;
+  background-color: rgba(247, 245, 240, 0.96) !important;
   border-color: #DDD5C7 !important;
 }
 
@@ -303,7 +331,8 @@ html.light .bg-\[\#09090B\] {
 }
 
 html.light .bg-\[\#121215\],
-html.light .bg-\[\#121215\]\/90 {
+html.light .bg-\[\#121215\]\/90,
+html.light .bg-\[\#121215\]\/95 {
   background-color: #FFFFFF !important;
 }
 

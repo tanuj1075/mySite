@@ -1,5 +1,6 @@
-import React, { useState } from 'react';
-import { Check } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { Check, Sun, Moon } from 'lucide-react';
+import { getTheme, setTheme, subscribeTheme, ThemeMode } from '../lib/theme';
 
 interface FooterProps {
   onSelectNav?: (nav: string) => void;
@@ -15,6 +16,11 @@ export const Footer: React.FC<FooterProps> = ({
   const [email, setEmail] = useState('');
   const [isSubscribed, setIsSubscribed] = useState(false);
   const [secretClickCount, setSecretClickCount] = useState(0);
+  const [theme, setCurrentTheme] = useState<ThemeMode>(getTheme());
+
+  useEffect(() => {
+    return subscribeTheme((t) => setCurrentTheme(t));
+  }, []);
 
   const handleSecretAdminTrigger = (e: React.MouseEvent) => {
     if (e.altKey || e.metaKey || e.ctrlKey) {
@@ -177,6 +183,51 @@ export const Footer: React.FC<FooterProps> = ({
                 DISCLOSURE
               </span>
             </div>
+          </div>
+        </div>
+
+        {/* Visual Appearance & Theme Controls */}
+        <div className="py-6 border-b border-[#242429] flex flex-col sm:flex-row items-center justify-between gap-4 font-mono text-[11px]">
+          <div className="flex items-center gap-2">
+            <span className="w-1.5 h-1.5 bg-[#c9a96e]"></span>
+            <span className="text-[#8e8e98] uppercase tracking-widest text-[10px]">
+              APPEARANCE MODE:
+            </span>
+            <span className="text-[#f4f4f6] font-bold text-[10px]">
+              {theme === 'dark' ? 'OBSIDIAN DARK LUXURY' : 'ALABASTER LIGHT LUXURY'}
+            </span>
+          </div>
+
+          <div
+            id="footer-theme-switcher"
+            className="flex items-center border border-[#242429] bg-[#121215] p-1 gap-1"
+          >
+            <button
+              id="footer-theme-dark-btn"
+              onClick={() => setTheme('dark')}
+              className={`flex items-center gap-2 px-3 py-1.5 text-[10px] font-bold uppercase tracking-wider transition-all cursor-pointer ${
+                theme === 'dark'
+                  ? 'bg-[#c9a96e] text-[#09090b]'
+                  : 'text-[#8e8e98] hover:text-[#f4f4f6]'
+              }`}
+              title="Switch to Obsidian Dark Luxury Theme"
+            >
+              <Moon className="w-3.5 h-3.5" />
+              <span>DARK MODE</span>
+            </button>
+            <button
+              id="footer-theme-light-btn"
+              onClick={() => setTheme('light')}
+              className={`flex items-center gap-2 px-3 py-1.5 text-[10px] font-bold uppercase tracking-wider transition-all cursor-pointer ${
+                theme === 'light'
+                  ? 'bg-[#c9a96e] text-[#09090b]'
+                  : 'text-[#8e8e98] hover:text-[#f4f4f6]'
+              }`}
+              title="Switch to Alabaster Light Luxury Theme"
+            >
+              <Sun className="w-3.5 h-3.5" />
+              <span>LIGHT MODE</span>
+            </button>
           </div>
         </div>
 

@@ -33,6 +33,7 @@ import { AdminLoginView } from './components/AdminLoginView';
 import { Footer } from './components/Footer';
 import { adminApi, authApi, clearAdminSession, clearSession, customerApi } from './lib/api';
 import { UpiPaymentModal } from './components/UpiPaymentModal';
+import { FloatingThemeWidget } from './components/FloatingThemeWidget';
 import { initTheme } from './lib/theme';
 import { subscribeCurrency } from './lib/currency';
 
@@ -1666,11 +1667,14 @@ export default function App() {
       )}
 
 
-      {/* Tactile Obsidian Dark Feedback Toast */}
+      {/* Floating Global Theme Mode Switcher */}
+      <FloatingThemeWidget />
+
+      {/* Tactile Feedback Toast Notification */}
       {toastMessage && (
         <aside
           aria-live="polite"
-          className="fixed bottom-6 right-6 z-50 bg-[#18181c] border border-[#242429] text-[#f4f4f6] px-4 py-3 font-mono text-[10px] tracking-widest shadow-2xl flex items-center gap-3 animate-fade-in"
+          className="fixed bottom-20 right-6 z-50 bg-[#18181c] border border-[#242429] text-[#f4f4f6] px-4 py-3 font-mono text-[10px] tracking-widest shadow-2xl flex items-center gap-3 animate-fade-in"
         >
           <span className="w-1.5 h-1.5 bg-[#c9a96e] shrink-0"></span>
           <span>{toastMessage}</span>

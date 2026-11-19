@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Search, Heart, ShoppingBag, User, Menu, X, Scale, Sun, Moon, Globe, ChevronDown } from 'lucide-react';
 import { CURRENCY_CONFIGS, SupportedCurrency, getActiveCurrency, setActiveCurrency, subscribeCurrency } from '../lib/currency';
-import { getTheme, toggleTheme, subscribeTheme, ThemeMode } from '../lib/theme';
+import { getTheme, setTheme, toggleTheme, subscribeTheme, ThemeMode } from '../lib/theme';
 
 interface HeaderProps {
   cartCount: number;
@@ -294,20 +294,39 @@ export const Header: React.FC<HeaderProps> = ({
             )}
           </div>
 
-          {/* Theme Mode Toggle Trigger */}
-          <button
-            id="theme-toggle-btn"
-            onClick={() => toggleTheme()}
-            className="w-7 h-7 sm:w-8 sm:h-8 flex items-center justify-center transition-colors cursor-pointer border border-[#242429] bg-[#121215] hover:border-[#c9a96e]"
-            aria-label="Toggle Dark / Light Theme"
-            title={`Switch to ${theme === 'dark' ? 'Alabaster Light' : 'Obsidian Dark'} Mode`}
+          {/* Segmented Theme Switcher */}
+          <div
+            id="header-theme-switcher"
+            className="flex items-center border border-[#242429] bg-[#121215] p-0.5"
+            title="Theme Selection: Dark / Light"
           >
-            {theme === 'dark' ? (
-              <Sun className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-[#c9a96e]" />
-            ) : (
-              <Moon className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-[#121215]" />
-            )}
-          </button>
+            <button
+              id="header-dark-theme-btn"
+              onClick={() => setTheme('dark')}
+              className={`flex items-center gap-1 px-2 py-1 text-[9px] font-mono font-bold tracking-wider transition-all cursor-pointer ${
+                theme === 'dark'
+                  ? 'bg-[#c9a96e] text-[#09090b]'
+                  : 'text-[#8e8e98] hover:text-[#f4f4f6]'
+              }`}
+              title="Obsidian Dark Luxury Theme"
+            >
+              <Moon className="w-3 h-3" />
+              <span className="hidden sm:inline">DARK</span>
+            </button>
+            <button
+              id="header-light-theme-btn"
+              onClick={() => setTheme('light')}
+              className={`flex items-center gap-1 px-2 py-1 text-[9px] font-mono font-bold tracking-wider transition-all cursor-pointer ${
+                theme === 'light'
+                  ? 'bg-[#c9a96e] text-[#09090b]'
+                  : 'text-[#8e8e98] hover:text-[#f4f4f6]'
+              }`}
+              title="Alabaster Light Luxury Theme"
+            >
+              <Sun className="w-3 h-3" />
+              <span className="hidden sm:inline">LIGHT</span>
+            </button>
+          </div>
 
           {/* Account Profile / Login Trigger */}
           <button
