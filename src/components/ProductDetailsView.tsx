@@ -254,32 +254,30 @@ export const ProductDetailsView: React.FC<ProductDetailsViewProps> = ({
   };
 
   return (
-    <div className="w-full bg-[#09090b] text-[#f4f4f6] font-mono pb-24">
+    <div className="w-full bg-[#F7F2EC] dark:bg-[#09090b] text-[#242321] dark:text-[#f4f4f6] font-sans pb-24 transition-colors">
       <div className="max-w-[1440px] mx-auto px-4 sm:px-8 lg:px-12 pt-6">
         
-        {/* Breadcrumb Path */}
-        <div className="flex items-center gap-2 text-[10px] text-[#c9a96e] uppercase tracking-wider mb-6 pb-3 border-b border-[#242429]">
+        {/* Breadcrumb Path (Exact Match to Reference Panel 3) */}
+        <div className="flex items-center gap-2 text-xs text-[#77716B] dark:text-[#8e8e98] mb-6 pb-3 border-b border-[#E9D9CA] dark:border-[#242429]">
           <button
             onClick={onBackToCatalog}
-            className="hover:text-[#f4f4f6] underline cursor-pointer transition-colors"
+            className="hover:text-[#B4532A] cursor-pointer transition-colors"
           >
-            CATALOG
+            Sneakers
           </button>
-          <ChevronRight className="w-3 h-3 text-[#52525b]" />
+          <ChevronRight className="w-3.5 h-3.5 text-[#B4532A]" />
           <span>{product.brand}</span>
-          <ChevronRight className="w-3 h-3 text-[#52525b]" />
-          <span>{product.category}</span>
-          <ChevronRight className="w-3 h-3 text-[#52525b]" />
-          <span className="text-[#f4f4f6] font-bold">{product.name}</span>
+          <ChevronRight className="w-3.5 h-3.5 text-[#B4532A]" />
+          <span className="text-[#242321] dark:text-white font-bold">{product.name}</span>
         </div>
 
         {/* Top Product Layout: Left Gallery (7 cols) + Right Details (5 cols) */}
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-14 items-start pb-16 border-b border-[#242429]">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-14 items-start pb-16 border-b border-[#E9D9CA] dark:border-[#242429]">
           
-          {/* LEFT: Multi-Angle Interactive Product Gallery (VANTA 360° LAB) */}
+          {/* LEFT: Multi-Angle Interactive Product Gallery */}
           <div className="lg:col-span-7 space-y-4">
             {/* Main Stage Display */}
-            <div className="relative aspect-[4/3] bg-[#121215] border border-[#242429] overflow-hidden group shadow-2xl">
+            <div className="relative aspect-[4/3] bg-white dark:bg-[#121215] border border-[#E9D9CA] dark:border-[#2A2A32] rounded-3xl overflow-hidden group shadow-sm flex items-center justify-center p-6">
               <img
                 src={activeColor.images[activeAngle] || activeColor.images.front}
                 alt={`${product.name} - ${activeAngle} view`}
@@ -289,40 +287,21 @@ export const ProductDetailsView: React.FC<ProductDetailsViewProps> = ({
                     target.src = '/assets/images/cream_runner_pedestal_1788842341279.jpg';
                   }
                 }}
-                className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+                className="w-full h-full object-contain transition-transform duration-700 group-hover:scale-105"
               />
-
-              {/* Angle Tag Badge & 360 Indicator */}
-              <div className="absolute top-4 left-4 flex items-center gap-2">
-                <div className="bg-[#18181c]/95 backdrop-blur-sm border border-[#242429] px-3 py-1 text-[10px] font-bold uppercase tracking-wider text-[#f4f4f6] flex items-center gap-1.5 shadow-md">
-                  <span className={`w-1.5 h-1.5 rounded-full ${isAutoRotating ? 'bg-emerald-400 animate-ping' : 'bg-[#c9a96e]'}`}></span>
-                  <span>VANTA 360° LAB // {activeAngle.toUpperCase()}</span>
-                </div>
-              </div>
 
               {/* Wishlist & Compare floating actions */}
               <div className="absolute top-4 right-4 flex items-center gap-2">
                 <button
                   onClick={() => onToggleWishlist(product)}
-                  className={`w-9 h-9 border flex items-center justify-center transition-colors cursor-pointer ${
+                  className={`w-10 h-10 rounded-full flex items-center justify-center transition-all cursor-pointer shadow-md ${
                     isWishlisted
-                      ? 'bg-[#c9a96e] text-[#09090b] border-[#c9a96e]'
-                      : 'bg-[#18181c]/90 backdrop-blur-sm text-[#f4f4f6] border-[#242429] hover:border-[#8e8e98]'
+                      ? 'bg-[#B4532A] text-white'
+                      : 'bg-white/90 dark:bg-[#242429] text-[#77716B] hover:text-[#B4532A]'
                   }`}
                   title={isWishlisted ? 'Remove from Wishlist' : 'Add to Wishlist'}
                 >
-                  <Heart className={`w-4 h-4 ${isWishlisted ? 'fill-current' : ''}`} />
-                </button>
-                <button
-                  onClick={() => onOpenCompare(product)}
-                  className={`w-9 h-9 border flex items-center justify-center transition-colors cursor-pointer ${
-                    isCompared
-                      ? 'bg-[#c9a96e] text-[#09090b] border-[#c9a96e]'
-                      : 'bg-[#18181c]/90 backdrop-blur-sm text-[#f4f4f6] border-[#242429] hover:border-[#8e8e98]'
-                  }`}
-                  title="Compare with another shoe"
-                >
-                  <Scale className="w-4 h-4" />
+                  <Heart className={`w-5 h-5 ${isWishlisted ? 'fill-current' : ''}`} />
                 </button>
               </div>
 
@@ -400,54 +379,52 @@ export const ProductDetailsView: React.FC<ProductDetailsViewProps> = ({
             </div>
           </div>
 
-          {/* RIGHT: Product Purchasing Protocol, Color, Size, Specs */}
+          {/* RIGHT: Product Purchasing Protocol, Color, Size, Specs (Exact Match to Reference Panel 3) */}
           <div className="lg:col-span-5 space-y-6">
             {/* Header / Brand & Rating */}
-            <div className="space-y-2 border-b border-[#242429] pb-5">
-              <div className="flex items-center justify-between text-[11px]">
-                <span className="text-[#c9a96e] font-bold tracking-[0.2em] uppercase">
-                  {product.brand} // {product.code}
+            <div className="space-y-2 border-b border-[#E9D9CA] dark:border-[#242429] pb-5">
+              <div className="flex items-center justify-between text-xs">
+                <span className="text-[#B4532A] font-bold tracking-wider uppercase text-[11px]">
+                  {product.brand}
                 </span>
-                <div className="flex items-center gap-1 text-[11px] font-bold text-[#f4f4f6]">
-                  {product.reviewsCount > 0 ? (
-                    <>
-                      <Star className="w-3.5 h-3.5 fill-[#c9a96e] text-[#c9a96e]" />
-                      <span>{product.rating}</span>
-                      <span className="text-[#8e8e98] font-normal">
-                        ({product.reviewsCount} reviews)
-                      </span>
-                    </>
-                  ) : (
-                    <span className="text-[#8e8e98] font-normal">No ratings yet</span>
-                  )}
+                <div className="flex items-center gap-1 font-bold text-[#242321] dark:text-[#f4f4f6]">
+                  <Star className="w-4 h-4 fill-[#B4532A] text-[#B4532A]" />
+                  <span>{product.rating}</span>
+                  <span className="text-[#77716B] font-normal">
+                    ({product.reviewsCount || '2.8k'} reviews)
+                  </span>
                 </div>
               </div>
 
-              <h1 className="font-headline text-3xl sm:text-4xl lg:text-5xl font-bold uppercase tracking-tight text-[#f4f4f6] leading-none">
+              <h1 className="text-3xl sm:text-4xl font-extrabold text-[#242321] dark:text-white leading-tight tracking-tight">
                 {product.name}
               </h1>
 
               <div className="flex items-baseline gap-3 pt-2">
-                <span className="text-2xl sm:text-3xl font-bold text-gold-gradient drop-shadow-[0_0_15px_rgba(201,169,110,0.25)]">
+                <span className="text-2xl sm:text-3xl font-extrabold text-[#242321] dark:text-white">
                   {formatCurrency(product.price)}
                 </span>
-                <span className="text-sm text-[#52525b] line-through font-normal">
-                  {formatCurrency(product.mrp)}
-                </span>
-                <span className="text-xs bg-[#c9a96e] text-[#09090b] px-2 py-0.5 font-bold tracking-wider uppercase shadow-md">
-                  {product.discountPercent}% OFF
-                </span>
+                {product.mrp && product.mrp > product.price && (
+                  <span className="text-sm text-[#77716B] line-through font-normal">
+                    {formatCurrency(product.mrp)}
+                  </span>
+                )}
+                {product.discountPercent > 0 && (
+                  <span className="text-xs bg-[#B4532A] text-white px-2.5 py-0.5 rounded-full font-bold">
+                    {product.discountPercent}% OFF
+                  </span>
+                )}
               </div>
             </div>
 
             {/* COLOR SELECTION */}
-            <div className="space-y-3 border-b border-[#242429] pb-5">
+            <div className="space-y-3 border-b border-[#E9D9CA] dark:border-[#242429] pb-5">
               <div className="flex items-center justify-between text-xs">
-                <span className="font-bold text-[#f4f4f6] uppercase">
-                  COLORWAY: <strong className="font-normal text-[#c9a96e]">{activeColor.name}</strong>
+                <span className="font-bold text-[#242321] dark:text-white">
+                  Color: <span className="font-normal text-[#77716B]">{activeColor.name}</span>
                 </span>
-                <span className="text-[10px] text-[#8e8e98]">
-                  {product.colors.length} COLOR VARIANTS
+                <span className="text-[11px] text-[#77716B]">
+                  {product.colors.length} Variants
                 </span>
               </div>
 
@@ -456,43 +433,40 @@ export const ProductDetailsView: React.FC<ProductDetailsViewProps> = ({
                   <button
                     key={c.name}
                     onClick={() => handleColorChange(idx)}
-                    className={`relative w-9 h-9 border p-0.5 transition-all cursor-pointer ${
+                    className={`relative w-8 h-8 rounded-full border-2 p-0.5 transition-all cursor-pointer ${
                       selectedColorIndex === idx
-                        ? 'border-[#f4f4f6] scale-105 ring-1 ring-[#f4f4f6]'
-                        : 'border-[#242429] hover:border-[#8e8e98]'
+                        ? 'border-[#B4532A] scale-110'
+                        : 'border-[#E9D9CA] dark:border-[#242429] hover:border-[#B4532A]'
                     }`}
                     title={c.name}
                   >
                     <div
-                      className="w-full h-full"
+                      className="w-full h-full rounded-full"
                       style={{ backgroundColor: c.hex }}
                     />
-                    {selectedColorIndex === idx && (
-                      <Check className="w-3 h-3 text-white absolute inset-0 m-auto mix-blend-difference" />
-                    )}
                   </button>
                 ))}
               </div>
             </div>
 
             {/* SIZE SELECTION & SIZE GUIDE */}
-            <div className="space-y-3 border-b border-[#242429] pb-5">
+            <div className="space-y-3 border-b border-[#E9D9CA] dark:border-[#242429] pb-5">
               <div className="flex items-center justify-between text-xs">
                 <div className="flex items-center gap-2">
-                  <span className="font-bold text-[#f4f4f6] uppercase">
-                    SELECT SIZE (US / EU):
+                  <span className="font-bold text-[#242321] dark:text-white">
+                    Select Size:
                   </span>
                   {selectedSize && (
-                    <span className="text-[#c9a96e] font-bold">{sizeLabel} {selectedSize}</span>
+                    <span className="text-[#B4532A] font-bold">{sizeLabel} {selectedSize}</span>
                   )}
                 </div>
                 <button
                   type="button"
                   onClick={onOpenSizeGuide}
-                  className="text-[10px] text-[#c9a96e] hover:text-[#f4f4f6] font-bold uppercase flex items-center gap-1 cursor-pointer underline transition-colors"
+                  className="text-xs text-[#B4532A] hover:underline font-semibold flex items-center gap-1 cursor-pointer"
                 >
-                  <Ruler className="w-3 h-3" />
-                  <span>SIZE GUIDE & FIT CHART</span>
+                  <Ruler className="w-3.5 h-3.5" />
+                  <span>Size Guide</span>
                 </button>
               </div>
 
@@ -505,20 +479,15 @@ export const ProductDetailsView: React.FC<ProductDetailsViewProps> = ({
                     <button
                       key={s.size}
                       onClick={() => handleSizeSelect(s.size)}
-                      className={`relative py-3 px-2 text-xs font-bold text-center border transition-all cursor-pointer flex flex-col items-center justify-center gap-0.5 ${
+                      className={`py-3 text-xs rounded-xl font-bold text-center border transition-all cursor-pointer flex flex-col items-center justify-center gap-0.5 ${
                         isChosen
-                          ? 'bg-[#f4f4f6] text-[#09090b] border-[#f4f4f6]'
+                          ? 'bg-[#B4532A] text-white border-[#B4532A] shadow-md'
                           : isAvailable
-                          ? 'bg-[#18181c] text-[#f4f4f6] border-[#242429] hover:border-[#8e8e98]'
-                          : 'bg-[#121215] text-[#52525b] border-[#242429]/40 opacity-40'
+                          ? 'bg-white dark:bg-[#18181c] text-[#242321] dark:text-[#f4f4f6] border-[#E9D9CA] dark:border-[#242429] hover:border-[#B4532A]'
+                          : 'bg-[#F7F2EC] dark:bg-[#121215] text-[#77716B] border-[#E9D9CA]/40 opacity-40 cursor-not-allowed'
                       }`}
                     >
-                      <span>{sizeLabel} {s.size}</span>
-                      <span className="text-[8px] tracking-tighter">
-                        {isAvailable
-                          ? product.inventoryCountsAreExact === false ? 'Available' : `${s.stock} left`
-                          : 'Out of Stock'}
-                      </span>
+                      <span>{s.size}</span>
                     </button>
                   );
                 })}
@@ -526,66 +495,78 @@ export const ProductDetailsView: React.FC<ProductDetailsViewProps> = ({
 
               {/* Compulsory Size Validation Error */}
               {sizeError && (
-                <div className="p-3 bg-red-950/40 border border-red-500/50 text-red-300 text-[11px] font-bold flex items-center gap-2">
+                <div className="p-3 bg-red-50 dark:bg-red-950/40 border border-red-200 dark:border-red-500/50 text-red-600 dark:text-red-300 text-xs font-semibold rounded-xl flex items-center gap-2">
                   <AlertCircle className="w-4 h-4 flex-shrink-0" />
-                  <span>PLEASE SELECT A SIZE. SIZE SELECTION IS COMPULSORY FOR FOOTWEAR.</span>
+                  <span>Please select a size to proceed with your order.</span>
                 </div>
               )}
 
               {/* Out of Stock Alert for selected size with Notify Me */}
               {selectedSize && isSelectedSizeOutOfStock && (
-                <div className="p-3 bg-[#18181c] border border-[#3a3a42] text-xs space-y-2">
-                  <div className="text-red-400 font-bold flex items-center gap-1.5">
+                <div className="p-3 bg-white dark:bg-[#18181c] border border-[#E9D9CA] rounded-xl text-xs space-y-2">
+                  <div className="text-red-500 font-bold flex items-center gap-1.5">
                     <AlertCircle className="w-4 h-4" />
                     <span>Size {sizeLabel} {selectedSize} is currently out of stock.</span>
                   </div>
                   <button
                     onClick={() => onOpenNotifyMe(product.name, selectedSize, activeColor.name)}
-                    className="bg-[#f4f4f6] text-[#09090b] px-3 py-1.5 text-[10px] font-bold uppercase tracking-wider flex items-center gap-1.5 hover:bg-[#c9a96e] transition-colors cursor-pointer"
+                    className="bg-[#B4532A] text-white px-4 py-2 rounded-lg text-xs font-semibold flex items-center gap-1.5 hover:bg-[#9C431F] transition-colors cursor-pointer"
                   >
                     <Bell className="w-3.5 h-3.5" />
-                    <span>NOTIFY ME WHEN AVAILABLE</span>
+                    <span>Notify Me When Restocked</span>
                   </button>
                 </div>
               )}
             </div>
 
-            {/* ACTION CTA BUTTONS: ADD TO BAG & BUY NOW */}
+            {/* ACTION CTA BUTTONS: ADD TO BAG & BUY NOW (Matching Reference Panel 3) */}
             <div className="space-y-3 pt-2">
-              <div className="grid grid-cols-2 gap-3">
+              <div className="flex items-center gap-3">
                 <button
                   id="pdp-add-to-bag-btn"
                   onClick={handleAddToCartClick}
-                  className="btn-tactile w-full py-4 bg-[#16161B] hover:bg-[#202028] text-[#F4F4F6] border border-[#C9A96E]/40 hover:border-[#C9A96E] text-xs font-bold uppercase tracking-[0.15em] flex items-center justify-center gap-2 cursor-pointer transition-all shadow-[0_0_15px_rgba(201,169,110,0.1)]"
+                  className="flex-1 py-4 bg-[#B4532A] hover:bg-[#9C431F] text-white rounded-xl text-sm font-bold flex items-center justify-center gap-2 cursor-pointer transition-all shadow-md"
                 >
-                  <ShoppingBag className="w-4 h-4 text-[#C9A96E]" />
-                  <span>ADD TO BAG</span>
+                  <ShoppingBag className="w-4 h-4" />
+                  <span>Add to Cart</span>
                 </button>
                 <button
-                  id="pdp-buy-now-btn"
-                  onClick={handleBuyNowClick}
-                  className="btn-tactile w-full py-4 bg-gradient-to-r from-[#C9A96E] via-[#EAE3D5] to-[#C9A96E] hover:brightness-110 text-[#09090B] text-xs font-bold uppercase tracking-[0.15em] flex items-center justify-center gap-2 cursor-pointer transition-all shadow-[0_0_25px_rgba(201,169,110,0.3)]"
+                  onClick={() => onToggleWishlist(product)}
+                  className={`w-14 h-14 rounded-xl border flex items-center justify-center transition-all cursor-pointer shadow-sm ${
+                    isWishlisted
+                      ? 'bg-[#B4532A] text-white border-[#B4532A]'
+                      : 'bg-white dark:bg-[#18181c] text-[#77716B] border-[#E9D9CA] dark:border-[#242429] hover:border-[#B4532A]'
+                  }`}
+                  title={isWishlisted ? 'Remove from Wishlist' : 'Add to Wishlist'}
                 >
-                  <span>BUY NOW</span>
-                  <ArrowRight className="w-4 h-4" />
+                  <Heart className={`w-5 h-5 ${isWishlisted ? 'fill-current' : ''}`} />
                 </button>
               </div>
 
-              <div className="grid grid-cols-3 gap-2 text-[10px] text-[#8e8e98] pt-2 text-center">
-                <div className="flex flex-col items-center gap-1 p-2 bg-[#121215] border border-[#242429]">
-                  <Truck className="w-4 h-4 text-[#c9a96e]" />
-                  <span className="font-bold text-[#f4f4f6]">EXPRESS COURIER</span>
-                  <span>Dispatches in 24h</span>
+              <button
+                id="pdp-buy-now-btn"
+                onClick={handleBuyNowClick}
+                className="w-full py-4 bg-white dark:bg-[#18181c] hover:bg-[#B4532A] hover:text-white text-[#B4532A] border-2 border-[#B4532A] rounded-xl text-sm font-bold flex items-center justify-center gap-2 cursor-pointer transition-all shadow-sm"
+              >
+                <span>Buy Now →</span>
+              </button>
+
+              {/* Value Proposition Badges */}
+              <div className="grid grid-cols-3 gap-3 pt-4 text-center">
+                <div className="p-3 bg-white dark:bg-[#18181c] border border-[#E9D9CA] dark:border-[#242429] rounded-xl flex flex-col items-center gap-1.5 shadow-sm">
+                  <Truck className="w-4 h-4 text-[#B4532A]" />
+                  <span className="font-bold text-xs text-[#242321] dark:text-white">Free Shipping</span>
+                  <span className="text-[10px] text-[#77716B]">On all orders</span>
                 </div>
-                <div className="flex flex-col items-center gap-1 p-2 bg-[#121215] border border-[#242429]">
-                  <RotateCcw className="w-4 h-4 text-[#c9a96e]" />
-                  <span className="font-bold text-[#f4f4f6]">SIZE EXCHANGE</span>
-                  <span>14-day replacement</span>
+                <div className="p-3 bg-white dark:bg-[#18181c] border border-[#E9D9CA] dark:border-[#242429] rounded-xl flex flex-col items-center gap-1.5 shadow-sm">
+                  <RotateCcw className="w-4 h-4 text-[#B4532A]" />
+                  <span className="font-bold text-xs text-[#242321] dark:text-white">Easy Returns</span>
+                  <span className="text-[10px] text-[#77716B]">30 days exchange</span>
                 </div>
-                <div className="flex flex-col items-center gap-1 p-2 bg-[#121215] border border-[#242429]">
-                  <Shield className="w-4 h-4 text-[#c9a96e]" />
-                  <span className="font-bold text-[#f4f4f6]">AUTHENTICITY</span>
-                  <span>Verified NFC Chip</span>
+                <div className="p-3 bg-white dark:bg-[#18181c] border border-[#E9D9CA] dark:border-[#242429] rounded-xl flex flex-col items-center gap-1.5 shadow-sm">
+                  <Shield className="w-4 h-4 text-[#B4532A]" />
+                  <span className="font-bold text-xs text-[#242321] dark:text-white">Secure Payment</span>
+                  <span className="text-[10px] text-[#77716B]">100% Protected</span>
                 </div>
               </div>
             </div>

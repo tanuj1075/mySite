@@ -16,8 +16,7 @@
       (function() {
         try {
           var saved = localStorage.getItem('vanta_theme_mode');
-          var prefersLight = window.matchMedia && window.matchMedia('(prefers-color-scheme: light)').matches;
-          var theme = saved === 'light' || (!saved && prefersLight) ? 'light' : 'dark';
+          var theme = saved === 'dark' ? 'dark' : 'light';
           if (theme === 'light') {
             document.documentElement.classList.add('light');
             document.documentElement.setAttribute('data-theme', 'light');
@@ -31,7 +30,7 @@
       })();
     </script>
   </head>
-  <body class="bg-[#09090b] text-[#f4f4f6] antialiased selection:bg-[#c9a96e33] selection:text-[#f4f4f6]">
+  <body class="bg-[#F7F2EC] text-[#242321] antialiased selection:bg-[#B4532A33] selection:text-[#B4532A]">
     <div id="root"></div>
     <script type="module" src="/src/main.tsx"></script>
   </body>

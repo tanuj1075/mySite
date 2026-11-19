@@ -233,246 +233,98 @@ export const ProductListingView: React.FC<ProductListingViewProps> = ({
   }, [filteredProducts, sortBy]);
 
   return (
-    <div className="w-full bg-[#09090b] text-[#f4f4f6] font-mono pb-24">
+    <div className="w-full bg-[#F7F2EC] dark:bg-[#09090b] text-[#242321] dark:text-[#f4f4f6] font-sans pb-24 transition-colors">
       <div className="max-w-[1440px] mx-auto px-4 sm:px-8 lg:px-12 pt-6">
         
-        {/* Page Header */}
-        <div className="border-b border-[#242429] pb-8 mb-8">
-          <div className="flex items-center gap-2 text-[10px] text-[#c9a96e] uppercase tracking-[0.2em] mb-3 font-bold">
-            <span className="w-1.5 h-1.5 bg-[#c9a96e] inline-block"></span>
-            <span>VANTA CATALOG // SPECIFICATION REGISTRY</span>
+        {/* Collection Header Banner (Exact Match to Reference Panel 2) */}
+        <div className="bg-gradient-to-r from-[#242321] via-[#2F2D2A] to-[#3D3A36] text-white rounded-3xl p-8 sm:p-12 mb-8 flex items-center justify-between overflow-hidden shadow-lg relative">
+          <div className="space-y-2 z-10 max-w-md">
+            <span className="text-xs font-bold uppercase tracking-[0.2em] text-[#E9D9CA]">
+              OUR COLLECTION
+            </span>
+            <h1 className="text-3xl sm:text-5xl font-extrabold uppercase tracking-tight text-white leading-tight">
+              SNEAKERS
+            </h1>
+            <p className="text-sm text-[#A8A49E]">
+              Step up your game. Handcrafted performance leather &amp; modern street grails.
+            </p>
           </div>
-
-          <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-6">
-            <div>
-              <h1 className="font-headline text-4xl sm:text-6xl font-bold tracking-tight uppercase text-[#f4f4f6] leading-none mb-3">
-                {selectedCategory === 'ALL'
-                  ? selectedBrand === 'ALL'
-                    ? 'ALL FOOTWEAR'
-                    : `${selectedBrand} COLLECTION`
-                  : `${selectedCategory.toUpperCase()} COLLECTION`}
-              </h1>
-              <p className="font-mono text-xs text-[#8e8e98] max-w-xl">
-                Showing {Math.min(visibleCount, sortedProducts.length)} of {sortedProducts.length} products ({products.length} in catalog). Filtered by architectural
-                material, size-level inventory, and brand canon.
-              </p>
-            </div>
-
-            {/* Sort Dropdown & Mobile Filter Toggle */}
-            <div className="flex items-center gap-3">
-              <button
-                onClick={() => setMobileFiltersOpen(!mobileFiltersOpen)}
-                className="lg:hidden flex items-center gap-2 bg-[#121215] border border-[#242429] px-4 py-2 text-xs font-bold text-[#f4f4f6] uppercase cursor-pointer"
-              >
-                <Filter className="w-3.5 h-3.5 text-[#c9a96e]" />
-                <span>FILTERS ({selectedSizes.length > 0 ? selectedSizes.length : ''})</span>
-              </button>
-
-              <div className="flex items-center gap-2">
-                <span className="text-[10px] font-bold text-[#c9a96e] uppercase">SORT:</span>
-                <select
-                  value={sortBy}
-                  onChange={(e) => setSortBy(e.target.value as any)}
-                  className="bg-[#121215] border border-[#242429] text-[#f4f4f6] text-[11px] px-3 py-2 font-mono uppercase focus:outline-none focus:border-[#8e8e98] cursor-pointer"
-                >
-                  <option value="POPULAR">POPULAR CANON</option>
-                  <option value="NEWEST">NEWEST DROPS</option>
-                  <option value="PRICE_ASC">PRICE: LOW → HIGH</option>
-                  <option value="PRICE_DESC">PRICE: HIGH → LOW</option>
-                  <option value="RATING">HIGHEST RATED</option>
-                  <option value="DISCOUNT">MAX DISCOUNT</option>
-                  <option value="TRENDING">TRENDING NOW</option>
-                </select>
-              </div>
-            </div>
+          <div className="hidden sm:block relative w-64 h-36">
+            <img
+              src="/assets/images/cream_runner_pedestal_1788842341279.jpg"
+              alt="Collection Sneaker"
+              className="w-full h-full object-contain transform rotate-[-6deg] drop-shadow-2xl rounded-xl"
+            />
           </div>
         </div>
 
-        {/* Quick Category / Brand Shortcut Strip */}
-        <div className="flex flex-wrap items-center gap-2 mb-8 pb-4 border-b border-[#242429] text-[11px]">
-          <span className="text-[10px] text-[#c9a96e] font-bold uppercase mr-1">QUICK PILLS:</span>
-          {['ALL', 'Sneakers', 'Running', 'Casual Shoes', 'Formal Shoes', 'Boots'].map((cat) => (
+        {/* Quick Filter Header & Sort Bar */}
+        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 pb-6 border-b border-[#E9D9CA] dark:border-[#242429] mb-8">
+          <div>
+            <span className="text-sm font-bold text-[#242321] dark:text-white">
+              {filteredProducts.length} Products Found
+            </span>
+            <span className="text-xs text-[#77716B] dark:text-[#8e8e98] ml-2">
+              (out of {products.length} in active catalog)
+            </span>
+          </div>
+
+          <div className="flex items-center gap-3 w-full sm:w-auto justify-between sm:justify-end">
             <button
-              key={cat}
-              onClick={() => setSelectedCategory(cat)}
-              className={`px-3 py-1.5 uppercase transition-all cursor-pointer border ${
-                selectedCategory === cat
-                  ? 'bg-[#f4f4f6] text-[#09090b] border-[#f4f4f6] font-bold'
-                  : 'bg-[#121215] text-[#8e8e98] border-[#242429] hover:text-[#f4f4f6] hover:border-[#3a3a42]'
-              }`}
+              onClick={() => setMobileFiltersOpen(!mobileFiltersOpen)}
+              className="lg:hidden flex items-center gap-2 bg-white dark:bg-[#121215] border border-[#E9D9CA] dark:border-[#242429] px-4 py-2 rounded-xl text-xs font-semibold text-[#242321] dark:text-[#f4f4f6] cursor-pointer"
             >
-              {cat}
+              <Filter className="w-4 h-4 text-[#B4532A]" />
+              <span>Filters ({selectedSizes.length > 0 ? selectedSizes.length : ''})</span>
             </button>
-          ))}
-          <div className="h-4 w-[1px] bg-[#242429] mx-2 hidden sm:block" />
-          {['VANTA ATELIER', 'CAMPUS', 'NIKE', 'ADIDAS', 'PUMA', 'RED TAPE', 'NEW BALANCE'].map((br) => (
-            <button
-              key={br}
-              onClick={() => setSelectedBrand(selectedBrand === br ? 'ALL' : br)}
-              className={`px-3 py-1.5 uppercase transition-all cursor-pointer border text-[10px] ${
-                selectedBrand === br
-                  ? 'bg-[#f4f4f6] text-[#09090b] border-[#f4f4f6] font-bold'
-                  : 'bg-[#121215] text-[#8e8e98] border-[#242429] hover:text-[#f4f4f6] hover:border-[#3a3a42]'
-              }`}
-            >
-              {br}
-            </button>
-          ))}
+
+            <div className="flex items-center gap-2">
+              <span className="text-xs font-semibold text-[#77716B] dark:text-[#8e8e98]">Sort by:</span>
+              <select
+                value={sortBy}
+                onChange={(e) => setSortBy(e.target.value as any)}
+                className="bg-white dark:bg-[#121215] border border-[#E9D9CA] dark:border-[#242429] text-[#242321] dark:text-[#f4f4f6] text-xs font-medium px-3.5 py-2 rounded-xl focus:outline-none focus:border-[#B4532A] cursor-pointer shadow-sm"
+              >
+                <option value="POPULAR">Popularity</option>
+                <option value="NEWEST">Newest Drops</option>
+                <option value="PRICE_ASC">Price: Low to High</option>
+                <option value="PRICE_DESC">Price: High to Low</option>
+                <option value="RATING">Highest Rated</option>
+                <option value="DISCOUNT">Biggest Discount</option>
+                <option value="TRENDING">Trending Now</option>
+              </select>
+            </div>
+          </div>
         </div>
 
         {/* Main Grid: Left Filter Sidebar (3 cols) + Right Product Grid (9 cols) */}
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
           
-          {/* LEFT SIDEBAR FILTERS */}
+          {/* LEFT SIDEBAR FILTERS (Matching Reference Panel 2) */}
           <div
-            className={`lg:col-span-3 space-y-6 bg-[#121215] border border-[#242429] p-5 ${
+            className={`lg:col-span-3 space-y-6 bg-white dark:bg-[#121215] border border-[#E9D9CA] dark:border-[#242429] p-6 rounded-2xl shadow-sm ${
               mobileFiltersOpen ? 'block' : 'hidden lg:block'
             }`}
           >
-            <div className="flex items-center justify-between border-b border-[#242429] pb-3">
-              <span className="text-xs font-bold text-[#f4f4f6] uppercase tracking-wider flex items-center gap-1.5">
-                <Filter className="w-3.5 h-3.5 text-[#c9a96e]" />
-                FILTER MATRIX
+            <div className="flex items-center justify-between border-b border-[#E9D9CA] dark:border-[#242429] pb-3">
+              <span className="text-sm font-bold text-[#242321] dark:text-white uppercase tracking-wider flex items-center gap-2">
+                <Filter className="w-4 h-4 text-[#B4532A]" />
+                Filter By
               </span>
               <button
                 onClick={resetFilters}
-                className="text-[10px] text-[#c9a96e] hover:text-[#f4f4f6] flex items-center gap-1 underline cursor-pointer transition-colors"
+                className="text-xs text-[#B4532A] hover:underline flex items-center gap-1 font-semibold cursor-pointer transition-colors"
               >
                 <RotateCcw className="w-3 h-3" />
-                RESET ALL
+                Reset
               </button>
             </div>
 
-            {/* 1. SIZE-LEVEL INVENTORY FILTER */}
-            <div className="space-y-2 border-b border-[#242429] pb-4">
-              <div className="flex items-center justify-between">
-                <span className="text-[11px] font-bold text-[#f4f4f6] uppercase">
-                  SIZE (US / EU)
-                </span>
-                <span className="text-[9px] text-[#c9a96e]">
-                  {selectedSizes.length > 0 ? `${selectedSizes.length} selected` : 'Any Size'}
-                </span>
-              </div>
-              <p className="text-[9px] text-[#8e8e98]">
-                Displays only shoes with verified stock in these exact sizes:
-              </p>
-              <div className="grid grid-cols-4 gap-1.5 pt-1">
-                {ALL_SIZES.map((size) => {
-                  const isSelected = selectedSizes.includes(size);
-                  return (
-                    <button
-                      key={size}
-                      onClick={() => toggleSize(size)}
-                      className={`py-1.5 text-center text-xs border font-mono transition-colors cursor-pointer ${
-                        isSelected
-                          ? 'bg-[#f4f4f6] text-[#09090b] border-[#f4f4f6] font-bold'
-                          : 'bg-[#18181c] text-[#8e8e98] border-[#242429] hover:border-[#3a3a42] hover:text-[#f4f4f6]'
-                      }`}
-                    >
-                      {size}
-                    </button>
-                  );
-                })}
-              </div>
-            </div>
-
-            {/* 2. BRAND CANON */}
-            <div className="space-y-2 border-b border-[#242429] pb-4">
-              <div className="flex items-center justify-between">
-                <span className="text-[11px] font-bold text-[#f4f4f6] uppercase">BRAND CANON</span>
-                <span className="text-[9px] text-[#c9a96e]">{selectedBrand}</span>
-              </div>
-              <div className="max-h-48 overflow-y-auto space-y-1 pr-1">
-                <button
-                  onClick={() => setSelectedBrand('ALL')}
-                  className={`w-full text-left px-2 py-1 text-xs uppercase flex items-center justify-between border cursor-pointer ${
-                    selectedBrand === 'ALL'
-                      ? 'bg-[#18181c] border-[#f4f4f6] text-[#f4f4f6] font-bold'
-                      : 'border-transparent text-[#8e8e98] hover:text-[#f4f4f6]'
-                  }`}
-                >
-                  <span>ALL BRANDS</span>
-                  {selectedBrand === 'ALL' && <Check className="w-3 h-3 text-[#c9a96e]" />}
-                </button>
-                {BRANDS.map((brand) => (
-                  <button
-                    key={brand}
-                    onClick={() => setSelectedBrand(brand)}
-                    className={`w-full text-left px-2 py-1 text-xs uppercase flex items-center justify-between border cursor-pointer ${
-                      selectedBrand === brand
-                        ? 'bg-[#18181c] border-[#f4f4f6] text-[#f4f4f6] font-bold'
-                        : 'border-transparent text-[#8e8e98] hover:text-[#f4f4f6]'
-                    }`}
-                  >
-                    <span>{brand}</span>
-                    {selectedBrand === brand && <Check className="w-3 h-3 text-[#c9a96e]" />}
-                  </button>
-                ))}
-              </div>
-            </div>
-
-            {/* 3. CATEGORY / SILHOUETTE */}
-            <div className="space-y-2 border-b border-[#242429] pb-4">
-              <div className="flex items-center justify-between">
-                <span className="text-[11px] font-bold text-[#f4f4f6] uppercase">CATEGORY</span>
-                <span className="text-[9px] text-[#c9a96e]">{selectedCategory}</span>
-              </div>
-              <div className="max-h-44 overflow-y-auto space-y-1 pr-1">
-                <button
-                  onClick={() => setSelectedCategory('ALL')}
-                  className={`w-full text-left px-2 py-1 text-xs uppercase flex items-center justify-between border cursor-pointer ${
-                    selectedCategory === 'ALL'
-                      ? 'bg-[#18181c] border-[#f4f4f6] text-[#f4f4f6] font-bold'
-                      : 'border-transparent text-[#8e8e98] hover:text-[#f4f4f6]'
-                  }`}
-                >
-                  <span>ALL CATEGORIES</span>
-                  {selectedCategory === 'ALL' && <Check className="w-3 h-3 text-[#c9a96e]" />}
-                </button>
-                {CATEGORIES.map((cat) => (
-                  <button
-                    key={cat}
-                    onClick={() => setSelectedCategory(cat)}
-                    className={`w-full text-left px-2 py-1 text-xs uppercase flex items-center justify-between border cursor-pointer ${
-                      selectedCategory === cat
-                        ? 'bg-[#18181c] border-[#f4f4f6] text-[#f4f4f6] font-bold'
-                        : 'border-transparent text-[#8e8e98] hover:text-[#f4f4f6]'
-                    }`}
-                  >
-                    <span>{cat}</span>
-                    {selectedCategory === cat && <Check className="w-3 h-3 text-[#c9a96e]" />}
-                  </button>
-                ))}
-              </div>
-            </div>
-
-            {/* 4. GENDER / DEMOGRAPHIC */}
-            <div className="space-y-2 border-b border-[#242429] pb-4">
-              <span className="text-[11px] font-bold text-[#f4f4f6] uppercase block">
-                DEMOGRAPHIC
-              </span>
-              <div className="grid grid-cols-2 gap-1.5">
-                {['ALL', ...GENDERS].map((g) => (
-                  <button
-                    key={g}
-                    onClick={() => setSelectedGender(g)}
-                    className={`py-1.5 px-2 text-center text-xs uppercase border transition-colors cursor-pointer ${
-                      selectedGender === g
-                        ? 'bg-[#f4f4f6] text-[#09090b] border-[#f4f4f6] font-bold'
-                        : 'bg-[#18181c] text-[#8e8e98] border-[#242429] hover:border-[#3a3a42] hover:text-[#f4f4f6]'
-                    }`}
-                  >
-                    {g}
-                  </button>
-                ))}
-              </div>
-            </div>
-
-            {/* 5. PRICE RANGE SLIDER */}
-            <div className="space-y-2 border-b border-[#242429] pb-4">
-              <div className="flex items-center justify-between text-xs">
-                <span className="font-bold text-[#f4f4f6] uppercase">MAX PRICE</span>
-                <span className="font-bold text-[#c9a96e]">{formatCurrency(maxPrice)}</span>
+            {/* Price Range Slider */}
+            <div className="space-y-3 border-b border-[#E9D9CA] dark:border-[#242429] pb-5">
+              <div className="flex items-center justify-between text-xs font-bold">
+                <span className="text-[#242321] dark:text-white">Price Range</span>
+                <span className="text-[#B4532A]">{formatCurrency(maxPrice)}</span>
               </div>
               <input
                 type="range"
@@ -484,47 +336,110 @@ export const ProductListingView: React.FC<ProductListingViewProps> = ({
                   isCustomPriceRef.current = true;
                   setMaxPrice(Number(e.target.value));
                 }}
-                className="w-full accent-[#c9a96e] cursor-pointer"
+                className="w-full accent-[#B4532A] cursor-pointer"
               />
-              <div className="flex justify-between text-[9px] text-[#8e8e98]">
+              <div className="flex justify-between text-[11px] text-[#77716B]">
                 <span>{formatCurrency(0)}</span>
                 <span>{formatCurrency(PRICE_CEILING)}</span>
               </div>
             </div>
 
-            {/* 6. MINIMUM RATING & AVAILABILITY */}
-            <div className="space-y-3">
-              <label className="flex items-center gap-2 text-xs cursor-pointer text-[#f4f4f6] font-bold">
-                <input
-                  type="checkbox"
-                  checked={onlyInStock}
-                  onChange={(e) => setOnlyInStock(e.target.checked)}
-                  className="accent-[#c9a96e]"
-                />
-                <span>IN STOCK ONLY</span>
-              </label>
-
-              <div className="space-y-1">
-                <span className="text-[10px] font-bold text-[#c9a96e] uppercase block">
-                  CUSTOMER RATING:
-                </span>
-                <div className="flex gap-1">
-                  {[0, 4.0, 4.5, 4.8].map((rt) => (
+            {/* Brand Checkboxes */}
+            <div className="space-y-3 border-b border-[#E9D9CA] dark:border-[#242429] pb-5">
+              <span className="text-xs font-bold text-[#242321] dark:text-white uppercase tracking-wider block">
+                Brands
+              </span>
+              <div className="max-h-48 overflow-y-auto space-y-1.5 pr-1">
+                <button
+                  onClick={() => setSelectedBrand('ALL')}
+                  className={`w-full text-left px-2.5 py-1.5 rounded-lg text-xs font-medium flex items-center justify-between transition-colors cursor-pointer ${
+                    selectedBrand === 'ALL'
+                      ? 'bg-[#B4532A] text-white font-bold'
+                      : 'text-[#77716B] hover:bg-[#F7F2EC] dark:hover:bg-[#18181c] dark:text-[#8e8e98]'
+                  }`}
+                >
+                  <span>All Brands</span>
+                  <span>({products.length})</span>
+                </button>
+                {BRANDS.map((brand) => {
+                  const count = products.filter((p) => p.brand.toLowerCase() === brand.toLowerCase()).length;
+                  if (count === 0) return null;
+                  return (
                     <button
-                      key={rt}
-                      onClick={() => setMinRating(rt)}
-                      className={`flex-1 py-1 text-[10px] border transition-colors cursor-pointer ${
-                        minRating === rt
-                          ? 'bg-[#f4f4f6] text-[#09090b] border-[#f4f4f6] font-bold'
-                          : 'bg-[#18181c] text-[#8e8e98] border-[#242429] hover:border-[#3a3a42]'
+                      key={brand}
+                      onClick={() => setSelectedBrand(selectedBrand === brand ? 'ALL' : brand)}
+                      className={`w-full text-left px-2.5 py-1.5 rounded-lg text-xs font-medium flex items-center justify-between transition-colors cursor-pointer ${
+                        selectedBrand === brand
+                          ? 'bg-[#B4532A] text-white font-bold'
+                          : 'text-[#77716B] hover:bg-[#F7F2EC] dark:hover:bg-[#18181c] dark:text-[#8e8e98]'
                       }`}
                     >
-                      {rt === 0 ? 'All' : `${rt}★+`}
+                      <span>{brand}</span>
+                      <span className="text-[10px] opacity-75">({count})</span>
                     </button>
-                  ))}
-                </div>
+                  );
+                })}
               </div>
             </div>
+
+            {/* Sizes Chips */}
+            <div className="space-y-3 border-b border-[#E9D9CA] dark:border-[#242429] pb-5">
+              <div className="flex items-center justify-between">
+                <span className="text-xs font-bold text-[#242321] dark:text-white uppercase tracking-wider">
+                  Size
+                </span>
+                {selectedSizes.length > 0 && (
+                  <span className="text-[10px] text-[#B4532A] font-semibold">
+                    {selectedSizes.length} selected
+                  </span>
+                )}
+              </div>
+              <div className="grid grid-cols-4 gap-2">
+                {ALL_SIZES.map((size) => {
+                  const isSelected = selectedSizes.includes(size);
+                  return (
+                    <button
+                      key={size}
+                      onClick={() => toggleSize(size)}
+                      className={`py-2 text-center text-xs rounded-xl font-bold transition-all cursor-pointer border ${
+                        isSelected
+                          ? 'bg-[#B4532A] text-white border-[#B4532A] shadow-sm'
+                          : 'bg-[#F7F2EC] dark:bg-[#18181c] text-[#77716B] dark:text-[#8e8e98] border-[#E9D9CA] dark:border-[#2A2A32] hover:border-[#B4532A]'
+                      }`}
+                    >
+                      {size}
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+
+            {/* Colors Swatches */}
+            {availableColors.length > 0 && (
+              <div className="space-y-3 pb-2">
+                <span className="text-xs font-bold text-[#242321] dark:text-white uppercase tracking-wider block">
+                  Color
+                </span>
+                <div className="flex flex-wrap gap-2">
+                  {availableColors.map((colorName) => {
+                    const isSelected = selectedColors.includes(colorName);
+                    return (
+                      <button
+                        key={colorName}
+                        onClick={() => toggleColor(colorName)}
+                        className={`px-3 py-1.5 rounded-full text-xs font-medium border transition-all cursor-pointer ${
+                          isSelected
+                            ? 'bg-[#B4532A] text-white border-[#B4532A]'
+                            : 'bg-[#F7F2EC] dark:bg-[#18181c] text-[#77716B] dark:text-[#8e8e98] border-[#E9D9CA] dark:border-[#2A2A32] hover:border-[#B4532A]'
+                        }`}
+                      >
+                        {colorName}
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+            )}
           </div>
 
           {/* RIGHT PRODUCT CARDS GRID */}
@@ -572,13 +487,13 @@ export const ProductListingView: React.FC<ProductListingViewProps> = ({
                   return (
                     <div
                       key={shoe.id}
-                      className="border border-[#242429] bg-[#121215] flex flex-col justify-between group hover:border-[#3a3a42] transition-all duration-300 hover:-translate-y-1 shadow-xl"
+                      className="bg-white dark:bg-[#18181c] border border-[#E9D9CA] dark:border-[#2A2A32] rounded-2xl flex flex-col justify-between group hover:border-[#B4532A] transition-all duration-300 hover:-translate-y-1 shadow-sm hover:shadow-xl overflow-hidden"
                     >
                       <div className="p-5">
                         {/* Card Header: Brand, Code, Wishlist */}
-                        <div className="flex items-center justify-between text-[10px] mb-3">
-                          <span className="text-[#c9a96e] font-bold tracking-wider uppercase">
-                            {shoe.brand} // {shoe.code}
+                        <div className="flex items-center justify-between text-[11px] mb-3">
+                          <span className="text-[#B4532A] font-bold tracking-wider uppercase text-[10px]">
+                            {shoe.brand}
                           </span>
                           <div className="flex items-center gap-1.5">
                             <button
@@ -586,24 +501,24 @@ export const ProductListingView: React.FC<ProductListingViewProps> = ({
                                 e.stopPropagation();
                                 onToggleWishlist(shoe);
                               }}
-                              className={`p-1 transition-colors cursor-pointer ${
-                                isWish ? 'text-[#c9a96e]' : 'text-[#8e8e98] hover:text-[#f4f4f6]'
+                              className={`w-7 h-7 rounded-full flex items-center justify-center transition-colors cursor-pointer ${
+                                isWish ? 'bg-[#B4532A] text-white' : 'bg-[#F7F2EC] dark:bg-[#242429] text-[#77716B] hover:text-[#B4532A]'
                               }`}
                               title={isWish ? 'Remove from Wishlist' : 'Add to Wishlist'}
                             >
-                              <Heart className={`w-4 h-4 ${isWish ? 'fill-current' : ''}`} />
+                              <Heart className={`w-3.5 h-3.5 ${isWish ? 'fill-current' : ''}`} />
                             </button>
                             <button
                               onClick={(e) => {
                                 e.stopPropagation();
                                 onToggleCompare(shoe);
                               }}
-                              className={`p-1 transition-colors cursor-pointer ${
-                                isComp ? 'text-[#c9a96e]' : 'text-[#8e8e98] hover:text-[#f4f4f6]'
+                              className={`w-7 h-7 rounded-full flex items-center justify-center transition-colors cursor-pointer ${
+                                isComp ? 'bg-[#B4532A] text-white' : 'bg-[#F7F2EC] dark:bg-[#242429] text-[#77716B] hover:text-[#B4532A]'
                               }`}
                               title="Add to comparison"
                             >
-                              <Scale className="w-4 h-4" />
+                              <Scale className="w-3.5 h-3.5" />
                             </button>
                           </div>
                         </div>
@@ -611,7 +526,7 @@ export const ProductListingView: React.FC<ProductListingViewProps> = ({
                         {/* Image Preview with Dual-Angle Hover Reveal */}
                         <div
                           onClick={() => onSelectProduct(shoe)}
-                          className="relative aspect-[4/3] bg-[#09090b] border border-[#242429] overflow-hidden mb-4 cursor-pointer"
+                          className="relative aspect-[4/3] bg-[#F7F2EC] dark:bg-[#121215] rounded-xl overflow-hidden mb-4 cursor-pointer flex items-center justify-center p-3"
                         >
                           {/* Primary Front Angle */}
                           <img
@@ -623,7 +538,7 @@ export const ProductListingView: React.FC<ProductListingViewProps> = ({
                                 target.src = '/assets/images/cream_runner_pedestal_1788842341279.jpg';
                               }
                             }}
-                            className={`w-full h-full object-cover transition-all duration-700 ${
+                            className={`w-full h-full object-contain transition-all duration-500 ${
                               sideImg !== frontImg ? 'group-hover:opacity-0' : 'group-hover:scale-105'
                             }`}
                           />
@@ -637,12 +552,12 @@ export const ProductListingView: React.FC<ProductListingViewProps> = ({
                                 const target = e.target as HTMLImageElement;
                                 target.style.display = 'none';
                               }}
-                              className="w-full h-full object-cover absolute inset-0 opacity-0 group-hover:opacity-100 transition-all duration-700 group-hover:scale-105"
+                              className="w-full h-full object-contain absolute inset-0 opacity-0 group-hover:opacity-100 transition-all duration-500 group-hover:scale-105 p-3"
                             />
                           )}
 
                           {shoe.discountPercent > 0 && (
-                            <div className="absolute top-2 left-2 bg-[#f4f4f6] text-[#09090b] px-2 py-0.5 text-[9px] font-bold tracking-wider uppercase">
+                            <div className="absolute top-2 left-2 bg-[#B4532A] text-white px-2 py-0.5 text-[9px] font-bold rounded-full">
                               {shoe.discountPercent}% OFF
                             </div>
                           )}
@@ -730,20 +645,20 @@ export const ProductListingView: React.FC<ProductListingViewProps> = ({
                       </div>
 
                       {/* Quick Action Bar */}
-                      <div className="grid grid-cols-2 gap-2 p-4 pt-0">
+                      <div className="grid grid-cols-2 gap-2 p-5 pt-0">
                         <button
                           onClick={() => onSelectProduct(shoe)}
-                          className="btn-tactile py-2 bg-[#18181c] hover:bg-[#242429] text-[#f4f4f6] border border-[#242429] hover:border-[#8e8e98] text-[10px] font-bold uppercase tracking-wider flex items-center justify-center gap-1 cursor-pointer transition-colors"
+                          className="py-2.5 bg-[#F7F2EC] dark:bg-[#242429] hover:bg-[#E9D9CA]/60 text-[#242321] dark:text-[#f4f4f6] text-xs font-semibold rounded-xl flex items-center justify-center gap-1.5 cursor-pointer transition-colors"
                         >
-                          <Eye className="w-3.5 h-3.5" />
-                          <span>DETAILS</span>
+                          <Eye className="w-4 h-4" />
+                          <span>Details</span>
                         </button>
                         <button
                           onClick={() => onSelectProduct(shoe)}
-                          className="btn-tactile py-2 bg-[#f4f4f6] hover:bg-[#c9a96e] text-[#09090b] text-[10px] font-bold uppercase tracking-wider flex items-center justify-center gap-1 cursor-pointer transition-colors"
+                          className="py-2.5 bg-[#B4532A] hover:bg-[#9C431F] text-white text-xs font-semibold rounded-xl flex items-center justify-center gap-1.5 cursor-pointer transition-colors shadow-sm"
                         >
-                          <ShoppingBag className="w-3.5 h-3.5" />
-                          <span>SELECT SIZE</span>
+                          <ShoppingBag className="w-4 h-4" />
+                          <span>Select Size</span>
                         </button>
                       </div>
                     </div>
@@ -753,15 +668,15 @@ export const ProductListingView: React.FC<ProductListingViewProps> = ({
 
                 {/* Pagination / Load more */}
                 {visibleCount < sortedProducts.length && (
-                  <div className="mt-10 flex flex-col items-center justify-center gap-3">
-                    <p className="text-xs text-[#8e8e98] font-mono">
+                  <div className="mt-12 flex flex-col items-center justify-center gap-3">
+                    <p className="text-xs text-[#77716B] dark:text-[#8e8e98]">
                       Showing {Math.min(visibleCount, sortedProducts.length)} of {sortedProducts.length} products
                     </p>
                     <button
                       onClick={() => setVisibleCount((prev) => prev + 24)}
-                      className="px-8 py-3 bg-[#f4f4f6] hover:bg-[#c9a96e] text-[#09090b] text-xs font-bold uppercase tracking-widest border border-[#f4f4f6] transition-colors cursor-pointer shadow-lg"
+                      className="px-8 py-3 bg-[#B4532A] hover:bg-[#9C431F] text-white text-xs font-semibold uppercase tracking-wider rounded-xl transition-all cursor-pointer shadow-md"
                     >
-                      LOAD MORE (+24)
+                      Load More Sneakers (+24)
                     </button>
                   </div>
                 )}

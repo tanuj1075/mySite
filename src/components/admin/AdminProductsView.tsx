@@ -580,71 +580,65 @@ export const AdminProductsView: React.FC<AdminProductsViewProps> = ({
     });
 
   return (
-    <div className="p-4 sm:p-8 font-sans space-y-8 bg-[#09090b] min-h-full">
-      {/* Top Header Section matching Image 2 */}
+    <div className="p-4 sm:p-8 font-sans space-y-8 bg-[#16161B] min-h-full text-white">
+      {/* Top Header Section (Exact Match to Reference Panel 10) */}
       <div>
-        <div className="font-mono text-[10px] text-[#c9a96e] tracking-[0.2em] uppercase mb-1">
-          ARCHIVE REFERENCE // SPECIMEN MANAGEMENT / SYS.VER.4.62
-        </div>
-
-        <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div>
-            <h1 className="font-headline text-3xl sm:text-4xl text-[#f4f4f6] tracking-tight">
-              Product Inventory &amp; Specimen Dossiers
+            <h1 className="text-3xl sm:text-4xl font-extrabold text-white tracking-tight">
+              Products Management
             </h1>
-            <p className="font-sans text-[13px] text-[#8e8e98] mt-1 max-w-2xl">
-              Catalog control across 48 master styles, multi-color palettes, and individual size SKU variants within the monolithic archive.
+            <p className="text-xs text-[#8e8e98] mt-1">
+              Active sneaker inventory ({products.length || specimens.length} items) across all brands and models
             </p>
           </div>
 
-          <div className="flex items-center gap-3 font-mono text-[11px] shrink-0">
+          <div className="flex items-center gap-3 shrink-0">
             <button
               onClick={handleExportCSV}
-              className="px-4 py-2.5 bg-[#121215] border border-[#242429] text-[#f4f4f6] hover:bg-[#1e1e24] transition-colors flex items-center gap-2 uppercase tracking-wider font-bold cursor-pointer"
+              className="px-4 py-2.5 bg-[#1E1E24] border border-[#2A2A32] text-[#8e8e98] hover:text-white rounded-xl text-xs font-semibold cursor-pointer transition-colors"
               title="Download Encrypted Specimen Catalog CSV"
             >
-              <Download className="w-3.5 h-3.5" />
-              <span>BULK EXPORT CSV</span>
+              Export CSV
             </button>
 
             <button
               onClick={() => setShowAddModal(true)}
-              className="px-4 py-2.5 bg-[#141312] text-[#18181c] hover:bg-[#35322e] transition-colors flex items-center gap-2 uppercase tracking-wider font-bold cursor-pointer shadow-sm"
+              className="px-5 py-2.5 bg-[#B4532A] hover:bg-[#9C431F] text-white rounded-xl font-bold text-xs flex items-center gap-2 cursor-pointer shadow-sm transition-all"
             >
-              <Plus className="w-3.5 h-3.5" />
-              <span>+ ADD NEW SPECIMEN</span>
+              <Plus className="w-4 h-4" />
+              <span>+ Add Product</span>
             </button>
           </div>
         </div>
       </div>
 
-      {/* Filter and Search Bar matching Image 2 */}
-      <div className="bg-[#121215] border border-[#242429] p-2 sm:p-3 flex flex-wrap items-center gap-3 font-mono text-[11px]">
+      {/* Filter and Search Bar (Exact Match to Reference Panel 10) */}
+      <div className="bg-[#1E1E24] border border-[#2A2A32] rounded-2xl p-3 flex flex-wrap items-center justify-between gap-3 text-xs">
         {/* Search Input */}
-        <div className="flex items-center gap-2 bg-[#09090b] border border-[#242429] px-3 py-1.5 flex-1 min-w-[240px]">
-          <Search className="w-3.5 h-3.5 text-[#c9a96e]" />
+        <div className="flex items-center gap-2 bg-[#16161B] border border-[#2A2A32] rounded-xl px-4 py-2.5 flex-1 min-w-[240px]">
+          <Search className="w-4 h-4 text-[#8e8e98]" />
           <input
             type="text"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            placeholder="Lookup Specimen SKU or Code..."
-            className="w-full bg-transparent border-none outline-none text-[#f4f4f6] text-[11px] font-mono placeholder:text-[#52525b]"
+            placeholder="Search products..."
+            className="w-full bg-transparent border-none outline-none text-white text-xs placeholder:text-[#52525b]"
           />
         </div>
 
         {/* Dropdown: Category */}
-        <div className="flex items-center gap-1.5 bg-[#09090b] border border-[#242429] px-3 py-1.5 text-[#f4f4f6]">
-          <span className="text-[#c9a96e]">CAT:</span>
+        <div className="flex items-center gap-2 bg-[#16161B] border border-[#2A2A32] rounded-xl px-4 py-2.5 text-white">
           <select
             value={selectedCategory}
             onChange={(e) => setSelectedCategory(e.target.value)}
-            className="bg-transparent border-none outline-none font-bold uppercase cursor-pointer"
+            className="bg-transparent border-none outline-none font-semibold text-xs cursor-pointer text-white"
           >
-            <option value="ALL SPECIMENS">ALL SPECIMENS</option>
-            <option value="SNEAKERS">SNEAKERS</option>
-            <option value="FOOTWEAR">FOOTWEAR</option>
-            <option value="RUNNING">RUNNING</option>
-            <option value="OUTERWEAR">OUTERWEAR</option>
+            <option value="ALL SPECIMENS" className="bg-[#1E1E24] text-white">All Categories</option>
+            <option value="SNEAKERS" className="bg-[#1E1E24] text-white">Sneakers</option>
+            <option value="FOOTWEAR" className="bg-[#1E1E24] text-white">Footwear</option>
+            <option value="RUNNING" className="bg-[#1E1E24] text-white">Running</option>
+            <option value="OUTERWEAR" className="bg-[#1E1E24] text-white">Boots &amp; Outerwear</option>
           </select>
         </div>
 

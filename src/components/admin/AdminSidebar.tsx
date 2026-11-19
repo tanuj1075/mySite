@@ -19,6 +19,7 @@ import {
   RotateCcw,
   ShieldCheck,
   CreditCard,
+  Settings,
 } from 'lucide-react';
 
 export type AdminSection =
@@ -40,7 +41,8 @@ export type AdminSection =
   | 'NOTIFICATIONS'
   | 'REVIEWS'
   | 'RETURNS_EXCHANGES'
-  | 'SECURITY_CLUSTER';
+  | 'SECURITY_CLUSTER'
+  | 'SETTINGS';
 
 interface AdminSidebarProps {
   activeSection: AdminSection;
@@ -106,6 +108,13 @@ export const AdminSidebar: React.FC<AdminSidebarProps> = ({
       items: [
         { id: 'REVIEWS' as AdminSection, label: 'REVIEWS', icon: MessageSquare },
         { id: 'RETURNS_EXCHANGES' as AdminSection, label: 'RETURNS & EXCHANGES', icon: RotateCcw, badge: returnsCount },
+      ],
+    },
+    {
+      group: 'SYSTEM',
+      items: [
+        { id: 'SECURITY_CLUSTER' as AdminSection, label: 'SECURITY', icon: ShieldCheck },
+        { id: 'SETTINGS' as AdminSection, label: 'SETTINGS', icon: Settings },
       ],
     },
   ];

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Check, Sun, Moon } from 'lucide-react';
+import { Check, Sun, Moon, Instagram, Youtube, Twitter } from 'lucide-react';
 import { getTheme, setTheme, subscribeTheme, ThemeMode } from '../lib/theme';
 
 interface FooterProps {
@@ -51,190 +51,222 @@ export const Footer: React.FC<FooterProps> = ({
   return (
     <footer
       id="main-footer"
-      className="w-full bg-[#09090b] border-t border-[#242429] mt-16"
+      className="w-full bg-[#242321] text-white border-t border-[#333230] mt-16 font-sans transition-colors"
     >
-      <div className="max-w-[1440px] mx-auto px-5 md:px-16 py-16">
+      <div className="max-w-[1440px] mx-auto px-5 md:px-12 py-14">
         {/* Top Section: Brand Statement & Columns */}
-        <div className="flex flex-col lg:flex-row justify-between items-start gap-12 pb-16 border-b border-[#242429]">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-10 pb-12 border-b border-[#3a3937]">
           {/* Brand Manifesto & Newsletter */}
-          <div className="max-w-md">
-            <div className="font-headline text-[30px] uppercase text-[#f4f4f6] font-bold tracking-tight mb-2">
-              VANTA ARCHIVE
+          <div className="lg:col-span-2 space-y-4">
+            <div className="font-sans text-3xl font-extrabold uppercase tracking-tight text-white">
+              VANTA
             </div>
-            <p className="font-mono text-[10px] uppercase tracking-[0.2em] text-[#c9a96e] font-bold mb-6">
-              TACTILE BRUTALISM. ZERO COMPROMISE.
+            <p className="text-sm text-[#A8A49E] max-w-sm leading-relaxed">
+              Walk the Extraordinary. High-performance luxury footwear crafted at the intersection of architectural brutalism and technical comfort.
             </p>
 
-            <form onSubmit={handleSubscribe} className="flex gap-2">
+            <form onSubmit={handleSubscribe} className="flex gap-2 max-w-sm pt-2">
               <input
                 type="email"
                 required
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                placeholder="SUBSCRIBE TO DISPATCH"
-                className="bg-[#121215] border border-[#242429] px-4 py-2.5 font-mono text-[11px] text-[#f4f4f6] focus:outline-none focus:border-[#8e8e98] w-64 tracking-wider placeholder:text-[#52525b]"
+                placeholder="Enter your email"
+                className="bg-[#2D2C29] border border-[#3e3c39] px-4 py-2.5 rounded-lg text-xs text-white focus:outline-none focus:border-[#B4532A] flex-1 placeholder:text-[#77716B]"
               />
               <button
                 type="submit"
-                className="bg-[#f4f4f6] text-[#09090b] font-mono text-[11px] font-bold px-5 py-2.5 hover:bg-[#c9a96e] transition-colors uppercase tracking-wider cursor-pointer"
+                className="bg-[#B4532A] hover:bg-[#9C431F] text-white text-xs font-semibold px-5 py-2.5 rounded-lg transition-colors cursor-pointer"
               >
-                {isSubscribed ? <Check className="w-4 h-4" /> : 'JOIN'}
+                {isSubscribed ? <Check className="w-4 h-4" /> : 'Subscribe'}
               </button>
             </form>
             {isSubscribed && (
-              <span className="font-mono text-[10px] text-[#c9a96e] mt-2 block tracking-wider font-bold">
-                ✓ ALLOCATION DISPATCH FREQUENCY INITIALIZED.
+              <span className="text-xs text-[#E9D9CA] font-medium block">
+                ✓ You have successfully subscribed to the dispatch frequency.
               </span>
             )}
           </div>
 
-          {/* 4 Link Columns */}
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-8 md:gap-12 w-full lg:w-auto">
-            {/* Catalog */}
-            <div className="flex flex-col gap-3">
-              <span className="font-mono text-[11px] font-bold text-[#f4f4f6] uppercase tracking-wider">
-                Catalog
-              </span>
-              <button
-                onClick={() => onSelectNav && onSelectNav('SHOP')}
-                className="font-mono text-[10px] text-[#8e8e98] hover:text-[#f4f4f6] text-left transition-colors uppercase cursor-pointer"
-              >
-                ALL PIECES
-              </button>
-              <button
-                onClick={() => onSelectNav && onSelectNav('COLLECTIONS')}
-                className="font-mono text-[10px] text-[#8e8e98] hover:text-[#f4f4f6] text-left transition-colors uppercase cursor-pointer"
-              >
-                SERIES INDEX
-              </button>
-              <button
-                onClick={() => onSelectNav && onSelectNav('NEW DROPS')}
-                className="font-mono text-[10px] text-[#8e8e98] hover:text-[#f4f4f6] text-left transition-colors uppercase cursor-pointer"
-              >
-                EDITIONS
-              </button>
-            </div>
+          {/* Quick Links */}
+          <div className="space-y-3">
+            <span className="text-xs font-bold uppercase tracking-wider text-white block">
+              Quick Links
+            </span>
+            <ul className="space-y-2 text-xs text-[#A8A49E]">
+              <li>
+                <button
+                  onClick={() => onSelectNav?.('COLLECTIONS')}
+                  className="hover:text-white transition-colors cursor-pointer"
+                >
+                  Home
+                </button>
+              </li>
+              <li>
+                <button
+                  onClick={() => onSelectNav?.('SHOP')}
+                  className="hover:text-white transition-colors cursor-pointer"
+                >
+                  Shop Sneakers
+                </button>
+              </li>
+              <li>
+                <button
+                  onClick={() => onSelectNav?.('NEW DROPS')}
+                  className="hover:text-white transition-colors cursor-pointer"
+                >
+                  New Arrivals
+                </button>
+              </li>
+              <li>
+                <button
+                  onClick={() => onSelectNav?.('ABOUT')}
+                  className="hover:text-white transition-colors cursor-pointer"
+                >
+                  About VANTA
+                </button>
+              </li>
+            </ul>
+          </div>
 
-            {/* Archives */}
-            <div className="flex flex-col gap-3">
-              <span className="font-mono text-[11px] font-bold text-[#f4f4f6] uppercase tracking-wider">
-                Archives
-              </span>
-              <button
-                onClick={() => onSelectNav && onSelectNav('ARCHIVES')}
-                className="font-mono text-[10px] text-[#8e8e98] hover:text-[#f4f4f6] text-left transition-colors uppercase cursor-pointer"
-              >
-                INDEX 2020-2024
-              </button>
-              <span
-                onClick={() => {
-                  const el = document.getElementById('blueprint-section');
-                  el?.scrollIntoView({ behavior: 'smooth' });
-                }}
-                className="font-mono text-[10px] text-[#8e8e98] hover:text-[#f4f4f6] cursor-pointer transition-colors uppercase"
-              >
-                DECONSTRUCT
-              </span>
-              <span
-                onClick={() => onSelectNav && onSelectNav('ARCHIVES')}
-                className="font-mono text-[10px] text-[#8e8e98] hover:text-[#f4f4f6] cursor-pointer transition-colors uppercase"
-              >
-                PERMANENT
-              </span>
-            </div>
+          {/* Customer Care */}
+          <div className="space-y-3">
+            <span className="text-xs font-bold uppercase tracking-wider text-white block">
+              Customer Care
+            </span>
+            <ul className="space-y-2 text-xs text-[#A8A49E]">
+              <li>
+                <button
+                  onClick={() => onSelectNav?.('ABOUT')}
+                  className="hover:text-white transition-colors cursor-pointer"
+                >
+                  FAQs
+                </button>
+              </li>
+              <li>
+                <button
+                  onClick={() => onSelectNav?.('ABOUT')}
+                  className="hover:text-white transition-colors cursor-pointer"
+                >
+                  Shipping Policy
+                </button>
+              </li>
+              <li>
+                <button
+                  onClick={() => onSelectNav?.('ABOUT')}
+                  className="hover:text-white transition-colors cursor-pointer"
+                >
+                  Return Policy
+                </button>
+              </li>
+              <li>
+                <button
+                  onClick={() => onSelectNav?.('ABOUT')}
+                  className="hover:text-white transition-colors cursor-pointer"
+                >
+                  Size Guide
+                </button>
+              </li>
+              <li>
+                <button
+                  onClick={() => onSelectNav?.('LOGIN')}
+                  className="text-[#E9D9CA] hover:text-white transition-colors cursor-pointer font-medium"
+                >
+                  Private Client Account
+                </button>
+              </li>
+            </ul>
+          </div>
 
-            {/* Concierge */}
-            <div className="flex flex-col gap-3">
-              <span className="font-mono text-[11px] font-bold text-[#f4f4f6] uppercase tracking-wider">
-                Concierge
-              </span>
-              <span
-                onClick={() => onSelectNav && onSelectNav('ABOUT')}
-                className="font-mono text-[10px] text-[#8e8e98] hover:text-[#f4f4f6] cursor-pointer transition-colors uppercase"
+          {/* Stay Connected */}
+          <div className="space-y-3">
+            <span className="text-xs font-bold uppercase tracking-wider text-white block">
+              Stay Connected
+            </span>
+            <p className="text-xs text-[#A8A49E]">
+              Follow our atelier for private drop announcements.
+            </p>
+            <div className="flex items-center gap-3 pt-1">
+              <a
+                href="https://instagram.com"
+                target="_blank"
+                rel="noreferrer"
+                className="w-8 h-8 rounded-full bg-[#2D2C29] border border-[#3e3c39] flex items-center justify-center text-[#A8A49E] hover:text-white hover:border-[#B4532A] transition-all"
+                aria-label="Instagram"
               >
-                AUTHENTICATION
-              </span>
-              <span
-                onClick={() => onSelectNav && onSelectNav('ABOUT')}
-                className="font-mono text-[10px] text-[#8e8e98] hover:text-[#f4f4f6] cursor-pointer transition-colors uppercase"
+                <Instagram className="w-4 h-4" />
+              </a>
+              <a
+                href="https://youtube.com"
+                target="_blank"
+                rel="noreferrer"
+                className="w-8 h-8 rounded-full bg-[#2D2C29] border border-[#3e3c39] flex items-center justify-center text-[#A8A49E] hover:text-white hover:border-[#B4532A] transition-all"
+                aria-label="YouTube"
               >
-                SHIPPING &amp; RETURN
-              </span>
-              <span
-                onClick={() => onSelectNav && onSelectNav('LOGIN')}
-                className="font-mono text-[10px] text-[#c9a96e] hover:text-[#f4f4f6] cursor-pointer transition-colors uppercase font-bold"
+                <Youtube className="w-4 h-4" />
+              </a>
+              <a
+                href="https://x.com"
+                target="_blank"
+                rel="noreferrer"
+                className="w-8 h-8 rounded-full bg-[#2D2C29] border border-[#3e3c39] flex items-center justify-center text-[#A8A49E] hover:text-white hover:border-[#B4532A] transition-all"
+                aria-label="Twitter / X"
               >
-                PRIVATE CLIENT LOGIN
-              </span>
-            </div>
-
-            {/* Protocol */}
-            <div className="flex flex-col gap-3">
-              <span className="font-mono text-[11px] font-bold text-[#f4f4f6] uppercase tracking-wider">
-                Protocol
-              </span>
-              <span className="font-mono text-[10px] text-[#8e8e98] hover:text-[#f4f4f6] cursor-pointer transition-colors uppercase">
-                TERMS OF SERVICE
-              </span>
-              <span className="font-mono text-[10px] text-[#8e8e98] hover:text-[#f4f4f6] cursor-pointer transition-colors uppercase">
-                PRIVACY POLICY
-              </span>
-              <span className="font-mono text-[10px] text-[#8e8e98] hover:text-[#f4f4f6] cursor-pointer transition-colors uppercase">
-                DISCLOSURE
-              </span>
+                <Twitter className="w-4 h-4" />
+              </a>
             </div>
           </div>
         </div>
 
         {/* Visual Appearance & Theme Controls */}
-        <div className="py-6 border-b border-[#242429] flex flex-col sm:flex-row items-center justify-between gap-4 font-mono text-[11px]">
+        <div className="py-6 border-b border-[#3a3937] flex flex-col sm:flex-row items-center justify-between gap-4 text-xs">
           <div className="flex items-center gap-2">
-            <span className="w-1.5 h-1.5 bg-[#c9a96e]"></span>
-            <span className="text-[#8e8e98] uppercase tracking-widest text-[10px]">
-              APPEARANCE MODE:
+            <span className="w-2 h-2 rounded-full bg-[#B4532A]"></span>
+            <span className="text-[#A8A49E] uppercase tracking-wider text-[11px]">
+              APPEARANCE:
             </span>
-            <span className="text-[#f4f4f6] font-bold text-[10px]">
-              {theme === 'dark' ? 'OBSIDIAN DARK LUXURY' : 'ALABASTER LIGHT LUXURY'}
+            <span className="text-white font-bold text-[11px]">
+              {theme === 'dark' ? 'OBSIDIAN DARK LUXURY' : 'WARM IVORY & TERRACOTTA'}
             </span>
           </div>
 
           <div
             id="footer-theme-switcher"
-            className="flex items-center border border-[#242429] bg-[#121215] p-1 gap-1"
+            className="flex items-center border border-[#3e3c39] bg-[#1E1E24] p-1 rounded-lg gap-1"
           >
-            <button
-              id="footer-theme-dark-btn"
-              onClick={() => setTheme('dark')}
-              className={`flex items-center gap-2 px-3 py-1.5 text-[10px] font-bold uppercase tracking-wider transition-all cursor-pointer ${
-                theme === 'dark'
-                  ? 'bg-[#c9a96e] text-[#09090b]'
-                  : 'text-[#8e8e98] hover:text-[#f4f4f6]'
-              }`}
-              title="Switch to Obsidian Dark Luxury Theme"
-            >
-              <Moon className="w-3.5 h-3.5" />
-              <span>DARK MODE</span>
-            </button>
             <button
               id="footer-theme-light-btn"
               onClick={() => setTheme('light')}
-              className={`flex items-center gap-2 px-3 py-1.5 text-[10px] font-bold uppercase tracking-wider transition-all cursor-pointer ${
+              className={`flex items-center gap-1.5 px-3 py-1.5 rounded text-xs font-semibold transition-all cursor-pointer ${
                 theme === 'light'
-                  ? 'bg-[#c9a96e] text-[#09090b]'
-                  : 'text-[#8e8e98] hover:text-[#f4f4f6]'
+                  ? 'bg-[#B4532A] text-white shadow-sm'
+                  : 'text-[#A8A49E] hover:text-white'
               }`}
-              title="Switch to Alabaster Light Luxury Theme"
+              title="Switch to Warm Ivory & Terracotta Mode"
             >
               <Sun className="w-3.5 h-3.5" />
               <span>LIGHT MODE</span>
+            </button>
+            <button
+              id="footer-theme-dark-btn"
+              onClick={() => setTheme('dark')}
+              className={`flex items-center gap-1.5 px-3 py-1.5 rounded text-xs font-semibold transition-all cursor-pointer ${
+                theme === 'dark'
+                  ? 'bg-[#B4532A] text-white shadow-sm'
+                  : 'text-[#A8A49E] hover:text-white'
+              }`}
+              title="Switch to Obsidian Dark Mode"
+            >
+              <Moon className="w-3.5 h-3.5" />
+              <span>DARK MODE</span>
             </button>
           </div>
         </div>
 
         {/* Bottom Bar: Copyright & System Coordinates */}
-        <div className="pt-8 flex flex-col sm:flex-row justify-between items-center gap-4 font-mono text-[10px] text-[#52525b]">
+        <div className="pt-6 flex flex-col sm:flex-row justify-between items-center gap-4 text-xs text-[#77716B]">
           <div className="flex items-center gap-4">
-            <span>© 2025 VANTA SYSTEM CORP. ALL RIGHTS RESERVED.</span>
+            <span>© 2026 VANTA SYSTEM CORP. ALL RIGHTS RESERVED.</span>
             <span className="hidden md:inline">|</span>
             <span className="hidden md:inline">CIVITANOVA MARCHE // BERLIN</span>
           </div>
@@ -242,7 +274,7 @@ export const Footer: React.FC<FooterProps> = ({
             <span>LAT: 52.5200 N / LONG: 13.4050 E</span>
             <span
               onClick={handleSecretAdminTrigger}
-              className="text-[#8e8e98] hover:text-[#c9a96e] font-bold select-none cursor-pointer transition-colors"
+              className="text-[#A8A49E] hover:text-[#B4532A] font-semibold select-none cursor-pointer transition-colors"
             >
               {isAdminAuthenticated ? 'SYS_STATUS: ADMIN_ACTIVE' : 'SYS_STATUS: NOMINAL'}
             </span>

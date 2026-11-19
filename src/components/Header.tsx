@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Search, Heart, ShoppingBag, User, Menu, X, Scale, Sun, Moon, Globe, ChevronDown } from 'lucide-react';
+import { Search, Heart, ShoppingBag, User, Menu, X, Scale, Sun, Moon, Globe, ChevronDown, Package, Truck, LogOut } from 'lucide-react';
 import { CURRENCY_CONFIGS, SupportedCurrency, getActiveCurrency, setActiveCurrency, subscribeCurrency } from '../lib/currency';
 import { getTheme, setTheme, toggleTheme, subscribeTheme, ThemeMode } from '../lib/theme';
 
@@ -38,6 +38,7 @@ export const Header: React.FC<HeaderProps> = ({
   const [theme, setCurrentTheme] = useState<ThemeMode>(getTheme());
   const [currency, setCurrentCurrency] = useState<SupportedCurrency>(getActiveCurrency());
   const [isCurrencyMenuOpen, setIsCurrencyMenuOpen] = useState(false);
+  const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
 
   useEffect(() => {
     const unsubTheme = subscribeTheme((t) => setCurrentTheme(t));
@@ -50,31 +51,27 @@ export const Header: React.FC<HeaderProps> = ({
 
   const activeCurrencyConfig = CURRENCY_CONFIGS[currency] || CURRENCY_CONFIGS.INR;
 
-  // Primary top navigation categories specified in guide:
+  // Primary top navigation categories matching reference screenshot Panel 1:
   // Men, Women, Kids, Sneakers, Sports, New Arrivals, Sale
   const categoryShortcuts = [
-    { label: 'MEN', filter: 'Men' },
-    { label: 'WOMEN', filter: 'Women' },
-    { label: 'KIDS', filter: 'Kids' },
-    { label: 'SNEAKERS', filter: 'Sneakers' },
-    { label: 'SPORTS', filter: 'Running' },
-    { label: 'NEW ARRIVALS', filter: 'New Arrivals' },
-    { label: 'SALE', filter: 'Sale' },
+    { label: 'Men', filter: 'Men' },
+    { label: 'Women', filter: 'Women' },
+    { label: 'Kids', filter: 'Kids' },
+    { label: 'Sneakers', filter: 'Sneakers' },
+    { label: 'Sports', filter: 'Running' },
+    { label: 'New Arrivals', filter: 'New Arrivals', navKey: 'NEW DROPS' },
+    { label: 'Sale', filter: 'Sale' },
   ];
 
-  const mainNavLinks = [
-    { key: 'SHOP', label: 'CATALOG' },
-    { key: 'COLLECTIONS', label: 'COLLECTIONS' },
-    { key: 'ARCHIVES', label: 'ARCHIVES' },
-    { key: 'NEW DROPS', label: 'NEW DROPS' },
-    { key: 'ABOUT', label: 'ABOUT' },
-  ];
-
-  const handleCategoryClick = (filter: string) => {
-    if (onSelectCategoryFilter) {
-      onSelectCategoryFilter(filter);
+  const handleCategoryClick = (filter: string, navKey?: string) => {
+    if (navKey) {
+      onSelectNav(navKey);
+    } else {
+      if (onSelectCategoryFilter) {
+        onSelectCategoryFilter(filter);
+      }
+      onSelectNav('SHOP');
     }
-    onSelectNav('SHOP');
     setMobileMenuOpen(false);
   };
 
@@ -86,191 +83,248 @@ export const Header: React.FC<HeaderProps> = ({
   return (
     <header
       id="main-header"
-      className="fixed top-0 left-0 w-full z-40 bg-[#09090b]/95 backdrop-blur-md border-b border-[#242429]"
+      className="fixed top-0 left-0 w-full z-40 bg-white/95 dark:bg-[#121215]/95 backdrop-blur-md border-b border-[#E9D9CA] dark:border-[#242429] transition-colors"
     >
-      {/* Top Category & Department Micro-Bar */}
-      <div className="hidden md:flex border-b border-[#242429] bg-[#09090b] px-5 md:px-16 py-1 items-center justify-between font-mono text-[10px] text-[#8e8e98]">
-        <div className="flex items-center gap-4">
-          <span className="text-[#c9a96e] font-bold tracking-widest">ATELIER DIRECT:</span>
-          {categoryShortcuts.map((cat) => (
-            <button
-              key={cat.label}
-              onClick={() => handleCategoryClick(cat.filter)}
-              className="text-[#8e8e98] hover:text-[#f4f4f6] transition-colors cursor-pointer font-semibold uppercase tracking-wider"
-            >
-              {cat.label}
-            </button>
-          ))}
+      {/* Top Status & Concierge Bar */}
+      <div
+        id="top-status-bar"
+        className="hidden md:flex border-b border-[#E9D9CA]/80 dark:border-[#242429] bg-[#F7F2EC] dark:bg-[#09090b] px-5 md:px-12 py-1 items-center justify-between text-[11px] text-[#77716B] dark:text-[#8e8e98] font-sans"
+      >
+        <div className="flex items-center gap-3">
+          <span className="w-1.5 h-1.5 rounded-full bg-[#B4532A]"></span>
+          <span className="font-semibold text-[#242321] dark:text-[#f4f4f6]">COMPLIMENTARY WORLDWIDE DELIVERY &amp; 30-DAY RETURNS</span>
         </div>
         <div className="flex items-center gap-4">
-          <span className="text-[#52525b] hidden lg:inline">FREE COMPLIMENTARY SIZE EXCHANGE ON ALL ORDERS</span>
-          
-          {/* Quick Currency indicator in micro-bar */}
+          {/* Quick Currency Selector */}
           <button
             onClick={() => setIsCurrencyMenuOpen((prev) => !prev)}
-            className="flex items-center gap-1 text-[#8e8e98] hover:text-[#c9a96e] transition-colors cursor-pointer"
+            className="flex items-center gap-1.5 text-[#242321] dark:text-[#8e8e98] hover:text-[#B4532A] transition-colors cursor-pointer font-medium"
             title="Worldwide Auto-Detected Currency"
           >
-            <Globe className="w-3 h-3 text-[#c9a96e]" />
+            <Globe className="w-3.5 h-3.5 text-[#B4532A]" />
             <span>{activeCurrencyConfig.flag} {activeCurrencyConfig.code} ({activeCurrencyConfig.symbol})</span>
           </button>
 
-          {/* Quick Theme toggle in micro-bar */}
+          {/* Quick Theme Toggle */}
           <button
             onClick={() => toggleTheme()}
-            className="flex items-center gap-1 text-[#8e8e98] hover:text-[#c9a96e] transition-colors cursor-pointer"
+            className="flex items-center gap-1.5 text-[#242321] dark:text-[#8e8e98] hover:text-[#B4532A] transition-colors cursor-pointer font-medium"
             title={`Toggle Theme (${theme === 'dark' ? 'Switch to Light' : 'Switch to Dark'})`}
           >
             {theme === 'dark' ? (
               <>
-                <Sun className="w-3 h-3 text-[#c9a96e]" />
-                <span>LIGHT MODE</span>
+                <Sun className="w-3.5 h-3.5 text-[#c9a96e]" />
+                <span>LIGHT</span>
               </>
             ) : (
               <>
-                <Moon className="w-3 h-3 text-[#121215]" />
-                <span>DARK MODE</span>
+                <Moon className="w-3.5 h-3.5 text-[#242321]" />
+                <span>DARK</span>
               </>
             )}
           </button>
 
-          <button
-            onClick={() => onSelectNav('LOGIN')}
-            className={`font-bold hover:underline cursor-pointer tracking-wider ${
-              activeNav === 'LOGIN' ? 'text-[#c9a96e] underline' : 'text-[#f4f4f6]'
-            }`}
-          >
-            {currentUser ? `[CLIENT: ${currentUser.name}]` : '[CLIENT LOGIN]'}
-          </button>
+          {currentUser ? (
+            <span className="font-medium text-[#242321] dark:text-[#f4f4f6]">Client: {currentUser.name}</span>
+          ) : (
+            <button
+              onClick={() => onSelectNav('LOGIN')}
+              className="text-[#B4532A] font-semibold hover:underline cursor-pointer"
+            >
+              Sign In
+            </button>
+          )}
+
           {isAdminAuthenticated && (
             <button
               onClick={onOpenAdminPortal}
-              className="font-bold cursor-pointer tracking-wider text-[#c9a96e] bg-[#121215] hover:bg-[#18181c] px-2 py-0.5 border border-[#3a3a42] text-[10px] transition-colors"
-              title="Open Atelier Administrator Console"
+              className="font-bold cursor-pointer text-[#B4532A] bg-[#E9D9CA]/40 dark:bg-[#18181c] px-2.5 py-0.5 rounded border border-[#B4532A]/30 text-[10px] hover:bg-[#B4532A] hover:text-white transition-all"
             >
-              [ADMIN CONSOLE ⚡]
+              ADMIN CONSOLE ⚡
             </button>
           )}
         </div>
       </div>
 
-      {/* Main Primary Header Bar */}
-      <div className="h-14 sm:h-16 max-w-[1440px] mx-auto px-5 md:px-16 flex items-center justify-between">
-        {/* Brand Logo & Wordmark */}
-        <div className="flex items-center gap-6">
-          <button
-            id="brand-logo-btn"
-            onClick={() => onSelectNav('COLLECTIONS')}
-            className="flex items-center gap-2.5 text-left group focus:outline-none cursor-pointer"
-          >
-            <span className="font-headline text-2xl sm:text-3xl font-extrabold tracking-tight uppercase text-[#f4f4f6] group-hover:tracking-wider transition-all duration-300">
-              VANTA
-            </span>
-            <span className="hidden sm:inline-block font-mono text-[9px] uppercase tracking-[0.25em] text-[#c9a96e] border-l border-[#242429] pl-2.5 py-0.5">
-              ARCHIVE // ATELIER
-            </span>
-          </button>
-        </div>
+      {/* Main Reference Header Bar */}
+      <div className="h-16 sm:h-20 max-w-[1440px] mx-auto px-5 md:px-12 flex items-center justify-between">
+        {/* Brand Logo */}
+        <button
+          id="brand-logo-btn"
+          onClick={() => onSelectNav('COLLECTIONS')}
+          className="flex items-center gap-2 group focus:outline-none cursor-pointer"
+        >
+          <span className="font-sans text-2xl sm:text-3xl font-extrabold tracking-tight uppercase text-[#242321] dark:text-[#f4f4f6]">
+            VANTA
+          </span>
+        </button>
 
-        {/* Navigation Bar (Desktop) */}
-        <nav className="hidden lg:flex items-center gap-8" id="primary-navigation">
-          {mainNavLinks.map((link) => {
-            const isActive = activeNav === link.key;
-            return (
-              <button
-                key={link.key}
-                id={`nav-${link.key.toLowerCase().replace(/\s+/g, '-')}`}
-                onClick={() => onSelectNav(link.key)}
-                className={`font-mono text-[11px] font-bold tracking-[0.14em] transition-all uppercase cursor-pointer ${
-                  isActive
-                    ? 'text-[#f4f4f6] border-b-2 border-[#f4f4f6] pb-0.5'
-                    : 'text-[#8e8e98] hover:text-[#f4f4f6] pb-0.5 border-b-2 border-transparent'
-                }`}
-              >
-                {link.label}
-              </button>
-            );
-          })}
+        {/* Primary Categories Navigation (Exact Match to Reference Panel 1) */}
+        <nav className="hidden lg:flex items-center gap-7 text-[13px] font-medium" id="primary-navigation">
+          {categoryShortcuts.map((cat) => (
+            <button
+              key={cat.label}
+              onClick={() => handleCategoryClick(cat.filter, cat.navKey)}
+              className="text-[#77716B] hover:text-[#242321] dark:text-[#8e8e98] dark:hover:text-[#f4f4f6] transition-colors cursor-pointer py-1"
+            >
+              {cat.label}
+            </button>
+          ))}
+          <button
+            onClick={() => onSelectNav('COLLECTIONS')}
+            className={`transition-colors cursor-pointer py-1 ${
+              activeNav === 'COLLECTIONS'
+                ? 'text-[#B4532A] font-semibold'
+                : 'text-[#77716B] hover:text-[#242321] dark:text-[#8e8e98] dark:hover:text-[#f4f4f6]'
+            }`}
+          >
+            Collections
+          </button>
+          <button
+            onClick={() => onSelectNav('ARCHIVES')}
+            className={`transition-colors cursor-pointer py-1 ${
+              activeNav === 'ARCHIVES'
+                ? 'text-[#B4532A] font-semibold'
+                : 'text-[#77716B] hover:text-[#242321] dark:text-[#8e8e98] dark:hover:text-[#f4f4f6]'
+            }`}
+          >
+            Archives
+          </button>
         </nav>
 
-        {/* Action Controls & Utilities */}
-        <div className="flex items-center gap-2 sm:gap-3.5" id="header-utilities">
+        {/* Action Controls & Utilities (Exact Match to Reference Top Right) */}
+        <div className="flex items-center gap-3 sm:gap-4" id="header-utilities">
           {/* Search Trigger */}
           <button
             id="search-trigger-btn"
             onClick={onOpenSearch}
-            className="text-[#8e8e98] hover:text-[#f4f4f6] transition-colors p-1.5 focus:outline-none cursor-pointer"
+            className="w-9 h-9 flex items-center justify-center rounded-full text-[#242321] dark:text-[#f4f4f6] hover:bg-[#F7F2EC] dark:hover:bg-[#18181c] transition-colors cursor-pointer"
             aria-label="Search Catalog"
             title="Search Catalog"
           >
-            <Search className="w-4 h-4 sm:w-4.5 sm:h-4.5" />
+            <Search className="w-5 h-5" />
           </button>
-
-          {/* Compare Modal Trigger */}
-          {onOpenCompare && (
-            <button
-              id="compare-trigger-btn"
-              onClick={onOpenCompare}
-              className="text-[#8e8e98] hover:text-[#f4f4f6] transition-colors relative p-1.5 focus:outline-none cursor-pointer"
-              aria-label="Compare Models"
-              title="Compare Models"
-            >
-              <Scale className="w-4 h-4 sm:w-4.5 sm:h-4.5" />
-              {compareCount > 0 && (
-                <span className="absolute -top-0.5 -right-1 bg-[#c9a96e] text-[#09090b] font-mono text-[9px] font-bold px-1 py-0.2 leading-tight">
-                  {compareCount}
-                </span>
-              )}
-            </button>
-          )}
 
           {/* Wishlist Trigger */}
           <button
             id="wishlist-trigger-btn"
             onClick={onOpenWishlist}
-            className="text-[#8e8e98] hover:text-[#f4f4f6] transition-colors relative p-1.5 focus:outline-none cursor-pointer"
+            className="w-9 h-9 flex items-center justify-center rounded-full text-[#242321] dark:text-[#f4f4f6] hover:bg-[#F7F2EC] dark:hover:bg-[#18181c] transition-colors relative cursor-pointer"
             aria-label="View Wishlist"
             title="View Wishlist"
           >
-            <Heart className="w-4 h-4 sm:w-4.5 sm:h-4.5" />
-            <span className="absolute -top-0.5 -right-1 bg-[#c9a96e] text-[#09090b] font-mono text-[9px] font-bold px-1 py-0.2 leading-tight">
-              {wishlistCount}
-            </span>
+            <Heart className="w-5 h-5" />
+            {wishlistCount > 0 && (
+              <span className="absolute -top-0.5 -right-0.5 bg-[#B4532A] text-white text-[10px] font-bold w-4 h-4 rounded-full flex items-center justify-center leading-none">
+                {wishlistCount}
+              </span>
+            )}
           </button>
 
-          {/* Bag / Cart Trigger */}
+          {/* Cart Bag Trigger */}
           <button
             id="bag-trigger-btn"
             onClick={() => onSelectNav('BAG')}
-            className={`transition-colors relative p-1.5 focus:outline-none cursor-pointer ${
-              activeNav === 'BAG' ? 'text-[#f4f4f6]' : 'text-[#8e8e98] hover:text-[#f4f4f6]'
-            }`}
+            className="w-9 h-9 flex items-center justify-center rounded-full text-[#242321] dark:text-[#f4f4f6] hover:bg-[#F7F2EC] dark:hover:bg-[#18181c] transition-colors relative cursor-pointer"
             aria-label="View Cart Bag"
             title="View Cart Bag"
           >
-            <ShoppingBag className="w-4 h-4 sm:w-4.5 sm:h-4.5" />
-            <span className="absolute -top-0.5 -right-1 bg-[#f4f4f6] text-[#09090b] font-mono text-[9px] font-bold px-1 py-0.2 leading-tight">
-              {cartCount < 10 ? `0${cartCount}` : cartCount}
+            <ShoppingBag className="w-5 h-5" />
+            <span className="absolute -top-0.5 -right-0.5 bg-[#B4532A] text-white text-[10px] font-bold w-4 h-4 rounded-full flex items-center justify-center leading-none">
+              {cartCount}
             </span>
           </button>
 
-          {/* Worldwide Currency Selector Dropdown */}
+          {/* User Account Avatar & Popover */}
           <div className="relative">
+            <button
+              id="user-account-btn"
+              onClick={() => {
+                if (currentUser) {
+                  setIsUserMenuOpen(!isUserMenuOpen);
+                } else {
+                  onSelectNav('LOGIN');
+                }
+              }}
+              className="w-9 h-9 rounded-full bg-[#E9D9CA] dark:bg-[#242429] flex items-center justify-center text-[#242321] dark:text-[#f4f4f6] hover:ring-2 hover:ring-[#B4532A] transition-all cursor-pointer font-bold text-xs"
+              aria-label="Client Account"
+              title={currentUser ? `Account: ${currentUser.name}` : 'Login / Register'}
+            >
+              {currentUser ? (
+                currentUser.name.charAt(0).toUpperCase()
+              ) : (
+                <User className="w-4 h-4 text-[#242321] dark:text-[#f4f4f6]" />
+              )}
+            </button>
+
+            {isUserMenuOpen && currentUser && (
+              <div className="absolute right-0 top-full mt-2 w-52 bg-white dark:bg-[#121215] border border-[#E9D9CA] dark:border-[#242429] rounded-xl shadow-xl z-50 py-2 text-xs">
+                <div className="px-4 py-2 border-b border-[#E9D9CA] dark:border-[#242429]">
+                  <p className="font-bold text-[#242321] dark:text-white truncate">{currentUser.name}</p>
+                  <p className="text-[11px] text-[#77716B] truncate">{currentUser.email}</p>
+                </div>
+                <button
+                  onClick={() => {
+                    onSelectNav('MY_ORDERS');
+                    setIsUserMenuOpen(false);
+                  }}
+                  className="w-full text-left px-4 py-2 text-[#242321] dark:text-[#f4f4f6] hover:bg-[#F7F2EC] dark:hover:bg-[#18181c] flex items-center gap-2 cursor-pointer transition-colors"
+                >
+                  <Package className="w-4 h-4 text-[#B4532A]" />
+                  <span>My Orders</span>
+                </button>
+                <button
+                  onClick={() => {
+                    onSelectNav('ORDER_TRACKING');
+                    setIsUserMenuOpen(false);
+                  }}
+                  className="w-full text-left px-4 py-2 text-[#242321] dark:text-[#f4f4f6] hover:bg-[#F7F2EC] dark:hover:bg-[#18181c] flex items-center gap-2 cursor-pointer transition-colors"
+                >
+                  <Truck className="w-4 h-4 text-[#B4532A]" />
+                  <span>Track Shipment</span>
+                </button>
+                <button
+                  onClick={() => {
+                    onOpenWishlist();
+                    setIsUserMenuOpen(false);
+                  }}
+                  className="w-full text-left px-4 py-2 text-[#242321] dark:text-[#f4f4f6] hover:bg-[#F7F2EC] dark:hover:bg-[#18181c] flex items-center gap-2 cursor-pointer transition-colors"
+                >
+                  <Heart className="w-4 h-4 text-[#B4532A]" />
+                  <span>Saved Wishlist</span>
+                </button>
+                <div className="border-t border-[#E9D9CA] dark:border-[#242429] mt-1 pt-1">
+                  <button
+                    onClick={() => {
+                      onSelectNav('LOGIN');
+                      setIsUserMenuOpen(false);
+                    }}
+                    className="w-full text-left px-4 py-2 text-red-500 hover:bg-red-50 dark:hover:bg-red-950/20 flex items-center gap-2 cursor-pointer transition-colors"
+                  >
+                    <LogOut className="w-4 h-4" />
+                    <span>Switch / Sign Out</span>
+                  </button>
+                </div>
+              </div>
+            )}
+          </div>
+
+          {/* Currency Dropdown Popover */}
+          <div className="relative hidden sm:block">
             <button
               id="header-currency-selector-btn"
               onClick={() => setIsCurrencyMenuOpen(!isCurrencyMenuOpen)}
-              className="flex items-center gap-1 px-2 py-1 bg-[#121215] border border-[#242429] hover:border-[#c9a96e] text-[10px] font-mono font-bold text-[#f4f4f6] tracking-wider transition-all cursor-pointer"
-              title="Change Display Currency Worldwide"
+              className="flex items-center gap-1 px-2.5 py-1.5 rounded-lg border border-[#E9D9CA] dark:border-[#242429] bg-white dark:bg-[#121215] text-[11px] font-semibold text-[#242321] dark:text-[#f4f4f6] hover:border-[#B4532A] transition-all cursor-pointer"
+              title="Display Currency"
             >
-              <Globe className="w-3 h-3 text-[#c9a96e]" />
               <span>{activeCurrencyConfig.code}</span>
-              <ChevronDown className="w-2.5 h-2.5 text-[#8e8e98]" />
+              <ChevronDown className="w-3 h-3 text-[#77716B]" />
             </button>
 
             {isCurrencyMenuOpen && (
-              <div className="absolute right-0 top-full mt-2 w-48 bg-[#121215] border border-[#c9a96e]/40 shadow-2xl z-50 py-1 font-mono text-[10px] max-h-64 overflow-y-auto">
-                <div className="px-2.5 py-1 text-[9px] uppercase tracking-wider text-[#c9a96e] border-b border-[#242429] font-bold">
-                  WORLDWIDE CURRENCY
+              <div className="absolute right-0 top-full mt-2 w-48 bg-white dark:bg-[#121215] border border-[#E9D9CA] dark:border-[#242429] rounded-xl shadow-xl z-50 py-1 text-[11px] max-h-64 overflow-y-auto">
+                <div className="px-3 py-1.5 text-[10px] font-bold uppercase tracking-wider text-[#77716B] border-b border-[#E9D9CA] dark:border-[#242429]">
+                  Select Currency
                 </div>
                 {Object.values(CURRENCY_CONFIGS).map((c) => (
                   <button
@@ -279,161 +333,87 @@ export const Header: React.FC<HeaderProps> = ({
                       setActiveCurrency(c.code);
                       setIsCurrencyMenuOpen(false);
                     }}
-                    className={`w-full text-left px-2.5 py-1.5 flex items-center justify-between hover:bg-[#18181c] cursor-pointer transition-colors ${
-                      currency === c.code ? 'text-[#c9a96e] font-bold bg-[#18181c]' : 'text-[#f4f4f6]'
+                    className={`w-full text-left px-3 py-2 flex items-center justify-between hover:bg-[#F7F2EC] dark:hover:bg-[#18181c] cursor-pointer transition-colors ${
+                      currency === c.code ? 'text-[#B4532A] font-bold bg-[#F7F2EC]/60 dark:bg-[#18181c]' : 'text-[#242321] dark:text-[#f4f4f6]'
                     }`}
                   >
-                    <span className="flex items-center gap-1.5">
+                    <span className="flex items-center gap-2">
                       <span>{c.flag}</span>
                       <span>{c.code}</span>
                     </span>
-                    <span className="text-[#8e8e98]">{c.symbol}</span>
+                    <span className="text-[#77716B]">{c.symbol}</span>
                   </button>
                 ))}
               </div>
             )}
           </div>
 
-          {/* Segmented Theme Switcher */}
-          <div
-            id="header-theme-switcher"
-            className="flex items-center border border-[#242429] bg-[#121215] p-0.5"
-            title="Theme Selection: Dark / Light"
-          >
-            <button
-              id="header-dark-theme-btn"
-              onClick={() => setTheme('dark')}
-              className={`flex items-center gap-1 px-2 py-1 text-[9px] font-mono font-bold tracking-wider transition-all cursor-pointer ${
-                theme === 'dark'
-                  ? 'bg-[#c9a96e] text-[#09090b]'
-                  : 'text-[#8e8e98] hover:text-[#f4f4f6]'
-              }`}
-              title="Obsidian Dark Luxury Theme"
-            >
-              <Moon className="w-3 h-3" />
-              <span className="hidden sm:inline">DARK</span>
-            </button>
-            <button
-              id="header-light-theme-btn"
-              onClick={() => setTheme('light')}
-              className={`flex items-center gap-1 px-2 py-1 text-[9px] font-mono font-bold tracking-wider transition-all cursor-pointer ${
-                theme === 'light'
-                  ? 'bg-[#c9a96e] text-[#09090b]'
-                  : 'text-[#8e8e98] hover:text-[#f4f4f6]'
-              }`}
-              title="Alabaster Light Luxury Theme"
-            >
-              <Sun className="w-3 h-3" />
-              <span className="hidden sm:inline">LIGHT</span>
-            </button>
-          </div>
-
-          {/* Account Profile / Login Trigger */}
-          <button
-            id="user-account-btn"
-            onClick={() => onSelectNav('LOGIN')}
-            className={`w-7 h-7 sm:w-8 sm:h-8 flex items-center justify-center transition-colors cursor-pointer border ${
-              activeNav === 'LOGIN'
-                ? 'bg-[#c9a96e] text-[#09090b] border-[#c9a96e]'
-                : 'bg-[#121215] text-[#f4f4f6] border-[#242429] hover:border-[#8e8e98]'
-            }`}
-            aria-label="Private Client Account / Login"
-            title="Private Client Account / Login"
-          >
-            {currentUser ? (
-              <span className="font-mono text-[11px] font-bold">{currentUser.name.charAt(0)}</span>
-            ) : (
-              <User className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-[#f4f4f6]" />
-            )}
-          </button>
-
           {/* Mobile Hamburger Toggle */}
           <button
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-            className="lg:hidden text-[#f4f4f6] p-1.5 cursor-pointer"
+            className="lg:hidden text-[#242321] dark:text-[#f4f4f6] p-1.5 cursor-pointer"
             aria-label="Toggle Navigation Menu"
           >
-            {mobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
+            {mobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
           </button>
         </div>
       </div>
 
-      {/* Mobile Drawer Menu */}
+      {/* Mobile Drawer */}
       {mobileMenuOpen && (
-        <div className="lg:hidden bg-[#09090b] border-b border-[#242429] px-5 py-4 flex flex-col gap-3 font-mono text-xs shadow-2xl">
-          <div className="text-[10px] text-[#c9a96e] font-bold uppercase pb-1 border-b border-[#242429]">
-            DEPARTMENTS & CATEGORIES
+        <div className="lg:hidden bg-white dark:bg-[#09090b] border-b border-[#E9D9CA] dark:border-[#242429] px-6 py-5 flex flex-col gap-3 text-sm shadow-xl animate-fade-in">
+          <div className="text-[11px] font-bold uppercase text-[#77716B] pb-1 border-b border-[#E9D9CA] dark:border-[#242429]">
+            Categories
           </div>
-          <div className="grid grid-cols-2 gap-1.5 pb-2">
+          <div className="grid grid-cols-2 gap-2 pb-3">
             {categoryShortcuts.map((cat) => (
               <button
                 key={cat.label}
-                onClick={() => handleCategoryClick(cat.filter)}
-                className="text-left py-1.5 px-2 bg-[#121215] border border-[#242429] text-[10px] font-bold uppercase text-[#8e8e98] hover:text-[#f4f4f6] hover:border-[#3a3a42]"
+                onClick={() => handleCategoryClick(cat.filter, cat.navKey)}
+                className="text-left py-2 px-3 bg-[#F7F2EC] dark:bg-[#121215] rounded-lg text-xs font-semibold text-[#242321] dark:text-[#f4f4f6] hover:bg-[#E9D9CA]/50"
               >
                 {cat.label}
               </button>
             ))}
           </div>
 
-          <div className="text-[10px] text-[#c9a96e] font-bold uppercase pb-1 border-b border-[#242429] pt-2">
-            GLOBAL SETTINGS & PREFERENCES
+          <div className="text-[11px] font-bold uppercase text-[#77716B] pb-1 border-b border-[#E9D9CA] dark:border-[#242429]">
+            Store Navigation
           </div>
-          <div className="grid grid-cols-2 gap-2">
+          <button
+            onClick={() => handleNavClick('COLLECTIONS')}
+            className="text-left py-2 text-sm font-medium text-[#242321] dark:text-[#f4f4f6]"
+          >
+            Collections
+          </button>
+          <button
+            onClick={() => handleNavClick('ARCHIVES')}
+            className="text-left py-2 text-sm font-medium text-[#242321] dark:text-[#f4f4f6]"
+          >
+            Archives
+          </button>
+          <button
+            onClick={() => handleNavClick('ABOUT')}
+            className="text-left py-2 text-sm font-medium text-[#242321] dark:text-[#f4f4f6]"
+          >
+            About VANTA
+          </button>
+
+          <div className="pt-2 border-t border-[#E9D9CA] dark:border-[#242429] flex items-center justify-between">
             <button
               onClick={() => toggleTheme()}
-              className="py-2 px-3 bg-[#121215] border border-[#242429] flex items-center justify-between text-[#f4f4f6] font-bold text-[10px] cursor-pointer"
+              className="py-2 px-3 rounded-lg bg-[#F7F2EC] dark:bg-[#121215] text-xs font-bold flex items-center gap-2 text-[#242321] dark:text-[#f4f4f6]"
             >
-              <span>THEME:</span>
-              <span className="text-[#c9a96e]">{theme === 'dark' ? '🌙 OBSIDIAN' : '☀️ ALABASTER'}</span>
+              {theme === 'dark' ? <Sun className="w-4 h-4 text-[#B4532A]" /> : <Moon className="w-4 h-4 text-[#242321]" />}
+              <span>{theme === 'dark' ? 'LIGHT MODE' : 'DARK MODE'}</span>
             </button>
             <button
               onClick={() => setIsCurrencyMenuOpen((prev) => !prev)}
-              className="py-2 px-3 bg-[#121215] border border-[#242429] flex items-center justify-between text-[#f4f4f6] font-bold text-[10px] cursor-pointer"
+              className="py-2 px-3 rounded-lg bg-[#F7F2EC] dark:bg-[#121215] text-xs font-bold text-[#B4532A]"
             >
-              <span>CURRENCY:</span>
-              <span className="text-[#c9a96e]">{activeCurrencyConfig.flag} {activeCurrencyConfig.code}</span>
+              {activeCurrencyConfig.flag} {activeCurrencyConfig.code}
             </button>
           </div>
-
-          <div className="text-[10px] text-[#c9a96e] font-bold uppercase pb-1 border-b border-[#242429]">
-            PRIMARY NAVIGATION
-          </div>
-          {mainNavLinks.map((link) => (
-            <button
-              key={link.key}
-              onClick={() => handleNavClick(link.key)}
-              className={`text-left py-2 px-3 border transition-colors cursor-pointer ${
-                activeNav === link.key
-                  ? 'bg-[#18181c] border-[#f4f4f6] text-[#f4f4f6] font-bold'
-                  : 'bg-[#121215] border-[#242429] text-[#8e8e98] hover:text-[#f4f4f6]'
-              }`}
-            >
-              {link.label}
-            </button>
-          ))}
-          <button
-            onClick={() => handleNavClick('BAG')}
-            className={`text-left py-2 px-3 border transition-colors cursor-pointer flex justify-between items-center ${
-              activeNav === 'BAG'
-                ? 'bg-[#18181c] border-[#f4f4f6] text-[#f4f4f6] font-bold'
-                : 'bg-[#121215] border-[#242429] text-[#8e8e98] hover:text-[#f4f4f6]'
-            }`}
-          >
-            <span>BAG // ALLOCATIONS</span>
-            <span className="text-[#c9a96e] font-bold">[{cartCount}]</span>
-          </button>
-          {isAdminAuthenticated && (
-            <button
-              onClick={() => {
-                setMobileMenuOpen(false);
-                onOpenAdminPortal();
-              }}
-              className="text-left py-2 px-3 bg-[#18181c] border border-[#3a3a42] font-bold text-[#c9a96e] uppercase tracking-wider"
-            >
-              PORTAL_ADM // ENTERPRISE CONSOLE
-            </button>
-          )}
         </div>
       )}
     </header>

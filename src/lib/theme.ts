@@ -5,7 +5,7 @@ export type ThemeMode = 'dark' | 'light';
 
 const THEME_STORAGE_KEY = 'vanta_theme_mode';
 
-let currentTheme: ThemeMode = 'dark';
+let currentTheme: ThemeMode = 'light';
 type ThemeListener = (theme: ThemeMode) => void;
 const listeners = new Set<ThemeListener>();
 
@@ -48,19 +48,17 @@ export function toggleTheme(): ThemeMode {
 }
 
 export function initTheme(): ThemeMode {
-  if (typeof window === 'undefined') return 'dark';
+  if (typeof window === 'undefined') return 'light';
 
   try {
     const saved = localStorage.getItem(THEME_STORAGE_KEY) as ThemeMode | null;
     if (saved === 'light' || saved === 'dark') {
       currentTheme = saved;
     } else {
-      // Check system preference
-      const prefersLight = window.matchMedia && window.matchMedia('(prefers-color-scheme: light)').matches;
-      currentTheme = prefersLight ? 'light' : 'dark';
+      currentTheme = 'light';
     }
   } catch {
-    currentTheme = 'dark';
+    currentTheme = 'light';
   }
 
   applyThemeToDOM(currentTheme);

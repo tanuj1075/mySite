@@ -42,60 +42,55 @@
 }
 
 @layer base {
-  * {
-    border-color: #242429;
-    border-radius: 0 !important;
-  }
-
   html, body {
-    background-color: #09090b;
-    background-image: 
-      radial-gradient(circle at 50% -10%, rgba(201, 169, 110, 0.09) 0%, transparent 55%),
-      radial-gradient(circle at 90% 25%, rgba(201, 169, 110, 0.05) 0%, transparent 40%),
-      radial-gradient(circle at 10% 70%, rgba(140, 115, 80, 0.04) 0%, transparent 45%),
-      linear-gradient(rgba(201, 169, 110, 0.02) 1px, transparent 1px),
-      linear-gradient(90deg, rgba(201, 169, 110, 0.02) 1px, transparent 1px);
-    background-size: 100% 100%, 100% 100%, 100% 100%, 64px 64px, 64px 64px;
-    background-attachment: fixed;
-    color: #f4f4f6;
+    background-color: #F7F2EC;
+    color: #242321;
     font-family: var(--font-sans);
     letter-spacing: -0.01em;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
-    transition: background-color 0.3s ease, color 0.3s ease;
+    transition: background-color 0.25s ease, color 0.25s ease;
   }
 
-  /* Architectural Travertine / Alabaster Light Luxury Mode */
   html.light, html.light body {
-    background-color: #F7F5F0;
-    background-image:
-      radial-gradient(circle at 50% -10%, rgba(201, 169, 110, 0.16) 0%, transparent 60%),
-      radial-gradient(circle at 90% 25%, rgba(201, 169, 110, 0.08) 0%, transparent 40%),
-      radial-gradient(circle at 10% 70%, rgba(168, 134, 71, 0.06) 0%, transparent 45%),
-      linear-gradient(rgba(168, 134, 71, 0.05) 1px, transparent 1px),
-      linear-gradient(90deg, rgba(168, 134, 71, 0.05) 1px, transparent 1px);
-    background-size: 100% 100%, 100% 100%, 100% 100%, 64px 64px, 64px 64px;
-    color: #121215;
+    background-color: #F7F2EC !important;
+    color: #242321 !important;
   }
 
-  /* Obsidian minimal scrollbar */
+  html.dark, html.dark body {
+    background-color: #09090b !important;
+    color: #f4f4f6 !important;
+  }
+
+  /* Minimal clean scrollbar */
   ::-webkit-scrollbar {
-    width: 4px;
-    height: 4px;
+    width: 6px;
+    height: 6px;
   }
   ::-webkit-scrollbar-track {
-    background: #09090b;
+    background: #F7F2EC;
   }
   ::-webkit-scrollbar-thumb {
-    background: #242429;
+    background: #E5DFD7;
+    border-radius: 9999px;
   }
   ::-webkit-scrollbar-thumb:hover {
-    background: #3a3a42;
+    background: #B4532A;
+  }
+
+  html.dark ::-webkit-scrollbar-track {
+    background: #09090b;
+  }
+  html.dark ::-webkit-scrollbar-thumb {
+    background: #242429;
+  }
+  html.dark ::-webkit-scrollbar-thumb:hover {
+    background: #c9a96e;
   }
 
   ::selection {
-    background: #c9a96e33;
-    color: #f4f4f6;
+    background: #B4532A26;
+    color: #B4532A;
   }
 }
 
@@ -266,68 +261,98 @@
   border-right: 1px solid;
 }
 
-/* LIGHT THEME SYSTEM OVERRIDES */
-html.light, html.light body {
-  background-color: #F7F5F0 !important;
-  background-image: 
-    radial-gradient(circle at 50% -10%, rgba(201, 169, 110, 0.12) 0%, transparent 55%),
-    radial-gradient(circle at 90% 25%, rgba(201, 169, 110, 0.07) 0%, transparent 40%),
-    radial-gradient(circle at 10% 70%, rgba(140, 115, 80, 0.06) 0%, transparent 45%),
-    linear-gradient(rgba(201, 169, 110, 0.05) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(201, 169, 110, 0.05) 1px, transparent 1px) !important;
-  color: #121215 !important;
+/* VANTA ARCHIVE REFERENCE PALETTE UTILITIES */
+.bg-warm-ivory { background-color: #F7F2EC !important; }
+.bg-crisp-white { background-color: #FFFFFF !important; }
+.bg-terracotta { background-color: #B4532A !important; }
+.hover\:bg-terracotta-dark:hover { background-color: #9C431F !important; }
+.bg-charcoal { background-color: #242321 !important; }
+.bg-warm-beige { background-color: #E9D9CA !important; }
+.text-terracotta { color: #B4532A !important; }
+.text-charcoal { color: #242321 !important; }
+.text-muted-gray { color: #77716B !important; }
+.border-warm-beige { border-color: #E9D9CA !important; }
+.border-subtle { border-color: #EDE7E0 !important; }
+
+.btn-terracotta {
+  background-color: #B4532A !important;
+  color: #FFFFFF !important;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  cursor: pointer;
+}
+.btn-terracotta:hover {
+  background-color: #9C431F !important;
+  box-shadow: 0 4px 14px rgba(180, 83, 42, 0.3);
 }
 
-html.light * {
-  border-color: #DDD5C7;
+.btn-outline-terracotta {
+  border: 1.5px solid #B4532A !important;
+  color: #B4532A !important;
+  background-color: transparent !important;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  cursor: pointer;
+}
+.btn-outline-terracotta:hover {
+  background-color: #B4532A !important;
+  color: #FFFFFF !important;
+}
+
+.vanta-card {
+  background-color: #FFFFFF;
+  border: 1px solid #E9D9CA;
+  border-radius: 1rem;
+  transition: all 0.25s ease;
+}
+.vanta-card:hover {
+  border-color: #B4532A;
+  box-shadow: 0 10px 25px -5px rgba(36, 35, 33, 0.08), 0 8px 10px -6px rgba(36, 35, 33, 0.04);
+  transform: translateY(-2px);
+}
+
+/* LIGHT THEME SYSTEM OVERRIDES */
+html.light, html.light body {
+  background-color: #F7F2EC !important;
+  color: #242321 !important;
 }
 
 html.light input,
 html.light select,
 html.light textarea {
   background-color: #FFFFFF !important;
-  color: #121215 !important;
-  border-color: #DDD5C7 !important;
+  color: #242321 !important;
+  border-color: #E9D9CA !important;
 }
 html.light input::placeholder,
 html.light textarea::placeholder {
-  color: #8E8E98 !important;
+  color: #77716B !important;
 }
 html.light input:focus,
 html.light select:focus,
 html.light textarea:focus {
-  border-color: #C9A96E !important;
-}
-
-html.light ::-webkit-scrollbar-track {
-  background: #F7F5F0;
-}
-html.light ::-webkit-scrollbar-thumb {
-  background: #DDD5C7;
-}
-html.light ::-webkit-scrollbar-thumb:hover {
-  background: #C9A96E;
+  border-color: #B4532A !important;
+  outline: 2px solid rgba(180, 83, 42, 0.2);
 }
 
 html.light header {
-  background-color: rgba(247, 245, 240, 0.96) !important;
-  border-color: #DDD5C7 !important;
+  background-color: rgba(255, 255, 255, 0.95) !important;
+  border-color: #E9D9CA !important;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
 }
 
-html.light #top-status-bar,
-html.light #main-header > div:first-child {
-  background-color: #EFEBE1 !important;
-  border-color: #DDD5C7 !important;
+html.light #top-status-bar {
+  background-color: #F7F2EC !important;
+  border-color: #E9D9CA !important;
 }
 
 html.light footer {
-  background-color: #EFEBE1 !important;
-  border-color: #DDD5C7 !important;
+  background-color: #242321 !important;
+  border-color: #333230 !important;
+  color: #FFFFFF !important;
 }
 
 html.light .bg-\[\#09090b\],
 html.light .bg-\[\#09090B\] {
-  background-color: #F7F5F0 !important;
+  background-color: #F7F2EC !important;
 }
 
 html.light .bg-\[\#121215\],
@@ -346,26 +371,26 @@ html.light .bg-\[\#1e1e24\],
 html.light .bg-\[\#1E1E24\],
 html.light .bg-\[\#1b1b20\],
 html.light .bg-\[\#1B1B20\] {
-  background-color: #EFEBE1 !important;
+  background-color: #FFFFFF !important;
 }
 
 html.light .border-\[\#242429\],
 html.light .border-\[\#3a3a42\] {
-  border-color: #DDD5C7 !important;
+  border-color: #E9D9CA !important;
 }
 
 html.light .text-\[\#f4f4f6\],
 html.light .text-\[\#F4F4F6\] {
-  color: #121215 !important;
+  color: #242321 !important;
 }
 
 html.light .text-\[\#8e8e98\],
 html.light .text-\[\#8E8E98\] {
-  color: #5E5C66 !important;
+  color: #77716B !important;
 }
 
 html.light .text-\[\#52525b\] {
-  color: #7E7C88 !important;
+  color: #77716B !important;
 }
 
 html.light .specimen-card {

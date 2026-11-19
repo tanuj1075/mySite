@@ -241,62 +241,50 @@ export const AdminLogisticsView: React.FC<AdminLogisticsViewProps> = ({
   };
 
   return (
-    <div className="p-4 sm:p-8 font-sans space-y-12 bg-[#09090b] min-h-full">
-      {/* SECTION 1: FULFILLMENT & LOGISTICS COMMAND matching Image 3 */}
+    <div className="p-4 sm:p-8 font-sans space-y-8 bg-[#16161B] min-h-full text-white">
+      {/* SECTION 1: ORDERS MANAGEMENT (Exact Match to Reference Panel 11) */}
       <div className="space-y-6">
         {/* Header Metadata */}
         <div>
-          <div className="font-mono text-[10px] text-[#c9a96e] tracking-[0.2em] uppercase mb-1">
-            ORDER FULFILLMENT // ADMIN
-          </div>
-
-          <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
             <div>
-              <h1 className="font-headline text-3xl sm:text-4xl text-[#f4f4f6] tracking-tight">
-                Fulfillment &amp; Logistics Command
+              <h1 className="text-3xl sm:text-4xl font-extrabold text-white tracking-tight">
+                Orders Management
               </h1>
-              <p className="font-sans text-[13px] text-[#8e8e98] mt-1 max-w-2xl">
-                End-to-end dispatch tracking, return appraisals, and size exchange allocations across regional hubs.
+              <p className="text-xs text-[#8e8e98] mt-1">
+                Fulfillment workflow, carrier dispatches, and customer order records
               </p>
             </div>
 
-            <div className="flex items-center gap-3 font-mono text-[11px] shrink-0">
-              <div className="flex items-center gap-2 px-3 py-1.5 bg-[#121215] border border-[#242429] text-[#f4f4f6] font-bold">
-                <span className="w-2 h-2 rounded-full bg-[#16a34a] animate-pulse"></span>
-                <span className="uppercase tracking-wider">DATABASE ORDERS</span>
-              </div>
-
+            <div className="flex items-center gap-3 shrink-0">
               <button
                 onClick={handleBatchDispatch}
-                className="px-4 py-2 bg-[#141312] text-[#18181c] hover:bg-[#35322e] transition-colors uppercase tracking-widest font-bold cursor-pointer"
+                className="px-5 py-2.5 bg-[#B4532A] hover:bg-[#9C431F] text-white rounded-xl font-bold text-xs cursor-pointer shadow-sm transition-all"
               >
-                BATCH DISPATCH
+                Batch Dispatch
               </button>
             </div>
           </div>
         </div>
 
-        {/* Filter Pills matching Image 3 */}
-        <div className="flex overflow-x-auto gap-2 border-b border-[#242429] pb-2 font-mono text-[10px] tracking-wider uppercase">
+        {/* Filter Tabs (Exact Match to Reference Panel 11) */}
+        <div className="flex overflow-x-auto gap-2 pb-2 text-xs">
           {[
-            { id: 'ALL', label: 'ALL ORDERS', count: orders.length.toString() },
-            { id: 'CONFIRMED', label: 'CONFIRMED', count: orders.filter(o => o.status === 'CONFIRMED').length.toString() },
-            { id: 'PACKED', label: 'PACKED', count: orders.filter(o => o.status === 'PACKED').length.toString() },
-            { id: 'SHIPPED', label: 'SHIPPED', count: orders.filter(o => o.status === 'SHIPPED').length.toString(), dot: true },
-            { id: 'DELIVERED', label: 'DELIVERED', count: orders.filter(o => o.status === 'DELIVERED').length.toString() },
+            { id: 'ALL', label: 'All Orders' },
+            { id: 'CONFIRMED', label: 'Processing' },
+            { id: 'SHIPPED', label: 'Shipped' },
+            { id: 'DELIVERED', label: 'Delivered' },
           ].map((tab) => (
             <button
               key={tab.id}
               onClick={() => setStatusFilter(tab.id)}
-              className={`px-3 py-1.5 border transition-colors cursor-pointer flex items-center gap-1.5 whitespace-nowrap ${
+              className={`px-4 py-2 rounded-xl font-bold transition-all cursor-pointer ${
                 statusFilter === tab.id
-                  ? 'bg-[#141312] text-[#18181c] border-[#141312] font-bold'
-                  : 'bg-[#121215] border-[#242429] text-[#8e8e98] hover:bg-[#1e1e24]'
+                  ? 'bg-[#B4532A] text-white shadow-sm'
+                  : 'bg-[#1E1E24] text-[#8e8e98] hover:text-white border border-[#2A2A32]'
               }`}
             >
-              {tab.dot && <span className="w-1.5 h-1.5 rounded-full bg-[#16a34a]"></span>}
-              <span>{tab.label}</span>
-              <span className="opacity-75">[{tab.count}]</span>
+              {tab.label}
             </button>
           ))}
         </div>

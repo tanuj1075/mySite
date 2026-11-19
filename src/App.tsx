@@ -19,6 +19,7 @@ import { NotifyMeModal } from './components/NotifyMeModal';
 import { CompareModal } from './components/CompareModal';
 import { OrderSuccessView } from './components/OrderSuccessView';
 import { OrderTrackingView } from './components/OrderTrackingView';
+import { MyOrdersView } from './components/MyOrdersView';
 import { ReturnsExchangeModal } from './components/ReturnsExchangeModal';
 import { AdminPanelView } from './components/AdminPanelView';
 import { SpecimenInspectModal } from './components/SpecimenInspectModal';
@@ -1247,8 +1248,8 @@ export default function App() {
   }
 
   return (
-    <div className="min-h-screen bg-[#09090b] text-[#f4f4f6] antialiased flex flex-col justify-between selection:bg-[#c9a96e33] selection:text-[#f4f4f6]">
-      {/* Fixed Luxury Brutalist Header */}
+    <div className="min-h-screen bg-[#F7F2EC] dark:bg-[#09090b] text-[#242321] dark:text-[#f4f4f6] antialiased flex flex-col justify-between selection:bg-[#B4532A33] selection:text-[#B4532A]">
+      {/* Fixed Luxury Header */}
       <Header
         cartCount={totalItemCount}
         wishlistCount={wishlistItems.length}
@@ -1293,10 +1294,11 @@ export default function App() {
       />
 
       {/* Main Content Area */}
-      <main className="w-full pt-16 sm:pt-24 bg-[#09090b] flex-1">
+      <main className="w-full pt-16 sm:pt-24 bg-[#F7F2EC] dark:bg-[#09090b] flex-1">
         {/* VIEW 1: COLLECTIONS (Hero & Home Experience) */}
         {activeNav === 'COLLECTIONS' && (
           <CollectionsView
+            products={products}
             onClaimVoidRunner={handleClaimVoidRunner}
             onQuickAddProduct={handleAddToCart}
             onNavigate={(nav) => {
@@ -1305,6 +1307,16 @@ export default function App() {
             }}
             onShowToast={showToast}
             onInspectSpecimen={(specimen) => setInspectingSpecimen(specimen)}
+            onSelectCategoryFilter={(cat) => {
+              setCategoryFilter(cat);
+              setActiveNav('SHOP');
+              window.scrollTo({ top: 0, behavior: 'smooth' });
+            }}
+            onSelectProduct={(product) => {
+              handleSelectProduct(product);
+            }}
+            wishlistIds={wishlistItems.map((w) => w.id)}
+            onToggleWishlist={handleToggleWishlistProduct}
           />
         )}
 
@@ -1400,21 +1412,78 @@ export default function App() {
               setIsReturnsModalOpen(true);
             }}
             onViewInvoice={() => setInvoiceModalOrder(currentOrder)}
+            onBackToOrders={() => {
+              setActiveNav('MY_ORDERS');
+              window.scrollTo({ top: 0, behavior: 'smooth' });
+            }}
           />
         )}
 
-        {/* VIEW 8: ORDER TRACKING (Section 25) */}
-        {activeNav === 'ORDER_TRACKING' && currentOrder && (
-          <OrderTrackingView
-            order={currentOrder}
-            onBackToOrders={() => {
+        {/* VIEW 8: ORDER TRACKING (Section 25 / Reference Panel 8) */}
+        {activeNav === 'ORDER_TRACKING' && (
+          currentOrder ? (
+            <OrderTrackingView
+              order={currentOrder}
+              onBackToOrders={() => {
+                setActiveNav(orders.length > 0 ? 'MY_ORDERS' : 'SHOP');
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+              }}
+              onRequestExchange={(order) => {
+                setExchangeTargetOrder(order);
+                setIsReturnsModalOpen(true);
+              }}
+              onSearchOrderId={(searchedId) => {
+                const found = orders.find((o) => o.id.toLowerCase().includes(searchedId.toLowerCase()));
+                if (found) {
+                  setCurrentOrder(found);
+                  showToast(`LOCATED SHIPMENT: #${found.id}`);
+                } else {
+                  showToast(`NO RECORD FOUND FOR ORDER: ${searchedId}`);
+                }
+              }}
+            />
+          ) : (
+            orders.length > 0 ? (
+              <OrderTrackingView
+                order={orders[0]}
+                onBackToOrders={() => {
+                  setActiveNav('MY_ORDERS');
+                  window.scrollTo({ top: 0, behavior: 'smooth' });
+                }}
+                onRequestExchange={(order) => {
+                  setExchangeTargetOrder(order);
+                  setIsReturnsModalOpen(true);
+                }}
+              />
+            ) : (
+              <div className="w-full bg-[#F7F2EC] dark:bg-[#09090b] text-[#242321] dark:text-[#f4f4f6] min-h-[60vh] flex flex-col items-center justify-center p-8 text-center">
+                <h2 className="text-2xl font-bold mb-2">No Active Orders Yet</h2>
+                <p className="text-xs text-[#77716B] mb-6">Complete a checkout to track your sneaker shipment in real-time.</p>
+                <button
+                  onClick={() => setActiveNav('SHOP')}
+                  className="px-6 py-3 bg-[#B4532A] hover:bg-[#9C431F] text-white text-xs font-bold rounded-xl transition-all shadow-sm"
+                >
+                  Browse Sneakers
+                </button>
+              </div>
+            )
+          )
+        )}
+
+        {/* VIEW: MY ORDERS (Reference Panel 7) */}
+        {activeNav === 'MY_ORDERS' && (
+          <MyOrdersView
+            orders={orders}
+            onSelectOrder={(order) => {
+              setCurrentOrder(order);
+              setActiveNav('ORDER_TRACKING');
+              window.scrollTo({ top: 0, behavior: 'smooth' });
+            }}
+            onContinueShopping={() => {
               setActiveNav('SHOP');
               window.scrollTo({ top: 0, behavior: 'smooth' });
             }}
-            onRequestExchange={(order) => {
-              setExchangeTargetOrder(order);
-              setIsReturnsModalOpen(true);
-            }}
+            onViewInvoice={(order) => setInvoiceModalOrder(order)}
           />
         )}
 

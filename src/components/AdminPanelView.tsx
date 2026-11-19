@@ -9,6 +9,7 @@ import { AdminOverviewView } from './admin/AdminOverviewView';
 import { AdminReviewsView } from './admin/AdminReviewsView';
 import { AdminPaymentsView } from './admin/AdminPaymentsView';
 import { AdminCustomersView } from './admin/AdminCustomersView';
+import { AdminSettingsView } from './admin/AdminSettingsView';
 
 
 interface AdminPanelViewProps {
@@ -202,6 +203,11 @@ export const AdminPanelView: React.FC<AdminPanelViewProps> = ({
           {/* SECURITY ENGINE -> AES-256 CLUSTER (IMAGE 4) */}
           {activeSection === 'SECURITY_CLUSTER' && (
             <AdminSecurityView onShowToast={onShowToast} />
+          )}
+
+          {/* STORE SETTINGS (REFERENCE PANEL 12) */}
+          {activeSection === 'SETTINGS' && (
+            <AdminSettingsView onShowToast={onShowToast} />
           )}
 
           {/* MAIN -> OVERVIEW / DROPS / COUPONS / LOGISTICS */}
