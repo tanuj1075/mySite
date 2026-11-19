@@ -27,8 +27,8 @@ import { formatCurrency } from '../lib/currency';
 
 interface ProductDetailsViewProps {
   product: ShoeProduct;
-  onAddToCart: (item: CartItem) => void;
-  onBuyNow: (item: CartItem) => void;
+  onAddToCart: (item: CartItem) => void | Promise<void>;
+  onBuyNow: (item: CartItem) => void | Promise<void>;
   onToggleWishlist: (product: ShoeProduct) => void;
   isWishlisted: boolean;
   onOpenSizeGuide: () => void;
@@ -148,7 +148,7 @@ export const ProductDetailsView: React.FC<ProductDetailsViewProps> = ({
   const isSelectedSizeOutOfStock = selectedSizeInfo ? selectedSizeInfo.stock <= 0 : false;
 
   // Add to Bag validation
-  const handleAddToCartClick = () => {
+  const handleAddToCartClick = async () => {
     if (!selectedSize) {
       setSizeError(true);
       onShowToast('MANDATORY ATTRIBUTE: SELECT SIZE SPECIFICATION');
@@ -177,12 +177,11 @@ export const ProductDetailsView: React.FC<ProductDetailsViewProps> = ({
       selectedSize: selectedSize,
     };
 
-    onAddToCart(cartItem);
-    onShowToast(`ALLOCATED: ${product.name} [${sizeLabel} ${selectedSize}]`);
+    await onAddToCart(cartItem);
   };
 
   // Buy Now validation
-  const handleBuyNowClick = () => {
+  const handleBuyNowClick = async () => {
     if (!selectedSize) {
       setSizeError(true);
       onShowToast('MANDATORY ATTRIBUTE: SELECT SIZE SPECIFICATION');
@@ -211,7 +210,7 @@ export const ProductDetailsView: React.FC<ProductDetailsViewProps> = ({
       selectedSize: selectedSize,
     };
 
-    onBuyNow(cartItem);
+    await onBuyNow(cartItem);
   };
 
   // Pincode validation handler

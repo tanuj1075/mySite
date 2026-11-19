@@ -175,8 +175,16 @@ export const customerApi = {
   orders() {
     return requestCustomer<Array<Record<string, unknown>>>('/orders');
   },
-  createOrder(addressId: string, paymentMethod: 'CARD' | 'UPI' | 'NET_BANKING' | 'WALLET' | 'COD', couponCode?: string) {
-    return requestCustomer<Record<string, unknown>>('/orders', { method: 'POST', body: JSON.stringify({ addressId, paymentMethod, couponCode }) });
+  createOrder(
+    addressId: string,
+    paymentMethod: 'CARD' | 'UPI' | 'NET_BANKING' | 'WALLET' | 'COD',
+    couponCode?: string,
+    items?: Array<{ productId: string; color: string; size: string; quantity: number }>
+  ) {
+    return requestCustomer<Record<string, unknown>>('/orders', {
+      method: 'POST',
+      body: JSON.stringify({ addressId, paymentMethod, couponCode, items }),
+    });
   },
   paymentQuote(addressId: string) {
     return requestCustomer<{ currency: string; exchangeRate: number; amount: number; baseAmount: number }>(

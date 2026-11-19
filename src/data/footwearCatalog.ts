@@ -204,6 +204,326 @@ export const INITIAL_PRODUCTS: ShoeProduct[] = [
     }
   },
   {
+    "id": "drop-void-runner",
+    "mrp": 54000,
+    "sku": "VN-DROP-VR-02",
+    "use": "Running / High Velocity",
+    "code": "SPEC_02_VR",
+    "name": "VOID RUNNER // SMALL BATCH 02",
+    "sole": "Carbon-Composite Plate & Expanded Cellular Rubber",
+    "brand": "VANTA ATELIER",
+    "color": "Obsidian Drop Edition",
+    "price": 48000,
+    "sport": "Running",
+    "upper": "Direct-Injection Carbon Matrix",
+    "width": "Medium",
+    "colors": [
+      {
+        "hex": "#141416",
+        "name": "Obsidian Drop Edition",
+        "images": {
+          "top": "/assets/images/void_runner_heel_1788838329834.jpg",
+          "back": "/assets/images/void_runner_heel_1788838329834.jpg",
+          "side": "/assets/images/void_runner_heel_1788838329834.jpg",
+          "sole": "/assets/images/void_runner_heel_1788838329834.jpg",
+          "front": "/assets/images/void_runner_heel_1788838329834.jpg"
+        }
+      }
+    ],
+    "gender": "Unisex",
+    "discountPercent": 11,
+    "waterResistance": "Water Repellent",
+    "countryOfOrigin": "Italy",
+    "isSale": false,
+    "rating": 4.95,
+    "weight": "410g",
+    "closure": "Internal Speed Lacing",
+    "fitType": "Regular Fit",
+    "category": "Sneakers",
+    "features": [
+      "Carbon-composite internal dynamic plate",
+      "Dense sound-dampening expanded cellular rubber",
+      "Direct injection sole engineered for hostile surfaces"
+    ],
+    "occasion": "Speed & Architectural Motion",
+    "warranty": "Lifetime Craftsmanship Warranty",
+    "sizeSystem": "US",
+    "sourceTags": ["Chrono Drop", "Limited Edition", "Serial M001-M500"],
+    "collections": ["New Drops", "Limited Edition"],
+    "description": "Carbon-composite internal dynamic plate encased in dense, sound-dampening expanded cellular rubber. Direct injection sole engineered for hostile surfaces.",
+    "recommended": "True to size. Order standard US size.",
+    "sourceStore": "VANTA ATELIER",
+    "comfortScore": 4.9,
+    "fitIndicator": "True to Size",
+    "isNewArrival": true,
+    "reviewsCount": 42,
+    "isLimitedDrop": true,
+    "productImages": ["/assets/images/void_runner_heel_1788838329834.jpg"],
+    "sizeInventory": {
+      "Obsidian Drop Edition": [
+        { "sku": "VN-VR02-US9", "size": "US 9 / EU 42.5", "stock": 12 },
+        { "sku": "VN-VR02-US10", "size": "US 10 / EU 44", "stock": 14 },
+        { "sku": "VN-VR02-US11", "size": "US 11 / EU 45", "stock": 8 }
+      ]
+    }
+  },
+  {
+    "id": "vn-void-runner",
+    "mrp": 54000,
+    "sku": "VN-VR-SPEC02",
+    "use": "Running / High Velocity",
+    "code": "RUNNER_VR02",
+    "name": "VOID RUNNER SPEC 02",
+    "sole": "Carbon-Composite Reaction Chassis",
+    "brand": "VANTA ATELIER",
+    "color": "Obsidian Void",
+    "price": 48000,
+    "sport": "Running",
+    "upper": "Direct-Injection Carbon Matrix",
+    "width": "Medium",
+    "colors": [
+      {
+        "hex": "#0e0e11",
+        "name": "Obsidian Void",
+        "images": {
+          "top": "/assets/images/void_runner_heel_1788838329834.jpg",
+          "back": "/assets/images/void_runner_heel_1788838329834.jpg",
+          "side": "/assets/images/void_runner_heel_1788838329834.jpg",
+          "sole": "/assets/images/void_runner_heel_1788838329834.jpg",
+          "front": "/assets/images/void_runner_heel_1788838329834.jpg"
+        }
+      }
+    ],
+    "gender": "Unisex",
+    "discountPercent": 11,
+    "waterResistance": "Water Repellent",
+    "countryOfOrigin": "Italy",
+    "isSale": false,
+    "rating": 4.95,
+    "weight": "410g",
+    "closure": "Internal Speed Lacing",
+    "fitType": "Regular Fit",
+    "category": "Sneakers",
+    "features": [
+      "Numbered small-batch production (01-500)",
+      "High-energy rebound flex plate",
+      "Direct injection sole"
+    ],
+    "occasion": "Speed & Architectural Motion",
+    "warranty": "Lifetime Craftsmanship Warranty",
+    "sizeSystem": "EU",
+    "sourceTags": ["Atelier Direct", "Vault Spec", "Limited Edition"],
+    "collections": ["New Drops", "Limited Edition"],
+    "description": "Exclusive small-batch production numbered 01 through 500. Carbon-composite plate dynamics encased in dense, sound-dampening expanded cellular rubber.",
+    "recommended": "True to size. Order your standard European size.",
+    "sourceStore": "VANTA ATELIER",
+    "comfortScore": 4.9,
+    "fitIndicator": "True to Size",
+    "isNewArrival": true,
+    "reviewsCount": 38,
+    "isLimitedDrop": true,
+    "productImages": ["/assets/images/void_runner_heel_1788838329834.jpg"],
+    "sizeInventory": {
+      "Obsidian Void": [
+        { "sku": "VN-VR02-40", "size": "EU 40", "stock": 10 },
+        { "sku": "VN-VR02-41", "size": "EU 41", "stock": 12 },
+        { "sku": "VN-VR02-42", "size": "EU 42", "stock": 15 },
+        { "sku": "VN-VR02-43", "size": "EU 43", "stock": 11 },
+        { "sku": "VN-VR02-44", "size": "EU 44", "stock": 8 }
+      ]
+    }
+  },
+  {
+    "id": "drop-ss25-monolith",
+    "mrp": 92000,
+    "sku": "VN-DROP-SS25-M01",
+    "use": "Architectural Outerwear",
+    "code": "SS25_M01",
+    "name": "SS25 MONOLITH OVERCOAT",
+    "sole": "Structural Double-Faced Architecture",
+    "brand": "VANTA ATELIER",
+    "color": "Basalt Charcoal & Titanium",
+    "price": 82000,
+    "sport": "Lifestyle",
+    "upper": "High-Density Basalt Tech-Membrane",
+    "width": "Medium",
+    "colors": [
+      {
+        "hex": "#1e1e24",
+        "name": "Basalt Charcoal & Titanium",
+        "images": {
+          "top": "/assets/images/ss25_monolith_model_1788838295128.jpg",
+          "back": "/assets/images/ss25_monolith_model_1788838295128.jpg",
+          "side": "/assets/images/ss25_monolith_model_1788838295128.jpg",
+          "sole": "/assets/images/ss25_monolith_model_1788838295128.jpg",
+          "front": "/assets/images/ss25_monolith_model_1788838295128.jpg"
+        }
+      }
+    ],
+    "gender": "Unisex",
+    "discountPercent": 10,
+    "waterResistance": "Yes",
+    "countryOfOrigin": "Italy",
+    "isSale": false,
+    "rating": 5.0,
+    "weight": "1420g",
+    "closure": "Titanium Anchor Hardware",
+    "fitType": "Regular Fit",
+    "category": "Casual Shoes",
+    "features": [
+      "Raw titanium hardware inserts",
+      "High-density basalt tech-membrane",
+      "Limited atelier edition of 48 pieces"
+    ],
+    "occasion": "Architectural Elevation",
+    "warranty": "Lifetime Craftsmanship Warranty",
+    "sizeSystem": "EU",
+    "sourceTags": ["Chrono Drop", "Chapter 01", "Limited Edition"],
+    "collections": ["New Drops", "Limited Edition"],
+    "description": "Tailored architectural silhouette constructed with raw titanium hardware inserts and high-density basalt tech-membrane.",
+    "recommended": "Relaxed tailored fit.",
+    "sourceStore": "VANTA ATELIER",
+    "comfortScore": 4.95,
+    "fitIndicator": "True to Size",
+    "isNewArrival": true,
+    "reviewsCount": 16,
+    "isLimitedDrop": true,
+    "productImages": ["/assets/images/ss25_monolith_model_1788838295128.jpg"],
+    "sizeInventory": {
+      "Basalt Charcoal & Titanium": [
+        { "sku": "VN-SS25-48", "size": "Size 48", "stock": 6 },
+        { "sku": "VN-SS25-50", "size": "Size 50", "stock": 8 },
+        { "sku": "VN-SS25-52", "size": "Size 52", "stock": 4 }
+      ]
+    }
+  },
+  {
+    "id": "vn-overcoat-01",
+    "mrp": 98000,
+    "sku": "VN-COAT-01-RAW",
+    "use": "Tailored Outerwear",
+    "code": "COAT_01",
+    "name": "OVERSIZED TAILORED OVERCOAT",
+    "sole": "Structural Architecture",
+    "brand": "VANTA ATELIER",
+    "color": "Raw Travertine & Heavy Wool",
+    "price": 89000,
+    "sport": "Lifestyle",
+    "upper": "100% Heavy Virgin Wool & Stone Fiber Weave",
+    "width": "Medium",
+    "colors": [
+      {
+        "hex": "#c4baa9",
+        "name": "Raw Travertine & Heavy Wool",
+        "images": {
+          "top": "/assets/images/overcoat_model_1788842290581.jpg",
+          "back": "/assets/images/overcoat_model_1788842290581.jpg",
+          "side": "/assets/images/overcoat_model_1788842290581.jpg",
+          "sole": "/assets/images/overcoat_model_1788842290581.jpg",
+          "front": "/assets/images/overcoat_model_1788842290581.jpg"
+        }
+      }
+    ],
+    "gender": "Unisex",
+    "discountPercent": 9,
+    "waterResistance": "Water Repellent",
+    "countryOfOrigin": "Italy",
+    "isSale": false,
+    "rating": 4.95,
+    "weight": "1420g",
+    "closure": "Horn Buttons",
+    "fitType": "Regular Fit",
+    "category": "Casual Shoes",
+    "features": [
+      "100% Heavy Virgin Wool & stone fiber weave",
+      "Unlined brutalist drape",
+      "Horn button closures"
+    ],
+    "occasion": "Architectural Elevation",
+    "warranty": "Lifetime Craftsmanship Warranty",
+    "sizeSystem": "EU",
+    "sourceTags": ["Atelier Direct", "Chapter 01", "Permanent Vault"],
+    "collections": ["New Drops", "Limited Edition"],
+    "description": "Oversized tailored technical overcoat paired with relaxed stone trousers. Horn buttons and unlined brutalist drape.",
+    "recommended": "Relaxed fit.",
+    "sourceStore": "VANTA ATELIER",
+    "comfortScore": 4.9,
+    "fitIndicator": "True to Size",
+    "isNewArrival": true,
+    "reviewsCount": 28,
+    "isLimitedDrop": true,
+    "productImages": ["/assets/images/overcoat_model_1788842290581.jpg"],
+    "sizeInventory": {
+      "Raw Travertine & Heavy Wool": [
+        { "sku": "VN-COAT-48", "size": "Size 48", "stock": 5 },
+        { "sku": "VN-COAT-50", "size": "Size 50", "stock": 8 },
+        { "sku": "VN-COAT-52", "size": "Size 52", "stock": 4 }
+      ]
+    }
+  },
+  {
+    "id": "vn-composite-01",
+    "mrp": 35000,
+    "sku": "VN-COMP-01-3K",
+    "use": "Midsole Component & Stability",
+    "code": "COMP_01",
+    "name": "3K CARBON MIDSOLE INTEGRITY SHANK",
+    "sole": "Torsional Carbon Bridge",
+    "brand": "VANTA LAB",
+    "color": "Atelier Natural",
+    "price": 31000,
+    "sport": "Lifestyle",
+    "upper": "High-Modulus Carbon Fiber Prepreg",
+    "width": "Medium",
+    "colors": [
+      {
+        "hex": "#222226",
+        "name": "Atelier Natural",
+        "images": {
+          "top": "/assets/images/blueprint_deconstruct_1788842375340.jpg",
+          "back": "/assets/images/blueprint_deconstruct_1788842375340.jpg",
+          "side": "/assets/images/blueprint_deconstruct_1788842375340.jpg",
+          "sole": "/assets/images/blueprint_deconstruct_1788842375340.jpg",
+          "front": "/assets/images/blueprint_deconstruct_1788842375340.jpg"
+        }
+      }
+    ],
+    "gender": "Unisex",
+    "discountPercent": 11,
+    "waterResistance": "Yes",
+    "countryOfOrigin": "Japan",
+    "isSale": false,
+    "rating": 4.9,
+    "weight": "98g",
+    "closure": "Embedded Hardware",
+    "fitType": "Regular Fit",
+    "category": "Sneakers",
+    "features": [
+      "Aerospace grade 3K carbon weave",
+      "Dynamic stride torsional stability",
+      "Universal atelier shank fitment"
+    ],
+    "occasion": "Engineering & Laboratory Analysis",
+    "warranty": "Lifetime Structural Warranty",
+    "sizeSystem": "Universal",
+    "sourceTags": ["Lab Spec", "Blueprint Deconstruct"],
+    "collections": ["Limited Edition"],
+    "description": "Precision-milled aerospace composite embedded between split dual-density foam wedges. 98g total shank transmitting dynamic stride stability.",
+    "recommended": "Universal specification.",
+    "sourceStore": "VANTA LAB",
+    "comfortScore": 5.0,
+    "fitIndicator": "True to Size",
+    "isNewArrival": false,
+    "reviewsCount": 22,
+    "isLimitedDrop": true,
+    "productImages": ["/assets/images/blueprint_deconstruct_1788842375340.jpg"],
+    "sizeInventory": {
+      "Atelier Natural": [
+        { "sku": "VN-COMP-UNI", "size": "Universal Atelier Shank Specification", "stock": 25 }
+      ]
+    }
+  },
+  {
     "id": "superkicks-9389711786235",
     "mrp": 2744,
     "sku": "SU-HF3263-600-7",

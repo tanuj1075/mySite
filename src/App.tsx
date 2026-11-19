@@ -280,6 +280,7 @@ export default function App() {
     name: string;
     role: string;
   } | null>(null);
+  const [adminCustomers, setAdminCustomers] = useState<any[]>([]);
 
   const [customerAuthMode, setCustomerAuthMode] = useState<'LOGIN' | 'REGISTER'>(() =>
     readCustomerAuthRoute() === 'register' ? 'REGISTER' : 'LOGIN'
@@ -356,9 +357,15 @@ export default function App() {
       if (cartItems.length > 0) {
         for (const guestItem of cartItems) {
           try {
-            await customerApi.addCartItem(guestItem.productId, guestItem.colorway, guestItem.specification, guestItem.quantity);
+            const guestProductId = guestItem.productId || (products.some((p) => p.id === guestItem.id) ? guestItem.id : guestItem.id);
+            await customerApi.addCartItem(
+              guestProductId,
+              guestItem.selectedColor ?? guestItem.colorway ?? 'Standard',
+              guestItem.selectedSize ?? guestItem.specification ?? 'Universal Last',
+              guestItem.quantity || 1
+            );
           } catch {
-            // Ignore if already in server cart or invalid
+            // Ignore if already in server cart or network transient
           }
         }
       }
@@ -401,7 +408,21 @@ export default function App() {
         phone: address.phone ?? undefined,
       }));
       const orders = storedOrders.map(toOrderRecord);
-      setCartItems(restoredCart);
+      setCartItems((prev) => {
+        const merged = [...restoredCart];
+        for (const localItem of prev) {
+          const alreadyIn = merged.some(
+            (rc) =>
+              (rc.productId === localItem.productId || rc.id === localItem.id) &&
+              (rc.selectedColor ?? rc.colorway) === (localItem.selectedColor ?? localItem.colorway) &&
+              (rc.selectedSize ?? rc.specification) === (localItem.selectedSize ?? localItem.specification)
+          );
+          if (!alreadyIn) {
+            merged.push(localItem);
+          }
+        }
+        return merged;
+      });
       setAddresses(addresses);
       setSelectedAddressId(addresses[0]?.id ?? '');
       setOrders(orders);
@@ -492,13 +513,21 @@ export default function App() {
       setIsAdminAuthenticated(true);
       setAdminIdentity({ email: admin.email, name: admin.name, role: admin.role });
       setIsAdminPanelOpen(true);
-      Promise.all([adminApi.orders(), adminApi.products(), adminApi.coupons(), adminApi.drops(), adminApi.exchanges()])
-        .then(([storedOrders, storedProducts, storedCoupons, storedDrops, storedExchanges]) => {
+      Promise.all([
+        adminApi.orders(),
+        adminApi.products(),
+        adminApi.coupons(),
+        adminApi.drops(),
+        adminApi.exchanges(),
+        adminApi.customers().catch(() => []),
+      ])
+        .then(([storedOrders, storedProducts, storedCoupons, storedDrops, storedExchanges, storedCustomers]) => {
           setOrders(storedOrders.map(toOrderRecord));
           setProducts(storedProducts.map((product) => product.catalog as ShoeProduct));
           setCoupons(storedCoupons.map(toCouponRecord));
           setDrops(storedDrops.map(toDropRecord));
           setExchanges(storedExchanges.map(toExchangeRecord));
+          if (Array.isArray(storedCustomers)) setAdminCustomers(storedCustomers);
         })
         .catch((error: unknown) => showToast(error instanceof Error ? error.message : 'Could not load saved admin records'));
       if (adminRoute === 'login') navigateAdminRoute('/admin', true);
@@ -741,51 +770,70 @@ export default function App() {
     showToast('ARCHIVE BAG RESTORED TO SPECIFICATION DEFAULTS');
   };
 
-  // Add item to bag
+  // Add item to bag with optimistic update and resilient server sync
   const handleAddToCart = async (item: CartItem) => {
-    if (currentUser) {
-      const productId = item.productId ?? (products.some((product) => product.id === item.id) ? item.id : undefined);
-      if (!productId) {
-        showToast('THIS SPECIMEN IS NOT AVAILABLE IN THE SAVED CATALOG');
-        return;
+    const normalizedColor = item.selectedColor ?? item.colorway ?? 'Standard';
+    const normalizedSize = item.selectedSize ?? item.specification ?? 'Universal Last';
+    const effectiveProductId = item.productId || (products.some((p) => p.id === item.id) ? item.id : item.id);
+    const preparedItem: CartItem = {
+      ...item,
+      productId: effectiveProductId,
+      selectedColor: normalizedColor,
+      colorway: normalizedColor,
+      selectedSize: normalizedSize,
+      specification: normalizedSize,
+    };
+
+    // 1. Optimistic Local State Update - guarantees item is placed in cart immediately
+    setCartItems((prev) => {
+      const matchIndex = prev.findIndex(
+        (ci) =>
+          (ci.productId === effectiveProductId || ci.id === item.id) &&
+          (ci.selectedColor ?? ci.colorway) === normalizedColor &&
+          (ci.selectedSize ?? ci.specification) === normalizedSize
+      );
+      if (matchIndex >= 0) {
+        const updated = [...prev];
+        updated[matchIndex] = {
+          ...updated[matchIndex],
+          quantity: updated[matchIndex].quantity + (item.quantity || 1),
+        };
+        return updated;
       }
+      return [...prev, preparedItem];
+    });
+
+    // 2. Resilient Server Sync if user is authenticated
+    if (currentUser && authApi.hasSession()) {
       try {
         const savedItem = await customerApi.addCartItem(
-          productId,
-          item.selectedColor ?? item.colorway,
-          item.selectedSize ?? item.specification,
-          item.quantity,
+          effectiveProductId,
+          normalizedColor,
+          normalizedSize,
+          item.quantity || 1,
         );
-        const persistedItem = { ...item, id: savedItem.id, productId, quantity: savedItem.quantity };
-        setCartItems((prev) => {
-          const existing = prev.find((cartItem) => cartItem.productId === productId
-            && (cartItem.selectedColor ?? cartItem.colorway) === (item.selectedColor ?? item.colorway)
-            && (cartItem.selectedSize ?? cartItem.specification) === (item.selectedSize ?? item.specification));
-          if (existing) return prev.map((cartItem) => cartItem.id === existing.id ? persistedItem : cartItem);
-          return [...prev, persistedItem];
-        });
-        showToast(`SAVED ${item.name} TO YOUR ACCOUNT BAG`);
-        return;
+        setCartItems((prev) =>
+          prev.map((ci) =>
+            ci.productId === effectiveProductId &&
+            (ci.selectedColor ?? ci.colorway) === normalizedColor &&
+            (ci.selectedSize ?? ci.specification) === normalizedSize
+              ? { ...ci, id: savedItem.id, quantity: savedItem.quantity }
+              : ci
+          )
+        );
+        showToast(`ALLOCATED ${item.name} TO YOUR VAULT BAG`);
       } catch (error) {
-        showToast(error instanceof Error ? error.message : 'Could not save item to your account bag');
-        return;
+        console.warn('Server cart sync issue (item preserved locally):', error);
+        showToast(`ALLOCATED ${item.name} TO BAG QUEUE (LOCAL LOCK)`);
       }
+    } else {
+      showToast(`ALLOCATED ${item.name} TO BAG QUEUE`);
     }
-    setCartItems((prev) => {
-      const existing = prev.find((i) => i.id === item.id);
-      if (existing) {
-        return prev.map((i) =>
-          i.id === item.id ? { ...i, quantity: i.quantity + 1 } : i
-        );
-      }
-      return [...prev, item];
-    });
-    showToast(`ALLOCATED ${item.name} TO BAG QUEUE`);
   };
 
-  // Buy Now: Add to bag and immediately jump to Checkout
-  const handleBuyNow = (item: CartItem) => {
-    handleAddToCart(item);
+  // Buy Now: Add to bag, await state sync, and immediately jump to Checkout
+  const handleBuyNow = async (item: CartItem) => {
+    await handleAddToCart(item);
     setActiveNav('BAG');
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
@@ -844,6 +892,7 @@ export default function App() {
   const handleClaimVoidRunner = () => {
     const voidRunnerItem: CartItem = {
       id: 'vn-void-runner',
+      productId: 'vn-void-runner',
       code: 'VOID_02',
       name: 'VOID RUNNER SPEC 02',
       edition: 'ACTIVE DROP // SPEC 02 // 500 UNITS',
@@ -851,6 +900,8 @@ export default function App() {
       image: '/assets/images/void_runner_heel_1788838329834.jpg',
       colorway: 'Carbon Void / Black',
       specification: 'US 10 / EU 44',
+      selectedColor: 'Carbon Void / Black',
+      selectedSize: 'US 10 / EU 44',
       availableSizes: ['US 9 / EU 42.5', 'US 9.5 / EU 43', 'US 10 / EU 44', 'US 11 / EU 45'],
       allocationStatus: 'Allocation Claimed // Run Serial M084',
       quantity: 1,
@@ -878,7 +929,14 @@ export default function App() {
     try {
       const savedOrder = await customerApi.createOrder(
         selectedAddressId,
-        paymentMethod === 'COD' ? 'COD' : 'UPI'
+        paymentMethod === 'COD' ? 'COD' : 'UPI',
+        undefined,
+        cartItems.map((item) => ({
+          productId: item.productId || item.id,
+          color: item.selectedColor || item.colorway || 'Standard',
+          size: item.selectedSize || item.specification || 'Universal Last',
+          quantity: item.quantity || 1,
+        }))
       );
 
       if (paymentMethod === 'COD') {
@@ -1496,6 +1554,7 @@ export default function App() {
         onUpdateDropStatus={handleUpdateDropStatus}
         coupons={coupons}
         onAddNewCoupon={handleAddNewCoupon}
+        customers={adminCustomers}
         onShowToast={showToast}
       />
 

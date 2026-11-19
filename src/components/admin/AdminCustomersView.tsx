@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Search, UserCheck, ShieldCheck, ArrowRight, Download, Package, Mail, MapPin, Phone, Award } from 'lucide-react';
+import { Search, UserCheck, ShieldCheck, ArrowRight, Download, Package, Mail, MapPin, Phone, Award, RefreshCw, Sparkles, Clock } from 'lucide-react';
 import { CustomerItem, Order } from '../../types';
 import { adminApi } from '../../lib/api';
 
@@ -24,6 +24,14 @@ export const AdminCustomersView: React.FC<AdminCustomersViewProps> = ({
   const [isLoadingCustomers, setIsLoadingCustomers] = useState(true);
   const [customerLoadKey, setCustomerLoadKey] = useState(0);
 
+  // Real-time polling: Refresh customers every 15s so newly registered accounts appear live
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setCustomerLoadKey((k) => k + 1);
+    }, 15000);
+    return () => clearInterval(interval);
+  }, []);
+
   useEffect(() => {
     let isCurrent = true;
     setIsLoadingCustomers(true);
@@ -34,6 +42,7 @@ export const AdminCustomersView: React.FC<AdminCustomersViewProps> = ({
         const customerOrders = Array.isArray(record.orders) ? record.orders as Array<{ total: string | number }> : [];
         const customerAddresses = Array.isArray(record.addresses) ? record.addresses as Array<{ city: string; country: string }> : [];
         const createdAt = new Date(String(record.createdAt));
+        const isNew = !Number.isNaN(createdAt.getTime()) && (Date.now() - createdAt.getTime() < 86400000);
         return {
           id: String(record.id),
           name: String(record.name),
@@ -44,6 +53,8 @@ export const AdminCustomersView: React.FC<AdminCustomersViewProps> = ({
           lifetimeOrders: customerOrders.length,
           totalSpent: customerOrders.reduce((sum, order) => sum + Number(order.total), 0),
           status: 'VERIFIED',
+          isNew,
+          registeredAt: Number.isNaN(createdAt.getTime()) ? undefined : createdAt.toLocaleString(undefined, { dateStyle: 'medium', timeStyle: 'short' }),
           memberSince: Number.isNaN(createdAt.getTime()) ? 'Unknown' : createdAt.toLocaleDateString(undefined, { month: 'short', year: 'numeric' }),
         };
       }));
@@ -126,13 +137,26 @@ export const AdminCustomersView: React.FC<AdminCustomersViewProps> = ({
             </p>
           </div>
 
-          <button
-            onClick={handleExportClientsCSV}
-            className="px-4 py-2.5 bg-[#121215] border border-[#242429] text-[#f4f4f6] hover:bg-[#1e1e24] font-mono text-[11px] font-bold uppercase tracking-wider flex items-center gap-2 cursor-pointer shadow-2xs"
-          >
-            <Download className="w-3.5 h-3.5" />
-            <span>EXPORT CLIENT CSV</span>
-          </button>
+          <div className="flex items-center gap-2">
+            <button
+              onClick={() => {
+                setCustomerLoadKey((k) => k + 1);
+                onShowToast('SYNCHRONIZING CLIENT REGISTRY WITH NEON DB...');
+              }}
+              className="px-4 py-2.5 bg-[#18181c] border border-[#242429] hover:border-[#c9a96e] text-[#f4f4f6] font-mono text-[11px] font-bold uppercase tracking-wider flex items-center gap-2 cursor-pointer shadow-2xs transition-colors"
+            >
+              <RefreshCw className={`w-3.5 h-3.5 text-[#c9a96e] ${isLoadingCustomers ? 'animate-spin' : ''}`} />
+              <span>REFRESH REGISTRY</span>
+            </button>
+
+            <button
+              onClick={handleExportClientsCSV}
+              className="px-4 py-2.5 bg-[#121215] border border-[#242429] text-[#f4f4f6] hover:bg-[#1e1e24] font-mono text-[11px] font-bold uppercase tracking-wider flex items-center gap-2 cursor-pointer shadow-2xs"
+            >
+              <Download className="w-3.5 h-3.5" />
+              <span>EXPORT CLIENT CSV</span>
+            </button>
+          </div>
         </div>
       </div>
 
@@ -249,8 +273,22 @@ export const AdminCustomersView: React.FC<AdminCustomersViewProps> = ({
                   className="hover:bg-[#1e1e24] transition-colors cursor-pointer"
                 >
                   <td className="py-3 px-3.5">
-                    <div className="font-bold text-[#f4f4f6] text-[12px]">{c.name}</div>
+                    <div className="flex items-center gap-2">
+                      <span className="font-bold text-[#f4f4f6] text-[12px]">{c.name}</span>
+                      {c.isNew && (
+                        <span className="px-1.5 py-0.5 bg-[#c9a96e]/20 border border-[#c9a96e] text-[#c9a96e] text-[8px] font-bold uppercase tracking-wider animate-pulse flex items-center gap-1">
+                          <Sparkles className="w-2.5 h-2.5" />
+                          <span>NEW PATRON</span>
+                        </span>
+                      )}
+                    </div>
                     <div className="text-[9px] text-[#c9a96e]">{c.email}</div>
+                    {c.registeredAt && (
+                      <div className="text-[8px] text-[#8e8e98] mt-0.5 flex items-center gap-1 font-mono">
+                        <Clock className="w-2.5 h-2.5" />
+                        <span>Registered: {c.registeredAt}</span>
+                      </div>
+                    )}
                   </td>
                   <td className="py-3 px-3.5 text-[#8e8e98]">{c.location}</td>
                   <td className="py-3 px-3.5 font-bold text-[#f4f4f6]">{c.tier}</td>

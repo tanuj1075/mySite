@@ -48,6 +48,7 @@ interface AdminSidebarProps {
   ordersCount?: number;
   lowStockCount?: number;
   returnsCount?: number;
+  customersCount?: number;
 }
 
 export const AdminSidebar: React.FC<AdminSidebarProps> = ({
@@ -56,6 +57,7 @@ export const AdminSidebar: React.FC<AdminSidebarProps> = ({
   ordersCount = 12,
   lowStockCount = 4,
   returnsCount = 2,
+  customersCount,
 }) => {
   const navGroups = [
     {
@@ -80,7 +82,7 @@ export const AdminSidebar: React.FC<AdminSidebarProps> = ({
       items: [
         { id: 'ORDERS' as AdminSection, label: 'ORDERS', icon: ShoppingBag, badge: ordersCount },
         { id: 'PAYMENTS' as AdminSection, label: 'PAYMENTS & UPI', icon: CreditCard },
-        { id: 'CUSTOMERS' as AdminSection, label: 'CUSTOMERS', icon: Users },
+        { id: 'CUSTOMERS' as AdminSection, label: 'CUSTOMERS', icon: Users, badge: customersCount },
         { id: 'COUPONS' as AdminSection, label: 'COUPONS', icon: Ticket },
       ],
     },

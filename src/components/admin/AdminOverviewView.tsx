@@ -24,6 +24,8 @@ import {
   Boxes,
   Radar,
   Truck,
+  Users,
+  UserCheck,
 } from 'lucide-react';
 import { SneakerDrop, Coupon, ShoeProduct, Order, BannerItem, AdminNotification } from '../../types';
 
@@ -37,6 +39,7 @@ interface AdminOverviewViewProps {
   onShowToast: (msg: string) => void;
   products?: ShoeProduct[];
   orders?: Order[];
+  customers?: any[];
   activeSection?: string;
 }
 
@@ -50,6 +53,7 @@ export const AdminOverviewView: React.FC<AdminOverviewViewProps> = ({
   onShowToast,
   products = [],
   orders = [],
+  customers = [],
   activeSection = 'OVERVIEW',
 }) => {
   // Drop modal
@@ -860,22 +864,103 @@ export const AdminOverviewView: React.FC<AdminOverviewViewProps> = ({
           <div className="text-[9px] text-[#8e8e98] mt-0.5">Dimensional size matrix intact</div>
         </div>
 
-        <div className="bg-[#121215] border border-[#242429] p-4 shadow-2xs">
-          <div className="text-[9px] text-[#c9a96e] uppercase tracking-wider font-bold">
-            SECURITY INTEGRITY
+        <div
+          onClick={() => onSelectSection('CUSTOMERS')}
+          className="bg-[#121215] border border-[#242429] hover:border-[#c9a96e] p-4 shadow-2xs cursor-pointer transition-colors group"
+        >
+          <div className="flex items-center justify-between">
+            <span className="text-[9px] text-[#c9a96e] uppercase tracking-wider font-bold">
+              REGISTERED PATRONS
+            </span>
+            <Users className="w-3.5 h-3.5 text-[#c9a96e] group-hover:scale-110 transition-transform" />
           </div>
-          <div className="text-2xl font-bold text-[#8e8e98] mt-1">Not measured</div>
-          <div className="text-[9px] text-[#c9a96e] mt-0.5">See database security events</div>
+          <div className="text-2xl font-bold text-[#f4f4f6] mt-1">
+            {customers.length} Clients
+          </div>
+          <div className="text-[9px] text-[#16a34a] font-bold mt-0.5 flex items-center justify-between">
+            <span>● Stored in patron database</span>
+            <span className="text-[#8e8e98] group-hover:text-[#f4f4f6]">VIEW DOSSIERS →</span>
+          </div>
         </div>
       </div>
 
-      {/* Historical analytics are not currently backed by an API. */}
+      {/* RECENT REGISTERED PATRONS DOSSIER WIDGET */}
       <div className="border border-[#242429] bg-[#121215] p-5 sm:p-6 space-y-4 rounded-xs shadow-xs font-mono">
-        <div className="pb-3 border-b border-[#242429]">
-          <div className="text-[9px] text-[#c9a96e] tracking-widest uppercase font-bold">ORDER ANALYTICS</div>
-          <h3 className="font-headline text-xl font-bold text-[#f4f4f6] tracking-tight">Historical volume</h3>
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-[#242429]">
+          <div>
+            <div className="text-[9px] text-[#c9a96e] tracking-widest uppercase font-bold">
+              CLIENT REGISTRY TELEMETRY // NEW PATRONS
+            </div>
+            <h3 className="font-headline text-xl font-bold text-[#f4f4f6] tracking-tight">
+              Stored Client Dossiers ({customers.length})
+            </h3>
+          </div>
+          <button
+            onClick={() => onSelectSection('CUSTOMERS')}
+            className="px-3.5 py-1.5 bg-[#18181c] border border-[#242429] hover:border-[#c9a96e] text-[#f4f4f6] text-[10px] font-bold uppercase tracking-wider cursor-pointer flex items-center gap-1.5 transition-colors self-start sm:self-auto"
+          >
+            <span>VIEW ALL CLIENT DOSSIERS</span>
+            <ArrowRight className="w-3 h-3 text-[#c9a96e]" />
+          </button>
         </div>
-        <p className="text-[12px] text-[#8e8e98]">Historical revenue and order velocity are not connected to this dashboard yet. The totals above use only the orders currently loaded from the database.</p>
+
+        {customers.length === 0 ? (
+          <div className="text-center py-6 text-xs text-[#8e8e98]">
+            No patron accounts found in database yet. New user registrations will appear here instantly.
+          </div>
+        ) : (
+          <div className="overflow-x-auto">
+            <table className="w-full text-left border-collapse text-[11px]">
+              <thead>
+                <tr className="border-b border-[#242429] text-[9px] text-[#c9a96e] tracking-widest uppercase bg-[#1e1e24]">
+                  <th className="py-2 px-3">PATRON NAME &amp; EMAIL</th>
+                  <th className="py-2 px-3">ENCLAVE STATUS</th>
+                  <th className="py-2 px-3">REGISTERED AT</th>
+                  <th className="py-2 px-3 text-right">ACTION</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-[#242429]/70">
+                {customers.slice(0, 5).map((cust) => {
+                  const createdAt = cust.createdAt ? new Date(cust.createdAt) : null;
+                  const formattedDate = createdAt && !Number.isNaN(createdAt.getTime())
+                    ? createdAt.toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' })
+                    : 'Verified Client';
+                  return (
+                    <tr
+                      key={cust.id}
+                      onClick={() => onSelectSection('CUSTOMERS')}
+                      className="hover:bg-[#1e1e24] cursor-pointer transition-colors"
+                    >
+                      <td className="py-2.5 px-3">
+                        <div className="font-bold text-[#f4f4f6]">{cust.name}</div>
+                        <div className="text-[9px] text-[#c9a96e]">{cust.email}</div>
+                      </td>
+                      <td className="py-2.5 px-3">
+                        <span className="px-2 py-0.5 bg-[#dcfce7]/10 border border-[#16a34a]/30 text-[#16a34a] text-[9px] font-bold uppercase">
+                          ACTIVE CUSTOMER
+                        </span>
+                      </td>
+                      <td className="py-2.5 px-3 text-[#8e8e98] text-[10px]">
+                        {formattedDate}
+                      </td>
+                      <td className="py-2.5 px-3 text-right">
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            onSelectSection('CUSTOMERS');
+                          }}
+                          className="px-2.5 py-1 bg-[#18181c] border border-[#242429] text-[#f4f4f6] text-[9px] font-bold uppercase hover:bg-[#242429] cursor-pointer"
+                        >
+                          OPEN DOSSIER →
+                        </button>
+                      </td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          </div>
+        )}
       </div>
 
       {/* 2-Column Split: Chrono Drops & Coupons */}

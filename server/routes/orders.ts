@@ -7,7 +7,17 @@ import { CurrencyQuoteError, currencyForCountry, quoteInrAmount } from '../lib/c
 import { estimateDelivery } from '../lib/delivery.js';
 
 const router = Router();
-const orderInput = z.object({ addressId: z.string(), paymentMethod: z.enum(['CARD', 'UPI', 'NET_BANKING', 'WALLET', 'COD']), couponCode: z.string().optional() });
+const orderInput = z.object({
+  addressId: z.string(),
+  paymentMethod: z.enum(['CARD', 'UPI', 'NET_BANKING', 'WALLET', 'COD']),
+  couponCode: z.string().optional(),
+  items: z.array(z.object({
+    productId: z.string(),
+    color: z.string(),
+    size: z.string(),
+    quantity: z.number().int().min(1).max(20),
+  })).optional(),
+});
 
 function generateOrderDisplayId(): string {
   const now = new Date();
@@ -28,7 +38,24 @@ router.post('/', async (req, res, next) => {
   try {
     const input = orderInput.parse(req.body);
     const userId = req.auth!.sub;
-    const cart = await prisma.cart.findUnique({ where: { userId }, include: { items: { include: { product: true } } } });
+    let cart = await prisma.cart.findUnique({ where: { userId }, include: { items: { include: { product: true } } } });
+    if (!cart) {
+      cart = await prisma.cart.create({ data: { userId }, include: { items: { include: { product: true } } } });
+    }
+    // If database cart is empty but order request provided items, sync them into the cart
+    if ((!cart.items || cart.items.length === 0) && input.items && input.items.length > 0) {
+      for (const item of input.items) {
+        const prod = await prisma.product.findUnique({ where: { id: item.productId } });
+        if (prod && prod.isActive) {
+          await prisma.cartItem.upsert({
+            where: { cartId_productId_color_size: { cartId: cart.id, productId: item.productId, color: item.color, size: item.size } },
+            update: { quantity: item.quantity },
+            create: { cartId: cart.id, productId: item.productId, color: item.color, size: item.size, quantity: item.quantity },
+          });
+        }
+      }
+      cart = await prisma.cart.findUnique({ where: { userId }, include: { items: { include: { product: true } } } });
+    }
     const address = await prisma.address.findFirst({ where: { id: input.addressId, userId } });
     if (!cart?.items.length) return res.status(400).json({ error: 'Cart is empty' });
     if (!address) return res.status(400).json({ error: 'Valid shipping address required' });

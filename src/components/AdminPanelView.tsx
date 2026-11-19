@@ -30,6 +30,7 @@ interface AdminPanelViewProps {
   onUpdateDropStatus: (dropId: string, status: any) => void;
   coupons: Coupon[];
   onAddNewCoupon: (coupon: Coupon) => void;
+  customers?: any[];
   onShowToast: (msg: string) => void;
 }
 
@@ -52,6 +53,7 @@ export const AdminPanelView: React.FC<AdminPanelViewProps> = ({
   onUpdateDropStatus,
   coupons,
   onAddNewCoupon,
+  customers = [],
   onShowToast,
 }) => {
   // Default to PRODUCTS tab as showcased in Image 2
@@ -106,6 +108,7 @@ export const AdminPanelView: React.FC<AdminPanelViewProps> = ({
               }
             }}
             ordersCount={orders.length}
+            customersCount={customers.length}
             lowStockCount={products.reduce((acc, p) => {
               let count = 0;
               const inventory = p.sizeInventory || {};
@@ -219,6 +222,7 @@ export const AdminPanelView: React.FC<AdminPanelViewProps> = ({
               onShowToast={onShowToast}
               products={products}
               orders={orders}
+              customers={customers}
               activeSection={activeSection}
             />
           )}

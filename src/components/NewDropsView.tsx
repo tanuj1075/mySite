@@ -160,6 +160,7 @@ export const NewDropsView: React.FC<NewDropsViewProps> = ({
                   onClick={() => {
                     const cartItem: CartItem = {
                       id: drop.id,
+                      productId: drop.id,
                       code: drop.code,
                       name: drop.title,
                       edition: drop.edition,
@@ -167,6 +168,8 @@ export const NewDropsView: React.FC<NewDropsViewProps> = ({
                       image: drop.image,
                       colorway: 'Obsidian Drop Edition',
                       specification: 'US 10 / EU 44',
+                      selectedColor: 'Obsidian Drop Edition',
+                      selectedSize: 'US 10 / EU 44',
                       availableSizes: ['US 9 / EU 42.5', 'US 10 / EU 44', 'US 11 / EU 45'],
                       allocationStatus: `Allocation Reserved // ${remaining} Remaining`,
                       quantity: 1,

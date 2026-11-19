@@ -315,6 +315,8 @@ export interface CustomerItem {
   totalSpent: number;
   status: 'VERIFIED' | 'VIP' | 'SUSPENDED';
   memberSince: string;
+  isNew?: boolean;
+  registeredAt?: string;
   addresses?: Address[];
 }
 
