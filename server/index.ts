@@ -78,8 +78,7 @@ app.use(cors({
     const normalizedOrigin = origin.replace(/\/$/, '');
     if (
       allowedOriginsList.includes(normalizedOrigin) ||
-      normalizedOrigin === 'https://vanta-archive.vercel.app' ||
-      normalizedOrigin.endsWith('.vercel.app')
+      normalizedOrigin === 'https://vanta-archive.vercel.app'
     ) {
       return callback(null, true);
     }

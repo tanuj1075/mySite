@@ -27,6 +27,9 @@ interface ProductListingViewProps {
   initialCategoryFilter?: string;
   initialBrandFilter?: string;
   onShowToast: (msg: string) => void;
+  catalogLoading?: boolean;
+  catalogError?: string | null;
+  onRetryCatalog?: () => void;
 }
 
 export const ProductListingView: React.FC<ProductListingViewProps> = ({
@@ -40,6 +43,9 @@ export const ProductListingView: React.FC<ProductListingViewProps> = ({
   initialCategoryFilter,
   initialBrandFilter,
   onShowToast,
+  catalogLoading = false,
+  catalogError = null,
+  onRetryCatalog,
 }) => {
   const PRICE_CEILING = useMemo(() => {
     if (!products.length) return 50000;
@@ -48,9 +54,10 @@ export const ProductListingView: React.FC<ProductListingViewProps> = ({
   }, [products]);
 
   // Filter States
-  const [selectedCategory, setSelectedCategory] = useState<string>(initialCategoryFilter || 'ALL');
+  const initialGender = GENDERS.find((gender) => gender.toLowerCase() === initialCategoryFilter?.toLowerCase());
+  const [selectedCategory, setSelectedCategory] = useState<string>(initialGender ? 'ALL' : initialCategoryFilter || 'ALL');
   const [selectedBrand, setSelectedBrand] = useState<string>(initialBrandFilter || 'ALL');
-  const [selectedGender, setSelectedGender] = useState<string>('ALL');
+  const [selectedGender, setSelectedGender] = useState<string>(initialGender || 'ALL');
   const [selectedSizes, setSelectedSizes] = useState<string[]>([]);
   const [selectedColors, setSelectedColors] = useState<string[]>([]);
   const [selectedSport, setSelectedSport] = useState<string>('ALL');
@@ -58,6 +65,19 @@ export const ProductListingView: React.FC<ProductListingViewProps> = ({
   const [onlyInStock, setOnlyInStock] = useState<boolean>(false);
   const [maxPrice, setMaxPrice] = useState<number>(PRICE_CEILING);
   const [visibleCount, setVisibleCount] = useState<number>(24);
+
+  React.useEffect(() => {
+    const gender = GENDERS.find((value) => value.toLowerCase() === initialCategoryFilter?.toLowerCase());
+    if (gender) {
+      setSelectedGender(gender);
+      setSelectedCategory('ALL');
+      return;
+    }
+    setSelectedGender('ALL');
+    setSelectedSport(initialCategoryFilter === 'Running' ? 'Running' : 'ALL');
+    const specialFilter = ['Running', 'Sale', 'New Arrivals'].includes(initialCategoryFilter ?? '');
+    setSelectedCategory(specialFilter ? 'ALL' : initialCategoryFilter || 'ALL');
+  }, [initialCategoryFilter]);
 
   // Preserve custom price filter unless ceiling is lower or initial load
   const isCustomPriceRef = React.useRef(false);
@@ -135,6 +155,8 @@ export const ProductListingView: React.FC<ProductListingViewProps> = ({
       if (selectedCategory !== 'ALL' && product.category !== selectedCategory) {
         return false;
       }
+      if (initialCategoryFilter === 'Sale' && !(product.isSale || product.mrp > product.price)) return false;
+      if (initialCategoryFilter === 'New Arrivals' && !product.isNewArrival) return false;
 
       // 2. Brand
       if (selectedBrand !== 'ALL' && product.brand.toUpperCase() !== selectedBrand.toUpperCase()) {
@@ -147,7 +169,7 @@ export const ProductListingView: React.FC<ProductListingViewProps> = ({
       }
 
       // 4. Sport / Use
-      if (selectedSport !== 'ALL' && product.use !== selectedSport) {
+      if (selectedSport !== 'ALL' && product.sport !== selectedSport && !product.use.toLowerCase().includes(selectedSport.toLowerCase())) {
         return false;
       }
 
@@ -200,6 +222,7 @@ export const ProductListingView: React.FC<ProductListingViewProps> = ({
   }, [
     products,
     selectedCategory,
+    initialCategoryFilter,
     selectedBrand,
     selectedGender,
     selectedSport,
@@ -296,6 +319,14 @@ export const ProductListingView: React.FC<ProductListingViewProps> = ({
             </div>
           </div>
         </div>
+
+        {catalogError && (
+          <div role="alert" className="mb-6 rounded-2xl border border-[#E9D9CA] bg-white p-5 text-sm text-[#242321]">
+            <p>The live catalog could not be loaded. {catalogError}</p>
+            {onRetryCatalog && <button onClick={onRetryCatalog} className="mt-3 rounded-full bg-[#B4532A] px-4 py-2 text-xs font-semibold text-white">Retry catalog</button>}
+          </div>
+        )}
+        {catalogLoading && products.length === 0 && <p className="mb-6 text-sm text-[#77716B]">Loading the live catalog…</p>}
 
         {/* Main Grid: Left Filter Sidebar (3 cols) + Right Product Grid (9 cols) */}
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">

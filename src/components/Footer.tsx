@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Check, Sun, Moon, Instagram, Youtube, Twitter } from 'lucide-react';
+import { Sun, Moon, Instagram, Youtube, Twitter } from 'lucide-react';
 import { getTheme, setTheme, subscribeTheme, ThemeMode } from '../lib/theme';
 
 interface FooterProps {
@@ -14,7 +14,7 @@ export const Footer: React.FC<FooterProps> = ({
   isAdminAuthenticated = false,
 }) => {
   const [email, setEmail] = useState('');
-  const [isSubscribed, setIsSubscribed] = useState(false);
+  const [subscribeMessage, setSubscribeMessage] = useState('');
   const [secretClickCount, setSecretClickCount] = useState(0);
   const [theme, setCurrentTheme] = useState<ThemeMode>(getTheme());
 
@@ -39,13 +39,7 @@ export const Footer: React.FC<FooterProps> = ({
 
   const handleSubscribe = (e: React.FormEvent) => {
     e.preventDefault();
-    if (email && email.includes('@')) {
-      setIsSubscribed(true);
-      setTimeout(() => {
-        setIsSubscribed(false);
-        setEmail('');
-      }, 4000);
-    }
+    if (email && email.includes('@')) setSubscribeMessage('Newsletter signup is not available yet.');
   };
 
   return (
@@ -78,12 +72,12 @@ export const Footer: React.FC<FooterProps> = ({
                 type="submit"
                 className="bg-[#B4532A] hover:bg-[#9C431F] text-white text-xs font-semibold px-5 py-2.5 rounded-lg transition-colors cursor-pointer"
               >
-                {isSubscribed ? <Check className="w-4 h-4" /> : 'Subscribe'}
+                Subscribe
               </button>
             </form>
-            {isSubscribed && (
+            {subscribeMessage && (
               <span className="text-xs text-[#E9D9CA] font-medium block">
-                ✓ You have successfully subscribed to the dispatch frequency.
+                {subscribeMessage}
               </span>
             )}
           </div>

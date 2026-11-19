@@ -1,5 +1,5 @@
 import React from 'react';
-import { Trash2, Plus, Minus, ArrowRight, ShieldCheck, RotateCcw, ShoppingBag } from 'lucide-react';
+import { Trash2, Plus, Minus, ArrowRight, ShieldCheck, ShoppingBag } from 'lucide-react';
 import { CartItem } from '../types';
 import { formatCurrency } from '../lib/currency';
 
@@ -9,7 +9,6 @@ interface CartItemListProps {
   onRemoveItem: (id: string) => void;
   onMoveToWishlist: (item: CartItem) => void;
   onOpenSizeSelector: (item: CartItem) => void;
-  onRestoreDefaultItems: () => void;
   onContinueShopping?: () => void;
 }
 
@@ -19,7 +18,6 @@ export const CartItemList: React.FC<CartItemListProps> = ({
   onRemoveItem,
   onMoveToWishlist,
   onOpenSizeSelector,
-  onRestoreDefaultItems,
   onContinueShopping,
 }) => {
   const totalItemCount = items.reduce((acc, item) => acc + item.quantity, 0);
@@ -59,11 +57,11 @@ export const CartItemList: React.FC<CartItemListProps> = ({
               Discover our handpicked archival collection and performance runners to add specimens to your cart.
             </p>
             <button
-              onClick={onRestoreDefaultItems}
+              onClick={onContinueShopping}
               className="mt-2 px-6 py-3 bg-[#B4532A] hover:bg-[#9C431F] text-white text-xs font-semibold rounded-xl transition-colors flex items-center gap-2 cursor-pointer shadow-sm"
             >
-              <RotateCcw className="w-4 h-4" />
-              <span>Restore Sample Sneakers</span>
+              <ShoppingBag className="w-4 h-4" />
+              <span>Continue Shopping</span>
             </button>
           </div>
         ) : (
@@ -92,7 +90,7 @@ export const CartItemList: React.FC<CartItemListProps> = ({
                     {item.name}
                   </h3>
                   <p className="text-xs text-[#77716B] dark:text-[#8e8e98]">
-                    Size: {item.selectedSize || '9'} • {item.colorway || 'White'}
+                    {[item.selectedSize, item.colorway].filter(Boolean).join(' • ') || 'Variant unavailable'}
                   </p>
                   <p className="text-sm font-extrabold text-[#242321] dark:text-white sm:hidden">
                     {formatCurrency(item.price * item.quantity)}
@@ -126,6 +124,7 @@ export const CartItemList: React.FC<CartItemListProps> = ({
                     aria-label="Increase quantity"
                     onClick={() => onUpdateQuantity(item.id, 1)}
                     className="w-8 h-8 flex items-center justify-center text-[#242321] dark:text-[#f4f4f6] hover:bg-[#E9D9CA]/50 transition-colors text-sm cursor-pointer"
+                    disabled={item.quantity >= 20}
                   >
                     <Plus className="w-3.5 h-3.5" />
                   </button>

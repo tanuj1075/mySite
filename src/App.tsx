@@ -5,7 +5,6 @@
 
 import React, { useState, useEffect } from 'react';
 import { Header } from './components/Header';
-import { ReservationBanner } from './components/ReservationBanner';
 import { CartItemList } from './components/CartItemList';
 import { CheckoutProtocol } from './components/CheckoutProtocol';
 import { CollectionsView } from './components/CollectionsView';
@@ -38,12 +37,6 @@ import { FloatingThemeWidget } from './components/FloatingThemeWidget';
 import { initTheme } from './lib/theme';
 import { subscribeCurrency } from './lib/currency';
 
-import { INITIAL_CART_ITEMS, INITIAL_ADDRESSES } from './data/mockData';
-import {
-  INITIAL_FOOTWEAR_CATALOG,
-  INITIAL_DROPS,
-  INITIAL_COUPONS,
-} from './data/footwearCatalog';
 import {
   CartItem,
   Address,
@@ -244,13 +237,15 @@ function toCouponRecord(record: Record<string, unknown>): Coupon {
 
 export default function App() {
   // Product Catalog State
-  const [products, setProducts] = useState<ShoeProduct[]>(INITIAL_FOOTWEAR_CATALOG);
-  const [selectedProduct, setSelectedProduct] = useState<ShoeProduct>(INITIAL_FOOTWEAR_CATALOG[0]);
+  const [products, setProducts] = useState<ShoeProduct[]>([]);
+  const [selectedProduct, setSelectedProduct] = useState<ShoeProduct | null>(null);
+  const [catalogLoading, setCatalogLoading] = useState(true);
+  const [catalogError, setCatalogError] = useState<string | null>(null);
   const [categoryFilter, setCategoryFilter] = useState<string>('ALL');
   const [brandFilter, setBrandFilter] = useState<string>('ALL');
 
   // Primary Cart & Allocations
-  const [cartItems, setCartItems] = useState<CartItem[]>(INITIAL_CART_ITEMS);
+  const [cartItems, setCartItems] = useState<CartItem[]>([]);
   const [wishlistItems, setWishlistItems] = useState<WishlistItem[]>([]);
   const [compareList, setCompareList] = useState<ShoeProduct[]>([]);
 
@@ -258,14 +253,12 @@ export default function App() {
   const [orders, setOrders] = useState<Order[]>([]);
   const [currentOrder, setCurrentOrder] = useState<Order | null>(null);
   const [exchanges, setExchanges] = useState<ExchangeReturnRequest[]>([]);
-  const [drops, setDrops] = useState<SneakerDrop[]>(INITIAL_DROPS);
-  const [coupons, setCoupons] = useState<Coupon[]>(INITIAL_COUPONS);
+  const [drops, setDrops] = useState<SneakerDrop[]>([]);
+  const [coupons, setCoupons] = useState<Coupon[]>([]);
 
   // Registered Addresses
-  const [addresses, setAddresses] = useState<Address[]>(INITIAL_ADDRESSES);
-  const [selectedAddressId, setSelectedAddressId] = useState<string>(
-    INITIAL_ADDRESSES[0]?.id || 'addr-default'
-  );
+  const [addresses, setAddresses] = useState<Address[]>([]);
+  const [selectedAddressId, setSelectedAddressId] = useState<string>('');
 
   // User Profile State
   const [currentUser, setCurrentUser] = useState<{
@@ -315,6 +308,7 @@ export default function App() {
     qrCodeDataUrl: string;
     expiresAt: string;
   } | null>(null);
+  const [pendingPaymentOrder, setPendingPaymentOrder] = useState<Record<string, unknown> | null>(null);
 
   // Notify Me Modal
   const [isNotifyMeOpen, setIsNotifyMeOpen] = useState(false);
@@ -485,16 +479,29 @@ export default function App() {
   }, []);
 
   useEffect(() => {
+    let isCurrent = true;
+    setCatalogLoading(true);
+    setCatalogError(null);
     customerApi.catalog().then((catalog) => {
-      if (!catalog.length) return;
+      if (!isCurrent) return;
       const savedProducts = catalog as ShoeProduct[];
       setProducts(savedProducts);
-      setSelectedProduct(savedProducts[0]);
+      setSelectedProduct(savedProducts[0] ?? null);
+    }).catch((error: unknown) => {
+      if (!isCurrent) return;
+      setCatalogError(error instanceof Error ? error.message : 'The product catalog could not be loaded.');
+      setProducts([]);
+      setSelectedProduct(null);
+    }).finally(() => {
+      if (isCurrent) setCatalogLoading(false);
+    });
+    customerApi.drops().then((storedDrops) => {
+      if (isCurrent) setDrops(storedDrops.map(toDropRecord));
     }).catch(() => undefined);
-    customerApi.drops().then((storedDrops) => setDrops(storedDrops.map(toDropRecord))).catch(() => undefined);
     if (authApi.hasSession()) {
       authApi.session().then(restoreCustomerRecords).catch(() => clearSession());
     }
+    return () => { isCurrent = false; };
   }, []);
 
   useEffect(() => {
@@ -777,20 +784,35 @@ export default function App() {
     }
   };
 
-  const handleRestoreDefaultItems = () => {
-    if (currentUser) {
-      showToast('DEFAULT DEMO ITEMS CANNOT REPLACE YOUR SAVED ACCOUNT BAG');
+  // Add only catalog-backed products to the bag. Authenticated cart changes
+  // are applied locally after the database confirms the write.
+  const handleAddToCart = async (item: CartItem) => {
+    const normalizedColor = item.selectedColor ?? item.colorway;
+    const normalizedSize = item.selectedSize ?? item.specification;
+    const effectiveProductId = item.productId || item.id;
+    const product = products.find((entry) => entry.id === effectiveProductId);
+    if (!product) {
+      showToast('This product is no longer available in the live catalog.');
       return;
     }
-    setCartItems(INITIAL_CART_ITEMS);
-    showToast('ARCHIVE BAG RESTORED TO SPECIFICATION DEFAULTS');
-  };
-
-  // Add item to bag with optimistic update and resilient server sync
-  const handleAddToCart = async (item: CartItem) => {
-    const normalizedColor = item.selectedColor ?? item.colorway ?? 'Standard';
-    const normalizedSize = item.selectedSize ?? item.specification ?? 'Universal Last';
-    const effectiveProductId = item.productId || (products.some((p) => p.id === item.id) ? item.id : item.id);
+    const colorInventory = (Object.entries(product.sizeInventory ?? {}) as [string, ShoeProduct['sizeInventory'][string]][]).find(
+      ([color]) => color.toLocaleLowerCase() === normalizedColor.toLocaleLowerCase(),
+    )?.[1] ?? [];
+    const sizeInventory = colorInventory.find((entry) => entry.size === normalizedSize);
+    if (!sizeInventory || sizeInventory.stock <= 0) {
+      showToast('Choose an available size before adding this product.');
+      return;
+    }
+    const existingQuantity = cartItems.find((entry) =>
+      entry.productId === effectiveProductId &&
+      (entry.selectedColor ?? entry.colorway) === normalizedColor &&
+      (entry.selectedSize ?? entry.specification) === normalizedSize
+    )?.quantity ?? 0;
+    const requestedQuantity = item.quantity || 1;
+    if (existingQuantity + requestedQuantity > sizeInventory.stock) {
+      showToast(`Only ${sizeInventory.stock} pair(s) are currently available in this size.`);
+      return;
+    }
     const preparedItem: CartItem = {
       ...item,
       productId: effectiveProductId,
@@ -800,49 +822,41 @@ export default function App() {
       specification: normalizedSize,
     };
 
-    // 1. Optimistic Local State Update - guarantees item is placed in cart immediately
-    setCartItems((prev) => {
-      const matchIndex = prev.findIndex(
-        (ci) =>
-          (ci.productId === effectiveProductId || ci.id === item.id) &&
-          (ci.selectedColor ?? ci.colorway) === normalizedColor &&
-          (ci.selectedSize ?? ci.specification) === normalizedSize
-      );
-      if (matchIndex >= 0) {
-        const updated = [...prev];
-        updated[matchIndex] = {
-          ...updated[matchIndex],
-          quantity: updated[matchIndex].quantity + (item.quantity || 1),
-        };
-        return updated;
-      }
-      return [...prev, preparedItem];
-    });
-
-    // 2. Resilient Server Sync if user is authenticated
     if (currentUser && authApi.hasSession()) {
       try {
         const savedItem = await customerApi.addCartItem(
           effectiveProductId,
           normalizedColor,
           normalizedSize,
-          item.quantity || 1,
+          requestedQuantity,
         );
         setCartItems((prev) =>
-          prev.map((ci) =>
-            ci.productId === effectiveProductId &&
+          prev.some((ci) => ci.productId === effectiveProductId &&
             (ci.selectedColor ?? ci.colorway) === normalizedColor &&
-            (ci.selectedSize ?? ci.specification) === normalizedSize
+            (ci.selectedSize ?? ci.specification) === normalizedSize)
+            ? prev.map((ci) => ci.productId === effectiveProductId &&
+              (ci.selectedColor ?? ci.colorway) === normalizedColor &&
+              (ci.selectedSize ?? ci.specification) === normalizedSize
               ? { ...ci, id: savedItem.id, quantity: savedItem.quantity }
-              : ci
-          )
+              : ci)
+            : [...prev, { ...preparedItem, id: savedItem.id, quantity: savedItem.quantity }]
         );
         showToast(`ALLOCATED ${item.name} TO YOUR VAULT BAG`);
       } catch (error) {
-        console.warn('Server cart sync issue (item preserved locally):', error);
-        showToast(`ALLOCATED ${item.name} TO BAG QUEUE (LOCAL LOCK)`);
+        showToast(error instanceof Error ? error.message : 'Cart could not be saved. Please retry.');
       }
     } else {
+      setCartItems((prev) => {
+        const matchIndex = prev.findIndex((ci) =>
+          ci.productId === effectiveProductId &&
+          (ci.selectedColor ?? ci.colorway) === normalizedColor &&
+          (ci.selectedSize ?? ci.specification) === normalizedSize
+        );
+        if (matchIndex < 0) return [...prev, preparedItem];
+        return prev.map((ci, index) => index === matchIndex
+          ? { ...ci, quantity: ci.quantity + requestedQuantity }
+          : ci);
+      });
       showToast(`ALLOCATED ${item.name} TO BAG QUEUE`);
     }
   };
@@ -904,27 +918,6 @@ export default function App() {
     }
   };
 
-  // Claim VOID RUNNER from Chapter 02
-  const handleClaimVoidRunner = () => {
-    const voidRunnerItem: CartItem = {
-      id: 'vn-void-runner',
-      productId: 'vn-void-runner',
-      code: 'VOID_02',
-      name: 'VOID RUNNER SPEC 02',
-      edition: 'ACTIVE DROP // SPEC 02 // 500 UNITS',
-      price: 590,
-      image: '/assets/images/void_runner_heel_1788838329834.jpg',
-      colorway: 'Carbon Void / Black',
-      specification: 'US 10 / EU 44',
-      selectedColor: 'Carbon Void / Black',
-      selectedSize: 'US 10 / EU 44',
-      availableSizes: ['US 9 / EU 42.5', 'US 9.5 / EU 43', 'US 10 / EU 44', 'US 11 / EU 45'],
-      allocationStatus: 'Allocation Claimed // Run Serial M084',
-      quantity: 1,
-    };
-    handleAddToCart(voidRunnerItem);
-  };
-
   // Order Placement & Creation
   const handlePlaceOrder = async (paymentMethod: PaymentMethod) => {
     if (cartItems.length === 0) {
@@ -943,54 +936,47 @@ export default function App() {
     }
     setIsOrderSubmitting(true);
     try {
-      let savedOrder: Record<string, unknown>;
-      try {
-        savedOrder = await customerApi.createOrder(
-          selectedAddressId,
-          paymentMethod === 'COD' ? 'COD' : 'UPI',
-          undefined,
-          cartItems.map((item) => ({
-            productId: item.productId || item.id,
-            color: item.selectedColor || item.colorway || 'Standard',
-            size: item.selectedSize || item.specification || 'Universal Last',
-            quantity: item.quantity || 1,
-          }))
-        );
-      } catch (orderErr) {
-        console.warn('Backend order placement fallback activated:', orderErr);
-        const chosenAddr = addresses.find((a) => a.id === selectedAddressId) || addresses[0];
-        savedOrder = {
-          id: `VN-${Date.now().toString().slice(-6)}`,
-          displayId: `VN-${new Date().getFullYear()}${String(new Date().getMonth() + 1).padStart(2, '0')}${String(new Date().getDate()).padStart(2, '0')}-${Math.random().toString(36).substring(2, 6).toUpperCase()}`,
-          status: 'CONFIRMED',
-          paymentStatus: 'PAID',
-          paymentMethod,
-          total: subtotal,
-          shippingAddress: chosenAddr,
-          items: cartItems.map((item) => ({
-            productId: item.productId || item.id,
-            sku: item.code || 'VN-SPEC-VAULT',
-            name: item.name,
-            brand: item.brand,
-            color: item.selectedColor || item.colorway || 'Standard',
-            size: item.selectedSize || item.specification || 'Universal Last',
-            price: item.price,
-            quantity: item.quantity || 1,
-            image: item.image,
-            product: { catalog: item },
-          })),
-          createdAt: new Date().toISOString(),
-        };
-      }
+      const orderItems = cartItems.map((item) => ({
+        productId: item.productId || item.id,
+        color: item.selectedColor || item.colorway,
+        size: item.selectedSize || item.specification,
+        quantity: item.quantity || 1,
+      }));
 
-      const order = toOrderRecord(savedOrder);
-      setOrders((prev) => [order, ...prev]);
-      setCurrentOrder(order);
-      setCartItems([]);
-      setInvoiceModalOrder(order);
-      setActiveNav('ORDER_SUCCESS');
-      window.scrollTo({ top: 0, behavior: 'smooth' });
-      showToast(`ACQUISITION CONFIRMED: #${order.id} // OFFICIAL INVOICE GENERATED`);
+      if (paymentMethod === 'COD') {
+        const savedOrder = await customerApi.createOrder(selectedAddressId, 'COD', undefined, orderItems);
+        const order = toOrderRecord(savedOrder);
+        setOrders((prev) => [order, ...prev]);
+        setCurrentOrder(order);
+        setPendingPaymentOrder(null);
+        setCartItems([]);
+        setInvoiceModalOrder(order);
+        setActiveNav('ORDER_SUCCESS');
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+        showToast(`Order ${order.id} placed. Payment is due on delivery.`);
+      } else {
+        // Keep an unverified order pending and open the existing provider-backed
+        // UPI flow. Retry uses the same order if payment setup needs another try.
+        const savedOrder = pendingPaymentOrder ?? await customerApi.createOrder(
+          selectedAddressId,
+          'UPI',
+          undefined,
+          orderItems,
+        );
+        setPendingPaymentOrder(savedOrder);
+        const paymentSession = await customerApi.initiateUpiPayment(String(savedOrder.id));
+        setCurrentOrder(toOrderRecord(savedOrder));
+        setUpiPaymentSession({
+          isOpen: true,
+          orderId: paymentSession.orderId,
+          displayId: paymentSession.displayId,
+          amount: paymentSession.amount,
+          currency: paymentSession.currency,
+          upiPaymentUrl: paymentSession.upiPaymentUrl,
+          qrCodeDataUrl: paymentSession.qrCodeDataUrl,
+          expiresAt: paymentSession.expiresAt,
+        });
+      }
     } catch (error) {
       showToast(error instanceof Error ? error.message : 'Order could not be saved');
     } finally {
@@ -1000,10 +986,18 @@ export default function App() {
 
   const handleUpiPaymentVerified = (verifiedOrderRecord: Record<string, unknown>) => {
     setUpiPaymentSession(null);
-    const order = toOrderRecord(verifiedOrderRecord);
+    const order = toOrderRecord({
+      ...(pendingPaymentOrder ?? {}),
+      ...verifiedOrderRecord,
+      id: pendingPaymentOrder?.id ?? verifiedOrderRecord.orderId,
+      displayId: pendingPaymentOrder?.displayId ?? verifiedOrderRecord.displayId,
+      paymentStatus: 'PAID',
+    });
     setOrders((prev) => [order, ...prev.filter((o) => o.id !== order.id)]);
     setCurrentOrder(order);
+    setPendingPaymentOrder(null);
     setCartItems([]);
+    setInvoiceModalOrder(order);
     setActiveNav('ORDER_SUCCESS');
     window.scrollTo({ top: 0, behavior: 'smooth' });
     showToast(`PAYMENT VERIFIED // ORDER #${order.id} CONFIRMED`);
@@ -1248,7 +1242,7 @@ export default function App() {
   }
 
   return (
-    <div className="min-h-screen bg-[#F7F2EC] dark:bg-[#09090b] text-[#242321] dark:text-[#f4f4f6] antialiased flex flex-col justify-between selection:bg-[#B4532A33] selection:text-[#B4532A]">
+    <div className="storefront-shell min-h-screen bg-[#F7F2EC] dark:bg-[#09090b] text-[#242321] dark:text-[#f4f4f6] antialiased flex flex-col justify-between selection:bg-[#B4532A33] selection:text-[#B4532A]">
       {/* Fixed Luxury Header */}
       <Header
         cartCount={totalItemCount}
@@ -1294,18 +1288,28 @@ export default function App() {
       />
 
       {/* Main Content Area */}
-      <main className="w-full pt-16 sm:pt-24 bg-[#F7F2EC] dark:bg-[#09090b] flex-1">
+      <main className="storefront-content w-full pt-16 sm:pt-24 bg-[#F7F2EC] dark:bg-[#09090b] flex-1">
         {/* VIEW 1: COLLECTIONS (Hero & Home Experience) */}
         {activeNav === 'COLLECTIONS' && (
           <CollectionsView
             products={products}
-            onClaimVoidRunner={handleClaimVoidRunner}
-            onQuickAddProduct={handleAddToCart}
+            catalogLoading={catalogLoading}
+            catalogError={catalogError}
+            onRetryCatalog={() => {
+              setCatalogLoading(true);
+              setCatalogError(null);
+              customerApi.catalog().then((catalog) => {
+                const savedProducts = catalog as ShoeProduct[];
+                setProducts(savedProducts);
+                setSelectedProduct(savedProducts[0] ?? null);
+              }).catch((error: unknown) => {
+                setCatalogError(error instanceof Error ? error.message : 'The product catalog could not be loaded.');
+              }).finally(() => setCatalogLoading(false));
+            }}
             onNavigate={(nav) => {
               setActiveNav(nav as NavSection);
               window.scrollTo({ top: 0, behavior: 'smooth' });
             }}
-            onShowToast={showToast}
             onInspectSpecimen={(specimen) => setInspectingSpecimen(specimen)}
             onSelectCategoryFilter={(cat) => {
               setCategoryFilter(cat);
@@ -1324,6 +1328,19 @@ export default function App() {
         {activeNav === 'SHOP' && (
           <ProductListingView
             products={products}
+            catalogLoading={catalogLoading}
+            catalogError={catalogError}
+            onRetryCatalog={() => {
+              setCatalogLoading(true);
+              setCatalogError(null);
+              customerApi.catalog().then((catalog) => {
+                const savedProducts = catalog as ShoeProduct[];
+                setProducts(savedProducts);
+                setSelectedProduct(savedProducts[0] ?? null);
+              }).catch((error: unknown) => {
+                setCatalogError(error instanceof Error ? error.message : 'The product catalog could not be loaded.');
+              }).finally(() => setCatalogLoading(false));
+            }}
             onSelectProduct={handleSelectProduct}
             onAddToCart={handleAddToCart}
             onToggleWishlist={handleToggleWishlistProduct}
@@ -1490,7 +1507,6 @@ export default function App() {
         {/* VIEW 9: BAG // ALLOCATION CHECKOUT PROTOCOL (Sections 15, 20-23) */}
         {activeNav === 'BAG' && (
           <div className="w-full">
-            <ReservationBanner initialMinutes={14} initialSeconds={27} />
             <div className="max-w-[1440px] mx-auto w-full px-5 md:px-16 py-10 lg:py-16">
               <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-start">
                 <div className="lg:col-span-7">
@@ -1500,7 +1516,7 @@ export default function App() {
                     onRemoveItem={handleRemoveItem}
                     onMoveToWishlist={handleMoveToWishlist}
                     onOpenSizeSelector={(item) => setSizeSelectorItem(item)}
-                    onRestoreDefaultItems={handleRestoreDefaultItems}
+                    onContinueShopping={() => setActiveNav('SHOP')}
                   />
                 </div>
                 <div className="lg:col-span-5">
@@ -1553,10 +1569,10 @@ export default function App() {
       <SizeGuideModal
         isOpen={isSizeGuideOpen}
         onClose={() => setIsSizeGuideOpen(false)}
-        sizeSystem={selectedProduct.sizeSystem}
-        sizes={Object.values(selectedProduct.sizeInventory).flat()}
+        sizeSystem={selectedProduct?.sizeSystem ?? 'US'}
+        sizes={selectedProduct ? Object.values(selectedProduct.sizeInventory).flat() : []}
         onSelectSize={(sz) => {
-          showToast(`CALIBRATED SIZE SELECTION: ${selectedProduct.sizeSystem === 'Size' ? 'SIZE' : selectedProduct.sizeSystem ?? 'US'} ${sz}`);
+          showToast(`Size guide selection: ${selectedProduct?.sizeSystem === 'Size' ? 'SIZE' : selectedProduct?.sizeSystem ?? 'US'} ${sz}`);
         }}
       />
 

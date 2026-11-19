@@ -56,3 +56,14 @@ test('Express receives the health and protected admin routes at their original p
     assert.deepEqual(await response.json(), { error: 'Authentication required' });
   }
 });
+
+test('CORS rejects unconfigured Vercel preview origins', async () => {
+  const response = await fetch(`${baseUrl}/api/health`, {
+    method: 'OPTIONS',
+    headers: {
+      Origin: 'https://untrusted-preview.vercel.app',
+      'Access-Control-Request-Method': 'GET',
+    },
+  });
+  assert.equal(response.headers.has('access-control-allow-origin'), false);
+});

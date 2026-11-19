@@ -158,18 +158,10 @@ export const customerApi = {
     return requestCustomer<{ items: Array<{ id: string; productId: string; color: string; size: string; quantity: number; product: { catalog: unknown } }> }>('/cart');
   },
   async addCartItem(productId: string, color: string, size: string, quantity: number) {
-    try {
-      return await requestCustomer<{ id: string; quantity: number }>('/cart/items', {
-        method: 'POST',
-        body: JSON.stringify({ productId, color, size, quantity }),
-      });
-    } catch (error) {
-      console.warn('Server cart sync issue, using local cart session fallback:', error);
-      return {
-        id: `local-item-${Date.now()}-${Math.random().toString(36).substring(2, 7)}`,
-        quantity,
-      };
-    }
+    return requestCustomer<{ id: string; quantity: number }>('/cart/items', {
+      method: 'POST',
+      body: JSON.stringify({ productId, color, size, quantity }),
+    });
   },
   updateCartItem(id: string, quantity: number) {
     return requestCustomer(`/cart/items/${encodeURIComponent(id)}`, { method: 'PATCH', body: JSON.stringify({ quantity }) });

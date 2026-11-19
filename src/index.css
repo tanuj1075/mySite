@@ -315,25 +315,33 @@ html.light, html.light body {
   color: #242321 !important;
 }
 
-html.light input,
-html.light select,
-html.light textarea {
+html.light .storefront-content input,
+html.light .storefront-content select,
+html.light .storefront-content textarea,
+html.light .storefront-surface input,
+html.light .storefront-surface select,
+html.light .storefront-surface textarea {
   background-color: #FFFFFF !important;
   color: #242321 !important;
   border-color: #E9D9CA !important;
 }
-html.light input::placeholder,
-html.light textarea::placeholder {
+html.light .storefront-content input::placeholder,
+html.light .storefront-content textarea::placeholder,
+html.light .storefront-surface input::placeholder,
+html.light .storefront-surface textarea::placeholder {
   color: #77716B !important;
 }
-html.light input:focus,
-html.light select:focus,
-html.light textarea:focus {
+html.light .storefront-content input:focus,
+html.light .storefront-content select:focus,
+html.light .storefront-content textarea:focus,
+html.light .storefront-surface input:focus,
+html.light .storefront-surface select:focus,
+html.light .storefront-surface textarea:focus {
   border-color: #B4532A !important;
   outline: 2px solid rgba(180, 83, 42, 0.2);
 }
 
-html.light header {
+html.light #main-header {
   background-color: rgba(255, 255, 255, 0.95) !important;
   border-color: #E9D9CA !important;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
@@ -350,87 +358,112 @@ html.light footer {
   color: #FFFFFF !important;
 }
 
-html.light .bg-\[\#09090b\],
-html.light .bg-\[\#09090B\] {
+html.light :is(.storefront-content, .storefront-surface) [class*="bg-[#09090b]"],
+html.light :is(.storefront-content, .storefront-surface) [class*="bg-[#09090B]"] {
   background-color: #F7F2EC !important;
 }
 
-html.light .bg-\[\#121215\],
-html.light .bg-\[\#121215\]\/90,
-html.light .bg-\[\#121215\]\/95 {
+html.light :is(.storefront-content, .storefront-surface) [class*="bg-[#121215]"] {
   background-color: #FFFFFF !important;
 }
 
-html.light .bg-\[\#16161b\],
-html.light .bg-\[\#16161B\],
-html.light .bg-\[\#17171c\],
-html.light .bg-\[\#17171C\],
-html.light .bg-\[\#18181c\],
-html.light .bg-\[\#18181C\],
-html.light .bg-\[\#1e1e24\],
-html.light .bg-\[\#1E1E24\],
-html.light .bg-\[\#1b1b20\],
-html.light .bg-\[\#1B1B20\] {
+html.light :is(.storefront-content, .storefront-surface) [class*="bg-[#16161b]"],
+html.light :is(.storefront-content, .storefront-surface) [class*="bg-[#16161B]"],
+html.light :is(.storefront-content, .storefront-surface) [class*="bg-[#17171c]"],
+html.light :is(.storefront-content, .storefront-surface) [class*="bg-[#17171C]"],
+html.light :is(.storefront-content, .storefront-surface) [class*="bg-[#18181c]"],
+html.light :is(.storefront-content, .storefront-surface) [class*="bg-[#18181C]"],
+html.light :is(.storefront-content, .storefront-surface) [class*="bg-[#1e1e24]"],
+html.light :is(.storefront-content, .storefront-surface) [class*="bg-[#1E1E24]"],
+html.light :is(.storefront-content, .storefront-surface) [class*="bg-[#1b1b20]"],
+html.light :is(.storefront-content, .storefront-surface) [class*="bg-[#1B1B20]"],
+html.light :is(.storefront-content, .storefront-surface) [class*="bg-[#242429]"] {
   background-color: #FFFFFF !important;
 }
 
-html.light .border-\[\#242429\],
-html.light .border-\[\#3a3a42\] {
+html.light :is(.storefront-content, .storefront-surface) [class*="border-[#242429]"],
+html.light :is(.storefront-content, .storefront-surface) [class*="border-[#3a3a42]"],
+html.light :is(.storefront-content, .storefront-surface) [class*="border-[#2A2A32]"],
+html.light :is(.storefront-content, .storefront-surface) [class*="border-[#1a1a1f]"] {
   border-color: #E9D9CA !important;
 }
 
-html.light .text-\[\#f4f4f6\],
-html.light .text-\[\#F4F4F6\] {
+html.light :is(.storefront-content, .storefront-surface) [class*="text-[#f4f4f6]"],
+html.light :is(.storefront-content, .storefront-surface) [class*="text-[#F4F4F6]"] {
   color: #242321 !important;
 }
 
-html.light .text-\[\#8e8e98\],
-html.light .text-\[\#8E8E98\] {
+html.light :is(.storefront-content, .storefront-surface) [class*="text-[#8e8e98]"],
+html.light :is(.storefront-content, .storefront-surface) [class*="text-[#8E8E98]"] {
   color: #77716B !important;
 }
 
-html.light .text-\[\#52525b\] {
+html.light :is(.storefront-content, .storefront-surface) [class*="text-[#52525b]"] {
   color: #77716B !important;
 }
 
-html.light .specimen-card {
+html.light :is(.storefront-content, .storefront-surface) [class*="text-[#c9a96e]"],
+html.light :is(.storefront-content, .storefront-surface) [class*="text-[#C9A96E]"] {
+  color: #B4532A !important;
+}
+
+html.light :is(.storefront-content, .storefront-surface) [class*="bg-[#c9a96e]"],
+html.light :is(.storefront-content, .storefront-surface) [class*="bg-[#C9A96E]"] {
+  background-color: #B4532A !important;
+}
+
+html.light :is(.storefront-content, .storefront-surface) [class*="border-[#c9a96e]"],
+html.light :is(.storefront-content, .storefront-surface) [class*="border-[#C9A96E]"] {
+  border-color: #B4532A !important;
+}
+
+html.light .storefront-content .specimen-card,
+html.light .storefront-surface .specimen-card {
   background-color: #FFFFFF !important;
   border-color: #DDD5C7 !important;
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.04);
 }
 
-html.light .specimen-card:hover {
+html.light .storefront-content .specimen-card:hover,
+html.light .storefront-surface .specimen-card:hover {
   background-color: #FFFFFF !important;
   border-color: #C9A96E !important;
   box-shadow: 0 20px 45px -10px rgba(168, 134, 71, 0.2), 0 0 25px rgba(201, 169, 110, 0.15);
 }
 
-html.light .pedestal-glow::after {
+html.light .storefront-content .pedestal-glow::after,
+html.light .storefront-surface .pedestal-glow::after {
   background: radial-gradient(ellipse, rgba(168, 134, 71, 0.22) 0%, transparent 75%);
 }
 
-html.light .btn-primary {
-  background-color: #121215 !important;
+html.light .storefront-content .btn-primary,
+html.light .storefront-surface .btn-primary {
+  background-color: #B4532A !important;
   color: #FFFFFF !important;
-  border-color: #121215 !important;
+  border-color: #B4532A !important;
 }
-html.light .btn-primary:hover {
-  background-color: #C9A96E !important;
-  color: #121215 !important;
-  border-color: #C9A96E !important;
+html.light .storefront-content .btn-primary:hover,
+html.light .storefront-surface .btn-primary:hover {
+  background-color: #9C431F !important;
+  color: #FFFFFF !important;
+  border-color: #9C431F !important;
 }
 
-html.light .btn-secondary {
-  color: #121215 !important;
+html.light .storefront-content .btn-secondary,
+html.light .storefront-surface .btn-secondary {
+  color: #242321 !important;
   border-color: #DDD5C7 !important;
 }
-html.light .btn-secondary:hover {
-  border-color: #121215 !important;
+html.light .storefront-content .btn-secondary:hover,
+html.light .storefront-surface .btn-secondary:hover {
+  border-color: #242321 !important;
 }
 
-html.light .museum-corners::before,
-html.light .museum-corners::after {
-  border-color: #A37D36 !important;
+html.light .storefront-content .museum-corners::before,
+html.light .storefront-content .museum-corners::after,
+html.light .storefront-surface .museum-corners::before,
+html.light .storefront-surface .museum-corners::after {
+  border-color: #B4532A !important;
 }
 
 @media print {

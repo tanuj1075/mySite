@@ -16,56 +16,26 @@ router.post('/items', async (req, res, next) => {
   try {
     const input = itemInput.parse(req.body);
     const cart = await getOrCreateCart(req.auth!.sub);
-    let product = await prisma.product.findUnique({ where: { id: input.productId } });
-    if (!product) {
-      product = await prisma.product.findFirst({
-        where: {
-          OR: [
-            { sku: input.productId },
-            { id: input.productId },
-          ],
-        },
-      });
-    }
-    if (!product) {
-      // Create resilient specimen record if not seeded yet
-      try {
-        product = await prisma.product.create({
-          data: {
-            id: input.productId,
-            sku: input.productId.toUpperCase(),
-            name: input.productId.replace(/[-_]/g, ' ').toUpperCase(),
-            brand: 'VANTA ATELIER',
-            category: 'Sneakers',
-            price: 48000,
-            mrp: 52000,
-            isActive: true,
-            catalog: {
-              id: input.productId,
-              name: input.productId.replace(/[-_]/g, ' ').toUpperCase(),
-              brand: 'VANTA ATELIER',
-              price: 48000,
-              mrp: 52000,
-              colors: [{ name: input.color, images: { front: '/assets/images/cream_runner_pedestal_1788842341279.jpg' } }],
-            },
-          },
-        });
-      } catch {
-        // In case of parallel insert race condition, fetch again
-        product = await prisma.product.findUnique({ where: { id: input.productId } });
-      }
-    }
+    const product = await prisma.product.findFirst({
+      where: { OR: [{ id: input.productId }, { sku: input.productId }], isActive: true },
+    });
     if (!product || !product.isActive) return res.status(404).json({ error: 'Product not found' });
+    const catalog = product.catalog as { colors?: Array<{ name: string }>; sizeInventory?: Record<string, Array<{ size: string; stock: number }>> };
+    const colorExists = catalog.colors?.some((color) => color.name === input.color);
+    const availableStock = catalog.sizeInventory?.[input.color]?.find((entry) => entry.size === input.size)?.stock ?? 0;
+    if (!colorExists || availableStock < 1) return res.status(400).json({ error: 'Selected product variant is unavailable' });
     const targetProductId = product.id;
+    const existingItem = await prisma.cartItem.findUnique({
+      where: { cartId_productId_color_size: { cartId: cart.id, productId: targetProductId, color: input.color, size: input.size } },
+    });
+    if ((existingItem?.quantity ?? 0) + input.quantity > Math.min(20, availableStock)) {
+      return res.status(400).json({ error: 'Requested quantity exceeds available stock' });
+    }
     const item = await prisma.cartItem.upsert({
       where: { cartId_productId_color_size: { cartId: cart.id, productId: targetProductId, color: input.color, size: input.size } },
       update: { quantity: { increment: input.quantity } },
       create: { cartId: cart.id, productId: targetProductId, color: input.color, size: input.size, quantity: input.quantity },
     });
-    if (item.quantity > 20) {
-      await prisma.cartItem.update({ where: { id: item.id }, data: { quantity: 20 } });
-      return res.status(400).json({ error: 'Maximum quantity of 20 per item reached' });
-    }
     res.status(201).json(item);
   } catch (error) { next(error); }
 });

@@ -1,14 +1,14 @@
 import React, { useState } from 'react';
-import { ArrowRight, Heart, ShoppingBag, ShieldCheck, Truck, RotateCcw, Lock, Sparkles, Tag, Activity, Footprints, Layers } from 'lucide-react';
-import { CartItem, ShoeProduct } from '../types';
+import { ArrowRight, Heart, ShieldCheck, Truck, RotateCcw, Lock, Sparkles, Tag, Activity, Footprints, Layers } from 'lucide-react';
+import { ShoeProduct } from '../types';
 import { formatCurrency } from '../lib/currency';
 
 interface CollectionsViewProps {
   products?: ShoeProduct[];
-  onClaimVoidRunner: () => void;
-  onQuickAddProduct: (item: CartItem) => void;
   onNavigate: (nav: string) => void;
-  onShowToast: (msg: string) => void;
+  catalogLoading?: boolean;
+  catalogError?: string | null;
+  onRetryCatalog?: () => void;
   onInspectSpecimen?: (specimen: any) => void;
   onSelectCategoryFilter?: (cat: string) => void;
   onSelectProduct?: (product: ShoeProduct) => void;
@@ -18,14 +18,16 @@ interface CollectionsViewProps {
 
 export const CollectionsView: React.FC<CollectionsViewProps> = ({
   products = [],
-  onQuickAddProduct,
   onNavigate,
-  onShowToast,
+  catalogLoading = false,
+  catalogError = null,
+  onRetryCatalog,
   onSelectCategoryFilter,
   onSelectProduct,
   wishlistIds = [],
   onToggleWishlist,
 }) => {
+  const maxDiscount = Math.max(0, ...products.map((product) => product.mrp > product.price ? Math.round((1 - product.price / product.mrp) * 100) : 0));
   // Category Icons bar matching Reference Panel 1
   const categoryPills = [
     { label: 'Men', filter: 'Men', icon: Footprints },
@@ -73,100 +75,11 @@ export const CollectionsView: React.FC<CollectionsViewProps> = ({
     },
   ];
 
-  // Best Sellers (Pull from database or fallback to top iconic models)
-  const bestSellers: ShoeProduct[] = products.length >= 4 ? products.slice(0, 4) : [
-    {
-      id: 'nike-af1-07',
-      name: "Air Force 1 '07",
-      brand: 'NIKE',
-      price: 11999,
-      mrp: 14999,
-      discountPercent: 20,
-      category: 'Sneakers',
-      colors: [
-        {
-          name: 'White',
-          hex: '#ffffff',
-          images: { front: '/assets/images/cream_runner_pedestal_1788842341279.jpg' },
-        },
-      ],
-      rating: 4.8,
-    } as unknown as ShoeProduct,
-    {
-      id: 'jordan-1-retro',
-      name: 'Jordan 1 Retro High',
-      brand: 'JORDAN',
-      price: 16999,
-      mrp: 19999,
-      discountPercent: 15,
-      category: 'Sneakers',
-      colors: [
-        {
-          name: 'Black & White',
-          hex: '#000000',
-          images: { front: '/assets/images/core_silhouettes_shoe_1788838314612.jpg' },
-        },
-      ],
-      rating: 4.9,
-    } as unknown as ShoeProduct,
-    {
-      id: 'nb-550-white',
-      name: 'New Balance 550',
-      brand: 'NEW BALANCE',
-      price: 12499,
-      mrp: 14999,
-      discountPercent: 17,
-      category: 'Sneakers',
-      colors: [
-        {
-          name: 'Sea Salt',
-          hex: '#eae3d5',
-          images: { front: '/assets/images/taupe_runner_pedestal_1788842355799.jpg' },
-        },
-      ],
-      rating: 4.7,
-    } as unknown as ShoeProduct,
-    {
-      id: 'adidas-samba-og',
-      name: 'Adidas Samba OG',
-      brand: 'ADIDAS',
-      price: 10999,
-      mrp: 12999,
-      discountPercent: 15,
-      category: 'Sneakers',
-      colors: [
-        {
-          name: 'Core Black',
-          hex: '#111111',
-          images: { front: '/assets/images/kinesis_zero_shoe_1788838347108.jpg' },
-        },
-      ],
-      rating: 4.8,
-    } as unknown as ShoeProduct,
-  ];
+  const bestSellers = products.slice(0, 4);
 
   const handleQuickAdd = (product: ShoeProduct, e: React.MouseEvent) => {
     e.stopPropagation();
-    const frontImg = product.colors?.[0]?.images?.front || '/assets/images/cream_runner_pedestal_1788842341279.jpg';
-    const colorName = product.colors?.[0]?.name || 'Standard Edition';
-    const cartItem: CartItem = {
-      id: `${product.id}-size-9`,
-      productId: product.id,
-      code: product.sku || product.id,
-      name: product.name,
-      edition: `${product.brand} // Size 9`,
-      price: product.price,
-      image: frontImg,
-      colorway: colorName,
-      specification: 'Size 9',
-      availableSizes: ['7', '8', '9', '10', '11'],
-      allocationStatus: 'Secured Allocation',
-      quantity: 1,
-      selectedColor: colorName,
-      selectedSize: '9',
-    };
-    onQuickAddProduct(cartItem);
-    onShowToast(`ADDED TO BAG: ${product.name}`);
+    handleCardClick(product);
   };
 
   const handleCardClick = (product: ShoeProduct) => {
@@ -327,7 +240,7 @@ export const CollectionsView: React.FC<CollectionsViewProps> = ({
         </div>
 
         {/* 4 Clean Product Cards */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+        {bestSellers.length > 0 ? <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
           {bestSellers.map((product) => {
             const frontImage = product.colors?.[0]?.images?.front || '/assets/images/cream_runner_pedestal_1788842341279.jpg';
             const isWishlisted = wishlistIds.includes(product.id);
@@ -393,16 +306,28 @@ export const CollectionsView: React.FC<CollectionsViewProps> = ({
                     <button
                       onClick={(e) => handleQuickAdd(product, e)}
                       className="w-8 h-8 rounded-full bg-[#F7F2EC] dark:bg-[#242429] hover:bg-[#B4532A] text-[#242321] dark:text-[#f4f4f6] hover:text-white flex items-center justify-center transition-colors cursor-pointer"
-                      title="Add to Bag"
+                      title="Choose size"
                     >
-                      <ShoppingBag className="w-4 h-4" />
+                      <ArrowRight className="w-4 h-4" />
                     </button>
                   </div>
                 </div>
               </div>
             );
           })}
-        </div>
+        </div> : (
+          <div className="rounded-2xl border border-[#E9D9CA] bg-white px-6 py-10 text-center">
+            <p className="text-sm font-semibold text-[#242321]">
+              {catalogLoading ? 'Loading the live collection…' : catalogError ? 'The live collection is unavailable.' : 'No products are available yet.'}
+            </p>
+            {catalogError && <p className="mt-2 text-xs text-[#77716B]">{catalogError}</p>}
+            {catalogError && onRetryCatalog && (
+              <button onClick={onRetryCatalog} className="mt-4 rounded-full bg-[#B4532A] px-5 py-2 text-xs font-semibold text-white hover:bg-[#9C431F]">
+                Retry catalog
+              </button>
+            )}
+          </div>
+        )}
       </section>
 
       {/* 5. PROMOTIONAL SALE BANNER (Exact Match to Reference Panel 1 Bottom) */}
@@ -413,16 +338,16 @@ export const CollectionsView: React.FC<CollectionsViewProps> = ({
               LIMITED TIME
             </span>
             <h2 className="text-4xl sm:text-5xl font-extrabold tracking-tight text-white leading-tight">
-              UP TO 40% OFF
+              {maxDiscount > 0 ? `UP TO ${maxDiscount}% OFF` : 'ARCHIVE RELEASE'}
             </h2>
             <p className="text-xs sm:text-sm text-[#A8A49E] leading-relaxed">
-              On selected archival grails and performance runners. Don't miss out on verified atelier allocations.
+              {maxDiscount > 0 ? 'Current reductions on selected products in the live catalog.' : 'Explore current footwear and new releases in the live catalog.'}
             </p>
             <button
-              onClick={() => onNavigate('SHOP')}
+              onClick={() => maxDiscount > 0 ? onSelectCategoryFilter?.('Sale') : onNavigate('SHOP')}
               className="bg-[#B4532A] hover:bg-[#9C431F] text-white text-xs sm:text-sm font-semibold px-7 py-3 rounded-xl transition-all cursor-pointer inline-flex items-center gap-2 shadow-lg"
             >
-              <span>Shop Sale</span>
+              <span>{maxDiscount > 0 ? 'Shop Sale' : 'Shop Collection'}</span>
               <ArrowRight className="w-4 h-4" />
             </button>
           </div>

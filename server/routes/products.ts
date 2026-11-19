@@ -7,7 +7,7 @@ router.get('/', async (_req, res, next) => {
   catch (error) { next(error); }
 });
 router.get('/:id', async (req, res, next) => {
-  try { const product = await prisma.product.findUnique({ where: { id: req.params.id } }); if (!product) return res.status(404).json({ error: 'Product not found' }); res.json(product.catalog); }
+  try { const product = await prisma.product.findFirst({ where: { id: req.params.id, isActive: true } }); if (!product) return res.status(404).json({ error: 'Product not found' }); res.json(product.catalog); }
   catch (error) { next(error); }
 });
 export default router;

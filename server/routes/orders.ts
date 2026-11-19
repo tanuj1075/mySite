@@ -59,6 +59,14 @@ router.post('/', async (req, res, next) => {
     const address = await prisma.address.findFirst({ where: { id: input.addressId, userId } });
     if (!cart?.items.length) return res.status(400).json({ error: 'Cart is empty' });
     if (!address) return res.status(400).json({ error: 'Valid shipping address required' });
+    const unavailableItem = cart.items.find((item) => {
+      if (!item.product.isActive) return true;
+      const catalog = item.product.catalog as { colors?: Array<{ name: string }>; sizeInventory?: Record<string, Array<{ size: string; stock: number }>> };
+      const colorExists = catalog.colors?.some((color) => color.name === item.color);
+      const availableStock = catalog.sizeInventory?.[item.color]?.find((entry) => entry.size === item.size)?.stock ?? 0;
+      return !colorExists || availableStock < item.quantity;
+    });
+    if (unavailableItem) return res.status(400).json({ error: 'A cart variant is unavailable or no longer has enough stock' });
     const subtotal = cart.items.reduce((sum, item) => sum + Number(item.product.price) * item.quantity, 0);
     const coupon = input.couponCode ? await prisma.coupon.findUnique({ where: { code: input.couponCode.toUpperCase() } }) : null;
     const discount = coupon?.isActive && subtotal >= Number(coupon.minOrderValue) ? Math.min(subtotal * coupon.discountPercent / 100, coupon.maxDiscount ? Number(coupon.maxDiscount) : Infinity) : 0;
