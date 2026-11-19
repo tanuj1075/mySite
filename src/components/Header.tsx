@@ -1,5 +1,7 @@
-import React, { useState } from 'react';
-import { Search, Heart, ShoppingBag, User, Menu, X, Scale } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { Search, Heart, ShoppingBag, User, Menu, X, Scale, Sun, Moon, Globe, ChevronDown } from 'lucide-react';
+import { CURRENCY_CONFIGS, SupportedCurrency, getActiveCurrency, setActiveCurrency, subscribeCurrency } from '../lib/currency';
+import { getTheme, toggleTheme, subscribeTheme, ThemeMode } from '../lib/theme';
 
 interface HeaderProps {
   cartCount: number;
@@ -33,6 +35,20 @@ export const Header: React.FC<HeaderProps> = ({
   onSelectCategoryFilter,
 }) => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [theme, setCurrentTheme] = useState<ThemeMode>(getTheme());
+  const [currency, setCurrentCurrency] = useState<SupportedCurrency>(getActiveCurrency());
+  const [isCurrencyMenuOpen, setIsCurrencyMenuOpen] = useState(false);
+
+  useEffect(() => {
+    const unsubTheme = subscribeTheme((t) => setCurrentTheme(t));
+    const unsubCurr = subscribeCurrency((c) => setCurrentCurrency(c));
+    return () => {
+      unsubTheme();
+      unsubCurr();
+    };
+  }, []);
+
+  const activeCurrencyConfig = CURRENCY_CONFIGS[currency] || CURRENCY_CONFIGS.INR;
 
   // Primary top navigation categories specified in guide:
   // Men, Women, Kids, Sneakers, Sports, New Arrivals, Sale
@@ -88,6 +104,36 @@ export const Header: React.FC<HeaderProps> = ({
         </div>
         <div className="flex items-center gap-4">
           <span className="text-[#52525b] hidden lg:inline">FREE COMPLIMENTARY SIZE EXCHANGE ON ALL ORDERS</span>
+          
+          {/* Quick Currency indicator in micro-bar */}
+          <button
+            onClick={() => setIsCurrencyMenuOpen((prev) => !prev)}
+            className="flex items-center gap-1 text-[#8e8e98] hover:text-[#c9a96e] transition-colors cursor-pointer"
+            title="Worldwide Auto-Detected Currency"
+          >
+            <Globe className="w-3 h-3 text-[#c9a96e]" />
+            <span>{activeCurrencyConfig.flag} {activeCurrencyConfig.code} ({activeCurrencyConfig.symbol})</span>
+          </button>
+
+          {/* Quick Theme toggle in micro-bar */}
+          <button
+            onClick={() => toggleTheme()}
+            className="flex items-center gap-1 text-[#8e8e98] hover:text-[#c9a96e] transition-colors cursor-pointer"
+            title={`Toggle Theme (${theme === 'dark' ? 'Switch to Light' : 'Switch to Dark'})`}
+          >
+            {theme === 'dark' ? (
+              <>
+                <Sun className="w-3 h-3 text-[#c9a96e]" />
+                <span>LIGHT MODE</span>
+              </>
+            ) : (
+              <>
+                <Moon className="w-3 h-3 text-[#121215]" />
+                <span>DARK MODE</span>
+              </>
+            )}
+          </button>
+
           <button
             onClick={() => onSelectNav('LOGIN')}
             className={`font-bold hover:underline cursor-pointer tracking-wider ${
@@ -208,6 +254,61 @@ export const Header: React.FC<HeaderProps> = ({
             </span>
           </button>
 
+          {/* Worldwide Currency Selector Dropdown */}
+          <div className="relative">
+            <button
+              id="header-currency-selector-btn"
+              onClick={() => setIsCurrencyMenuOpen(!isCurrencyMenuOpen)}
+              className="flex items-center gap-1 px-2 py-1 bg-[#121215] border border-[#242429] hover:border-[#c9a96e] text-[10px] font-mono font-bold text-[#f4f4f6] tracking-wider transition-all cursor-pointer"
+              title="Change Display Currency Worldwide"
+            >
+              <Globe className="w-3 h-3 text-[#c9a96e]" />
+              <span>{activeCurrencyConfig.code}</span>
+              <ChevronDown className="w-2.5 h-2.5 text-[#8e8e98]" />
+            </button>
+
+            {isCurrencyMenuOpen && (
+              <div className="absolute right-0 top-full mt-2 w-48 bg-[#121215] border border-[#c9a96e]/40 shadow-2xl z-50 py-1 font-mono text-[10px] max-h-64 overflow-y-auto">
+                <div className="px-2.5 py-1 text-[9px] uppercase tracking-wider text-[#c9a96e] border-b border-[#242429] font-bold">
+                  WORLDWIDE CURRENCY
+                </div>
+                {Object.values(CURRENCY_CONFIGS).map((c) => (
+                  <button
+                    key={c.code}
+                    onClick={() => {
+                      setActiveCurrency(c.code);
+                      setIsCurrencyMenuOpen(false);
+                    }}
+                    className={`w-full text-left px-2.5 py-1.5 flex items-center justify-between hover:bg-[#18181c] cursor-pointer transition-colors ${
+                      currency === c.code ? 'text-[#c9a96e] font-bold bg-[#18181c]' : 'text-[#f4f4f6]'
+                    }`}
+                  >
+                    <span className="flex items-center gap-1.5">
+                      <span>{c.flag}</span>
+                      <span>{c.code}</span>
+                    </span>
+                    <span className="text-[#8e8e98]">{c.symbol}</span>
+                  </button>
+                ))}
+              </div>
+            )}
+          </div>
+
+          {/* Theme Mode Toggle Trigger */}
+          <button
+            id="theme-toggle-btn"
+            onClick={() => toggleTheme()}
+            className="w-7 h-7 sm:w-8 sm:h-8 flex items-center justify-center transition-colors cursor-pointer border border-[#242429] bg-[#121215] hover:border-[#c9a96e]"
+            aria-label="Toggle Dark / Light Theme"
+            title={`Switch to ${theme === 'dark' ? 'Alabaster Light' : 'Obsidian Dark'} Mode`}
+          >
+            {theme === 'dark' ? (
+              <Sun className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-[#c9a96e]" />
+            ) : (
+              <Moon className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-[#121215]" />
+            )}
+          </button>
+
           {/* Account Profile / Login Trigger */}
           <button
             id="user-account-btn"
@@ -254,6 +355,26 @@ export const Header: React.FC<HeaderProps> = ({
                 {cat.label}
               </button>
             ))}
+          </div>
+
+          <div className="text-[10px] text-[#c9a96e] font-bold uppercase pb-1 border-b border-[#242429] pt-2">
+            GLOBAL SETTINGS & PREFERENCES
+          </div>
+          <div className="grid grid-cols-2 gap-2">
+            <button
+              onClick={() => toggleTheme()}
+              className="py-2 px-3 bg-[#121215] border border-[#242429] flex items-center justify-between text-[#f4f4f6] font-bold text-[10px] cursor-pointer"
+            >
+              <span>THEME:</span>
+              <span className="text-[#c9a96e]">{theme === 'dark' ? '🌙 OBSIDIAN' : '☀️ ALABASTER'}</span>
+            </button>
+            <button
+              onClick={() => setIsCurrencyMenuOpen((prev) => !prev)}
+              className="py-2 px-3 bg-[#121215] border border-[#242429] flex items-center justify-between text-[#f4f4f6] font-bold text-[10px] cursor-pointer"
+            >
+              <span>CURRENCY:</span>
+              <span className="text-[#c9a96e]">{activeCurrencyConfig.flag} {activeCurrencyConfig.code}</span>
+            </button>
           </div>
 
           <div className="text-[10px] text-[#c9a96e] font-bold uppercase pb-1 border-b border-[#242429]">

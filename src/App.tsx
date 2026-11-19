@@ -33,6 +33,8 @@ import { AdminLoginView } from './components/AdminLoginView';
 import { Footer } from './components/Footer';
 import { adminApi, authApi, clearAdminSession, clearSession, customerApi } from './lib/api';
 import { UpiPaymentModal } from './components/UpiPaymentModal';
+import { initTheme } from './lib/theme';
+import { subscribeCurrency } from './lib/currency';
 
 import { INITIAL_CART_ITEMS, INITIAL_ADDRESSES } from './data/mockData';
 import {
@@ -454,7 +456,14 @@ export default function App() {
     }
   };
 
+  const [, setCurrencyUpdateTrigger] = useState(0);
+
   useEffect(() => {
+    initTheme();
+    const unsubCurrency = subscribeCurrency(() => {
+      setCurrencyUpdateTrigger((prev) => prev + 1);
+    });
+
     const handlePopState = () => {
       setAdminRoute(readAdminRoute());
       const customerRoute = readCustomerAuthRoute();
@@ -467,7 +476,10 @@ export default function App() {
       }
     };
     window.addEventListener('popstate', handlePopState);
-    return () => window.removeEventListener('popstate', handlePopState);
+    return () => {
+      window.removeEventListener('popstate', handlePopState);
+      unsubCurrency();
+    };
   }, []);
 
   useEffect(() => {

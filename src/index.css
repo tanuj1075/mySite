@@ -62,6 +62,20 @@
     letter-spacing: -0.01em;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
+    transition: background-color 0.3s ease, color 0.3s ease;
+  }
+
+  /* Architectural Travertine / Alabaster Light Luxury Mode */
+  html.light, html.light body {
+    background-color: #F7F5F0;
+    background-image:
+      radial-gradient(circle at 50% -10%, rgba(201, 169, 110, 0.16) 0%, transparent 60%),
+      radial-gradient(circle at 90% 25%, rgba(201, 169, 110, 0.08) 0%, transparent 40%),
+      radial-gradient(circle at 10% 70%, rgba(168, 134, 71, 0.06) 0%, transparent 45%),
+      linear-gradient(rgba(168, 134, 71, 0.05) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(168, 134, 71, 0.05) 1px, transparent 1px);
+    background-size: 100% 100%, 100% 100%, 100% 100%, 64px 64px, 64px 64px;
+    color: #121215;
   }
 
   /* Obsidian minimal scrollbar */
@@ -250,6 +264,119 @@
   right: 0;
   border-bottom: 1px solid;
   border-right: 1px solid;
+}
+
+/* LIGHT THEME SYSTEM OVERRIDES */
+html.light * {
+  border-color: #DDD5C7;
+}
+
+html.light ::-webkit-scrollbar-track {
+  background: #F7F5F0;
+}
+html.light ::-webkit-scrollbar-thumb {
+  background: #DDD5C7;
+}
+html.light ::-webkit-scrollbar-thumb:hover {
+  background: #C9A96E;
+}
+
+html.light header {
+  background-color: rgba(247, 245, 240, 0.94) !important;
+  border-color: #DDD5C7 !important;
+}
+
+html.light #top-status-bar,
+html.light #main-header > div:first-child {
+  background-color: #EFEBE1 !important;
+  border-color: #DDD5C7 !important;
+}
+
+html.light footer {
+  background-color: #EFEBE1 !important;
+  border-color: #DDD5C7 !important;
+}
+
+html.light .bg-\[\#09090b\],
+html.light .bg-\[\#09090B\] {
+  background-color: #F7F5F0 !important;
+}
+
+html.light .bg-\[\#121215\],
+html.light .bg-\[\#121215\]\/90 {
+  background-color: #FFFFFF !important;
+}
+
+html.light .bg-\[\#16161b\],
+html.light .bg-\[\#16161B\],
+html.light .bg-\[\#17171c\],
+html.light .bg-\[\#17171C\],
+html.light .bg-\[\#18181c\],
+html.light .bg-\[\#18181C\],
+html.light .bg-\[\#1e1e24\],
+html.light .bg-\[\#1E1E24\],
+html.light .bg-\[\#1b1b20\],
+html.light .bg-\[\#1B1B20\] {
+  background-color: #EFEBE1 !important;
+}
+
+html.light .border-\[\#242429\],
+html.light .border-\[\#3a3a42\] {
+  border-color: #DDD5C7 !important;
+}
+
+html.light .text-\[\#f4f4f6\],
+html.light .text-\[\#F4F4F6\] {
+  color: #121215 !important;
+}
+
+html.light .text-\[\#8e8e98\],
+html.light .text-\[\#8E8E98\] {
+  color: #5E5C66 !important;
+}
+
+html.light .text-\[\#52525b\] {
+  color: #7E7C88 !important;
+}
+
+html.light .specimen-card {
+  background-color: #FFFFFF !important;
+  border-color: #DDD5C7 !important;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.04);
+}
+
+html.light .specimen-card:hover {
+  background-color: #FFFFFF !important;
+  border-color: #C9A96E !important;
+  box-shadow: 0 20px 45px -10px rgba(168, 134, 71, 0.2), 0 0 25px rgba(201, 169, 110, 0.15);
+}
+
+html.light .pedestal-glow::after {
+  background: radial-gradient(ellipse, rgba(168, 134, 71, 0.22) 0%, transparent 75%);
+}
+
+html.light .btn-primary {
+  background-color: #121215 !important;
+  color: #FFFFFF !important;
+  border-color: #121215 !important;
+}
+html.light .btn-primary:hover {
+  background-color: #C9A96E !important;
+  color: #121215 !important;
+  border-color: #C9A96E !important;
+}
+
+html.light .btn-secondary {
+  color: #121215 !important;
+  border-color: #DDD5C7 !important;
+}
+html.light .btn-secondary:hover {
+  border-color: #121215 !important;
+}
+
+html.light .museum-corners::before,
+html.light .museum-corners::after {
+  border-color: #A37D36 !important;
 }
 
 @media print {

@@ -13,7 +13,7 @@ import {
 } from 'lucide-react';
 import { Address, PaymentMethod } from '../types';
 import { CHECKOUT_STEPS } from '../data/mockData';
-import { formatCurrency } from '../lib/currency';
+import { formatCurrency, getActiveCurrency, CURRENCY_CONFIGS } from '../lib/currency';
 import { authApi, customerApi } from '../lib/api';
 
 interface PaymentQuote {
@@ -115,9 +115,11 @@ export const CheckoutProtocol: React.FC<CheckoutProtocolProps> = ({
     return () => { active = false; };
   }, [selectedAddressId, addresses]);
 
-  // Financial calculations
-  const currency = paymentQuote?.currency ?? 'INR';
-  const exchangeRate = paymentQuote?.exchangeRate ?? 1;
+  // Financial calculations with worldwide multi-currency support
+  const activeCurrency = getActiveCurrency();
+  const activeConfig = CURRENCY_CONFIGS[activeCurrency] || CURRENCY_CONFIGS.INR;
+  const currency = paymentQuote?.currency ?? activeCurrency;
+  const exchangeRate = paymentQuote?.exchangeRate ?? (activeCurrency === 'INR' ? 1 : activeConfig.rateFromInr);
   const displayedSubtotal = (paymentQuote?.baseAmount ?? subtotal) * exchangeRate;
   const totalSettlement = paymentQuote?.amount ?? displayedSubtotal;
 
