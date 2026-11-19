@@ -457,9 +457,9 @@ export const CheckoutProtocol: React.FC<CheckoutProtocolProps> = ({
           <button
             type="button"
             id="submit-order-btn"
-            disabled={isOrderSubmitting || subtotal <= 0 || (authApi.hasSession() && (!paymentQuote || isQuoteLoading || Boolean(quoteError)))}
+            disabled={isOrderSubmitting || subtotal <= 0}
             onClick={() => onPlaceOrder(paymentMethod)}
-            className="w-full py-5 bg-[#f4f4f6] text-[#09090b] font-mono text-[12px] font-bold uppercase tracking-[0.2em] hover:bg-[#c9a96e] transition-all flex items-center justify-center gap-3 shadow-lg active:scale-[0.99] cursor-pointer disabled:opacity-30 disabled:cursor-not-allowed"
+            className="w-full py-5 bg-gradient-to-r from-[#C9A96E] via-[#EAE3D5] to-[#C9A96E] text-[#09090B] font-mono text-[12px] font-bold uppercase tracking-[0.2em] hover:brightness-110 transition-all flex items-center justify-center gap-3 shadow-[0_0_25px_rgba(201,169,110,0.25)] active:scale-[0.99] cursor-pointer disabled:opacity-30 disabled:cursor-not-allowed"
           >
             {isOrderSubmitting ? (
               <span className="flex items-center gap-2">

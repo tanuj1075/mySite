@@ -428,13 +428,13 @@ export const ProductDetailsView: React.FC<ProductDetailsViewProps> = ({
               </h1>
 
               <div className="flex items-baseline gap-3 pt-2">
-                <span className="text-2xl sm:text-3xl font-bold text-[#f4f4f6]">
+                <span className="text-2xl sm:text-3xl font-bold text-gold-gradient drop-shadow-[0_0_15px_rgba(201,169,110,0.25)]">
                   {formatCurrency(product.price)}
                 </span>
                 <span className="text-sm text-[#52525b] line-through font-normal">
                   {formatCurrency(product.mrp)}
                 </span>
-                <span className="text-xs bg-[#f4f4f6] text-[#09090b] px-2 py-0.5 font-bold tracking-wider uppercase">
+                <span className="text-xs bg-[#c9a96e] text-[#09090b] px-2 py-0.5 font-bold tracking-wider uppercase shadow-md">
                   {product.discountPercent}% OFF
                 </span>
               </div>
@@ -554,15 +554,17 @@ export const ProductDetailsView: React.FC<ProductDetailsViewProps> = ({
             <div className="space-y-3 pt-2">
               <div className="grid grid-cols-2 gap-3">
                 <button
+                  id="pdp-add-to-bag-btn"
                   onClick={handleAddToCartClick}
-                  className="btn-tactile w-full py-4 bg-[#18181c] hover:bg-[#242429] text-[#f4f4f6] border border-[#242429] hover:border-[#8e8e98] text-xs font-bold uppercase tracking-[0.15em] flex items-center justify-center gap-2 cursor-pointer transition-colors"
+                  className="btn-tactile w-full py-4 bg-[#16161B] hover:bg-[#202028] text-[#F4F4F6] border border-[#C9A96E]/40 hover:border-[#C9A96E] text-xs font-bold uppercase tracking-[0.15em] flex items-center justify-center gap-2 cursor-pointer transition-all shadow-[0_0_15px_rgba(201,169,110,0.1)]"
                 >
-                  <ShoppingBag className="w-4 h-4" />
+                  <ShoppingBag className="w-4 h-4 text-[#C9A96E]" />
                   <span>ADD TO BAG</span>
                 </button>
                 <button
+                  id="pdp-buy-now-btn"
                   onClick={handleBuyNowClick}
-                  className="btn-tactile w-full py-4 bg-[#f4f4f6] hover:bg-[#c9a96e] text-[#09090b] text-xs font-bold uppercase tracking-[0.15em] flex items-center justify-center gap-2 cursor-pointer transition-colors shadow-lg"
+                  className="btn-tactile w-full py-4 bg-gradient-to-r from-[#C9A96E] via-[#EAE3D5] to-[#C9A96E] hover:brightness-110 text-[#09090B] text-xs font-bold uppercase tracking-[0.15em] flex items-center justify-center gap-2 cursor-pointer transition-all shadow-[0_0_25px_rgba(201,169,110,0.3)]"
                 >
                   <span>BUY NOW</span>
                   <ArrowRight className="w-4 h-4" />

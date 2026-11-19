@@ -107,7 +107,7 @@ export const NewDropsView: React.FC<NewDropsViewProps> = ({
             return (
               <div
                 key={drop.id}
-                className="border border-[#242429] bg-[#121215] p-6 sm:p-8 flex flex-col justify-between group hover:border-[#3a3a42] transition-colors"
+                className="specimen-card museum-corners border border-[#242429] bg-[#121215] p-6 sm:p-8 flex flex-col justify-between group transition-all shadow-2xl"
               >
                 <div>
                   <div className="flex items-center justify-between border-b border-[#242429] pb-4 mb-4 text-[10px]">
@@ -117,7 +117,7 @@ export const NewDropsView: React.FC<NewDropsViewProps> = ({
                     </span>
                   </div>
 
-                  <div className="relative aspect-[16/9] bg-[#18181c] border border-[#242429] overflow-hidden mb-6">
+                  <div className="relative aspect-[16/9] bg-[#18181c] border border-[#242429] overflow-hidden mb-6 pedestal-glow">
                     <img
                       src={drop.image}
                       alt={drop.title}
@@ -127,10 +127,10 @@ export const NewDropsView: React.FC<NewDropsViewProps> = ({
                   </div>
 
                   <div className="flex items-baseline justify-between mb-2">
-                    <h3 className="font-headline text-2xl font-bold uppercase text-[#f4f4f6] tracking-tight">
+                    <h3 className="font-headline text-2xl font-bold uppercase text-[#f4f4f6] tracking-tight group-hover:text-gold-gradient transition-colors">
                       {drop.title}
                     </h3>
-                    <span className="text-sm font-bold text-[#f4f4f6]">{formatCurrency(drop.price)}</span>
+                    <span className="text-sm font-bold text-gold-gradient">{formatCurrency(drop.price)}</span>
                   </div>
 
                   <p className="text-xs text-[#8e8e98] leading-relaxed mb-6 font-mono">
@@ -177,7 +177,7 @@ export const NewDropsView: React.FC<NewDropsViewProps> = ({
                     onClaimDrop(cartItem);
                     onShowToast(`CLAIMED DROP ALLOCATION: ${drop.title}`);
                   }}
-                  className="w-full py-4 bg-[#f4f4f6] hover:bg-[#c9a96e] text-[#09090b] text-xs font-bold uppercase tracking-widest flex items-center justify-center gap-3 transition-all cursor-pointer group"
+                  className="w-full py-4 bg-gradient-to-r from-[#C9A96E] via-[#EAE3D5] to-[#C9A96E] text-[#09090B] hover:brightness-110 text-xs font-bold uppercase tracking-widest flex items-center justify-center gap-3 transition-all cursor-pointer group shadow-[0_0_20px_rgba(201,169,110,0.3)]"
                 >
                   <span>CLAIM ALLOCATION FROM RUN</span>
                   <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />

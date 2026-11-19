@@ -402,7 +402,7 @@ export const CollectionsView: React.FC<CollectionsViewProps> = ({
                 <span>{currentHero.tag}</span>
               </div>
               <h1 className="font-headline text-5xl sm:text-7xl lg:text-8xl tracking-tight text-[#f4f4f6] leading-[0.95]">
-                {currentHero.title} <span className="italic font-normal text-[#c9a96e]">{currentHero.highlight}</span>
+                {currentHero.title} <span className="italic font-normal text-gold-gradient drop-shadow-[0_0_20px_rgba(201,169,110,0.3)]">{currentHero.highlight}</span>
               </h1>
               <p className="font-mono text-xs sm:text-sm text-[#8e8e98] max-w-xl leading-relaxed pt-2">
                 {currentHero.description}
@@ -439,7 +439,7 @@ export const CollectionsView: React.FC<CollectionsViewProps> = ({
           </div>
 
           {/* Hero Main Macro Image Display */}
-          <div className="mt-8 relative border border-[#242429] bg-[#121215] overflow-hidden group shadow-2xl">
+          <div className="mt-8 relative border border-[#C9A96E]/30 bg-[#121215] overflow-hidden group shadow-[0_0_50px_rgba(201,169,110,0.1)] museum-corners">
             <div className="relative aspect-[16/9] sm:aspect-[21/10] w-full max-h-[640px] overflow-hidden">
               <img
                 key={currentHero.image}
@@ -447,7 +447,8 @@ export const CollectionsView: React.FC<CollectionsViewProps> = ({
                 alt={currentHero.alt}
                 className="w-full h-full object-cover object-center transform transition-transform duration-700 group-hover:scale-105"
               />
-              <div className="absolute inset-0 bg-gradient-to-t from-[#09090b]/80 via-transparent to-transparent pointer-events-none"></div>
+              <div className="absolute inset-0 bg-gradient-to-t from-[#09090b]/85 via-transparent to-transparent pointer-events-none"></div>
+              <div className="absolute inset-0 bg-radial-gradient pointer-events-none opacity-40"></div>
 
               {/* Callout Badge 1: Top Left */}
               <div className="absolute top-4 left-4 sm:top-6 sm:left-6 bg-[#18181c]/90 backdrop-blur-sm border border-[#242429] px-3 py-1.5 font-mono text-[10px] sm:text-xs text-[#f4f4f6] tracking-wider shadow-md">
@@ -537,9 +538,9 @@ export const CollectionsView: React.FC<CollectionsViewProps> = ({
             {featuredBrandCards.map((brand) => (
               <div
                 key={brand.name}
-                className="group border border-[#242429] bg-[#18181c] hover:border-[#3a3a42] transition-colors"
+                className="specimen-card museum-corners group border border-[#242429] bg-[#121215] transition-all"
               >
-                <div className="aspect-[4/5] overflow-hidden bg-[#09090b]">
+                <div className="aspect-[4/5] overflow-hidden bg-[#09090b] pedestal-glow">
                   <img
                     src={brand.image}
                     alt={`${brand.name} sneaker product detail`}
@@ -916,19 +917,19 @@ export const CollectionsView: React.FC<CollectionsViewProps> = ({
             {filteredCuratedSpecimens.map((spec) => (
               <div
                 key={spec.id}
-                className="border border-[#242429] bg-[#121215] p-6 space-y-4 group hover:border-[#3a3a42] transition-all duration-300 flex flex-col justify-between shadow-xl"
+                className="specimen-card museum-corners border border-[#242429] bg-[#121215] p-6 space-y-4 group flex flex-col justify-between shadow-2xl transition-all"
               >
                 <div className="space-y-4">
                   <div className="flex justify-between items-center font-mono text-[10px] text-[#8e8e98] border-b border-[#242429] pb-2">
                     <span className="font-bold text-[#c9a96e]">
                       {spec.code} // {spec.category}
                     </span>
-                    <span className="font-bold text-[#f4f4f6] text-xs">
+                    <span className="font-bold text-gold-gradient text-xs">
                       {formatCurrency(spec.price)}
                     </span>
                   </div>
 
-                  <div className="aspect-[4/3] bg-[#09090b] border border-[#242429] overflow-hidden relative">
+                  <div className="aspect-[4/3] bg-[#09090b] border border-[#242429] overflow-hidden relative pedestal-glow">
                     <img
                       src={spec.image}
                       alt={spec.name}
@@ -937,13 +938,13 @@ export const CollectionsView: React.FC<CollectionsViewProps> = ({
                     <span className="absolute top-3 left-3 bg-[#f4f4f6] text-[#09090b] font-mono text-[9px] px-2 py-0.5 tracking-wider uppercase font-bold">
                       {spec.badge}
                     </span>
-                    <span className="absolute bottom-3 right-3 bg-[#121215]/90 border border-[#242429] font-mono text-[10px] text-[#c9a96e] px-2 py-0.5">
+                    <span className="absolute bottom-3 right-3 bg-[#121215]/90 border border-[#c9a96e]/40 font-mono text-[10px] text-[#c9a96e] px-2 py-0.5 shadow-md">
                       {spec.allotment}
                     </span>
                   </div>
 
                   <div className="space-y-2">
-                    <h3 className="font-headline text-2xl font-bold text-[#f4f4f6]">
+                    <h3 className="font-headline text-2xl font-bold text-[#f4f4f6] group-hover:text-gold-gradient transition-colors">
                       {spec.name}
                     </h3>
                     <div className="font-mono text-xs text-[#8e8e98]">
@@ -973,7 +974,7 @@ export const CollectionsView: React.FC<CollectionsViewProps> = ({
                   </button>
                   <button
                     onClick={() => handleAcquireSpecimenItem(spec)}
-                    className="btn-tactile py-2.5 px-2 bg-[#f4f4f6] text-[#09090b] hover:bg-[#c9a96e] text-[10px] font-bold uppercase tracking-wider flex items-center justify-center gap-1.5 cursor-pointer transition-colors shadow-md"
+                    className="btn-tactile py-2.5 px-2 bg-gradient-to-r from-[#C9A96E] via-[#EAE3D5] to-[#C9A96E] text-[#09090B] font-bold text-[10px] uppercase tracking-wider flex items-center justify-center gap-1.5 cursor-pointer hover:brightness-110 transition-all shadow-[0_0_15px_rgba(201,169,110,0.25)]"
                   >
                     <span>ACQUIRE +</span>
                   </button>

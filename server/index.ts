@@ -76,7 +76,11 @@ app.use(cors({
   origin: (origin, callback) => {
     if (!origin) return callback(null, true);
     const normalizedOrigin = origin.replace(/\/$/, '');
-    if (allowedOriginsList.includes(normalizedOrigin)) {
+    if (
+      allowedOriginsList.includes(normalizedOrigin) ||
+      normalizedOrigin === 'https://vanta-archive.vercel.app' ||
+      normalizedOrigin.endsWith('.vercel.app')
+    ) {
       return callback(null, true);
     }
     // In local development, permit localhost and local network devices

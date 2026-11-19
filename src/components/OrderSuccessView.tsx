@@ -1,5 +1,5 @@
 import React from 'react';
-import { CheckCircle, Truck, ArrowRight, ShoppingBag, Shield, Clock } from 'lucide-react';
+import { CheckCircle, Truck, ArrowRight, ShoppingBag, Shield, Clock, FileText, Printer } from 'lucide-react';
 import { Order } from '../types';
 import { formatCurrency } from '../lib/currency';
 
@@ -8,6 +8,7 @@ interface OrderSuccessViewProps {
   onTrackOrder: (orderId: string) => void;
   onContinueShopping: () => void;
   onRequestExchange: (order: Order) => void;
+  onViewInvoice?: () => void;
 }
 
 export const OrderSuccessView: React.FC<OrderSuccessViewProps> = ({
@@ -15,6 +16,7 @@ export const OrderSuccessView: React.FC<OrderSuccessViewProps> = ({
   onTrackOrder,
   onContinueShopping,
   onRequestExchange,
+  onViewInvoice,
 }) => {
   return (
     <div className="w-full bg-[#09090b] text-[#f4f4f6] font-mono pb-24">
@@ -39,7 +41,31 @@ export const OrderSuccessView: React.FC<OrderSuccessViewProps> = ({
             </div>
           </div>
 
-          {/* Delivery & Transit Banner */}
+          {/* Official Atelier Invoice & Bill Banner */}
+          {onViewInvoice && (
+            <div className="bg-gradient-to-r from-[#17171C] via-[#1E1E24] to-[#17171C] border border-[#C9A96E]/50 p-5 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 shadow-[0_0_20px_rgba(201,169,110,0.1)]">
+              <div className="flex items-center gap-3">
+                <div className="p-2.5 bg-[#C9A96E]/15 border border-[#C9A96E]/40 text-[#C9A96E]">
+                  <FileText className="w-5 h-5" />
+                </div>
+                <div>
+                  <span className="text-[10px] text-[#C9A96E] font-bold uppercase tracking-wider block">
+                    ATELIER ACQUISITION BILL & PROVENANCE DOSSIER
+                  </span>
+                  <span className="text-xs font-bold text-[#F4F4F6]">
+                    Official Client Receipt Generated // Settlement Clearance Validated
+                  </span>
+                </div>
+              </div>
+              <button
+                onClick={onViewInvoice}
+                className="w-full sm:w-auto px-5 py-2.5 bg-gradient-to-r from-[#C9A96E] via-[#EAE3D5] to-[#C9A96E] text-[#09090B] text-xs font-bold uppercase tracking-wider hover:brightness-110 transition-all cursor-pointer flex items-center justify-center gap-2 shadow-[0_0_15px_rgba(201,169,110,0.2)]"
+              >
+                <Printer className="w-3.5 h-3.5" />
+                <span>VIEW & PRINT BILL (PDF)</span>
+              </button>
+            </div>
+          )}
           <div className="bg-[#18181c] border border-[#242429] p-5 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
             <div className="flex items-center gap-3">
               <Truck className="w-6 h-6 text-[#c9a96e]" />
