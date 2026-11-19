@@ -51,11 +51,17 @@ export function initTheme(): ThemeMode {
   if (typeof window === 'undefined') return 'light';
 
   try {
-    const saved = localStorage.getItem(THEME_STORAGE_KEY) as ThemeMode | null;
-    if (saved === 'light' || saved === 'dark') {
-      currentTheme = saved;
-    } else {
+    if (!localStorage.getItem('vanta_redesign_v2')) {
+      localStorage.setItem(THEME_STORAGE_KEY, 'light');
+      localStorage.setItem('vanta_redesign_v2', 'true');
       currentTheme = 'light';
+    } else {
+      const saved = localStorage.getItem(THEME_STORAGE_KEY) as ThemeMode | null;
+      if (saved === 'light' || saved === 'dark') {
+        currentTheme = saved;
+      } else {
+        currentTheme = 'light';
+      }
     }
   } catch {
     currentTheme = 'light';

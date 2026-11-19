@@ -3,10 +3,10 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>VANTA ARCHIVE | Tactile Brutalism. Zero Compromise.</title>
-    <meta name="description" content="VANTA specimens are conceived at the intersection of monolithic brutalist architecture and technical performance leather craft." />
-    <meta property="og:title" content="VANTA ARCHIVE | Tactile Brutalism. Zero Compromise." />
-    <meta property="og:description" content="VANTA specimens are conceived at the intersection of monolithic brutalist architecture and technical performance leather craft." />
+    <title>VANTA ARCHIVE | Luxury Sneaker Store</title>
+    <meta name="description" content="VANTA ARCHIVE — Premium Modern Luxury Sneaker Store. Discover archival sneakers, performance runners, and timeless silhouettes." />
+    <meta property="og:title" content="VANTA ARCHIVE | Luxury Sneaker Store" />
+    <meta property="og:description" content="VANTA ARCHIVE — Premium Modern Luxury Sneaker Store. Style. Comfort. Performance." />
     <meta property="og:type" content="website" />
     <meta name="twitter:card" content="summary_large_image" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -15,17 +15,16 @@
     <script>
       (function() {
         try {
+          if (!localStorage.getItem('vanta_redesign_v2')) {
+            localStorage.setItem('vanta_theme_mode', 'light');
+            localStorage.setItem('vanta_redesign_v2', 'true');
+          }
           var saved = localStorage.getItem('vanta_theme_mode');
           var theme = saved === 'dark' ? 'dark' : 'light';
-          if (theme === 'light') {
-            document.documentElement.classList.add('light');
-            document.documentElement.setAttribute('data-theme', 'light');
-            document.documentElement.style.colorScheme = 'light';
-          } else {
-            document.documentElement.classList.add('dark');
-            document.documentElement.setAttribute('data-theme', 'dark');
-            document.documentElement.style.colorScheme = 'dark';
-          }
+          document.documentElement.classList.remove('dark', 'light');
+          document.documentElement.classList.add(theme);
+          document.documentElement.setAttribute('data-theme', theme);
+          document.documentElement.style.colorScheme = theme;
         } catch (e) {}
       })();
     </script>
