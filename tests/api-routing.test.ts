@@ -26,6 +26,15 @@ test('Vercel SPA fallback leaves API paths for the serverless function', () => {
   assert.equal(existsSync(resolve('api/[...path].ts')), true);
   assert.equal(existsSync(resolve('api/delivery/estimate.ts')), true, 'delivery estimate has an explicit function route');
   assert.equal(existsSync(resolve('api/payments/quote.ts')), true, 'payment quote has an explicit function route');
+  assert.equal(existsSync(resolve('api/admin/orders.ts')), true, 'admin orders has an explicit function route');
+  assert.equal(existsSync(resolve('api/admin/products.ts')), true, 'admin products has an explicit function route');
+  assert.equal(existsSync(resolve('api/admin/coupons.ts')), true, 'admin coupons has an explicit function route');
+  assert.equal(existsSync(resolve('api/admin/drops.ts')), true, 'admin drops has an explicit function route');
+  assert.equal(existsSync(resolve('api/admin/exchanges.ts')), true, 'admin exchanges has an explicit function route');
+  assert.equal(existsSync(resolve('api/admin/[...slug].ts')), true, 'admin wildcard slug route exists');
+  assert.equal(existsSync(resolve('api/drops/index.ts')), true, 'drops index route exists');
+  assert.equal(existsSync(resolve('api/exchanges/index.ts')), true, 'exchanges index route exists');
+  assert.equal(existsSync(resolve('api/auth/[...slug].ts')), true, 'auth wildcard slug route exists');
   const spaFallback = vercel.rewrites.find(({ destination }) => destination === '/index.html');
   assert.ok(spaFallback, 'SPA deep links should resolve to index.html');
   const spaPattern = new RegExp('^' + spaFallback.source + '$');

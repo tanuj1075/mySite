@@ -34,13 +34,22 @@ const ARGON2_OPTIONS: Options = {
 const BCRYPT_HASH_PATTERN = /^\$2[aby]\$\d{2}\$/;
 
 export async function hashPassword(password: string): Promise<string> {
-  return argon2Hash(password, ARGON2_OPTIONS);
+  try {
+    return await argon2Hash(password, ARGON2_OPTIONS);
+  } catch (err) {
+    console.warn('Argon2 unavailable, using bcrypt fallback:', err);
+    return bcrypt.hash(password, 10);
+  }
 }
 
 export async function verifyPassword(password: string, storedHash: string): Promise<boolean> {
   try {
     if (storedHash.startsWith('$argon2id$')) {
-      return await argon2Verify(storedHash, password);
+      try {
+        return await argon2Verify(storedHash, password);
+      } catch (argonErr) {
+        console.warn('Argon2 verify unavailable on runtime, falling back:', argonErr);
+      }
     }
 
     if (BCRYPT_HASH_PATTERN.test(storedHash)) {
@@ -57,17 +66,11 @@ export async function verifyPassword(password: string, storedHash: string): Prom
 }
 
 export async function migratePasswordIfNeeded(
-  userId: string,
-  password: string,
-  storedHash: string,
+  _userId: string,
+  _password: string,
+  _storedHash: string,
 ): Promise<void> {
-  if (!BCRYPT_HASH_PATTERN.test(storedHash)) return;
-
-  const upgradedHash = await hashPassword(password);
-  await prisma.user.updateMany({
-    where: { id: userId, passwordHash: storedHash },
-    data: { passwordHash: upgradedHash },
-  });
+  // Preserved for backwards compatibility without forcing native-only argon2 hashes on serverless runtimes
 }
 
 // ─── Client IP Helper ─────────────────────────────────────────────────────────
