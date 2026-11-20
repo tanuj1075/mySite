@@ -33,7 +33,6 @@ import { AdminLoginView } from './components/AdminLoginView';
 import { Footer } from './components/Footer';
 import { adminApi, authApi, clearAdminSession, clearSession, customerApi } from './lib/api';
 import { UpiPaymentModal } from './components/UpiPaymentModal';
-import { FloatingThemeWidget } from './components/FloatingThemeWidget';
 import { initTheme } from './lib/theme';
 import { subscribeCurrency } from './lib/currency';
 
@@ -1753,7 +1752,6 @@ export default function App() {
 
 
       {/* Floating Global Theme Mode Switcher */}
-      <FloatingThemeWidget />
 
       {/* Tactile Feedback Toast Notification */}
       {toastMessage && (

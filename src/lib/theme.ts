@@ -13,28 +13,20 @@ export function getTheme(): ThemeMode {
   return currentTheme;
 }
 
-export function applyThemeToDOM(theme: ThemeMode) {
+export function applyThemeToDOM(_theme: ThemeMode) {
   if (typeof document === 'undefined') return;
   const root = document.documentElement;
-
-  if (theme === 'light') {
-    root.classList.add('light');
-    root.classList.remove('dark');
-    root.setAttribute('data-theme', 'light');
-    root.style.colorScheme = 'light';
-  } else {
-    root.classList.add('dark');
-    root.classList.remove('light');
-    root.setAttribute('data-theme', 'dark');
-    root.style.colorScheme = 'dark';
-  }
+  root.classList.remove('dark');
+  root.classList.add('light');
+  root.setAttribute('data-theme', 'light');
+  root.style.colorScheme = 'light';
 }
 
-export function setTheme(theme: ThemeMode) {
-  currentTheme = theme;
-  applyThemeToDOM(theme);
+export function setTheme(_theme: ThemeMode) {
+  currentTheme = 'light';
+  applyThemeToDOM('light');
   try {
-    localStorage.setItem(THEME_STORAGE_KEY, theme);
+    localStorage.setItem(THEME_STORAGE_KEY, 'light');
   } catch {
     // ignore
   }
@@ -42,33 +34,23 @@ export function setTheme(theme: ThemeMode) {
 }
 
 export function toggleTheme(): ThemeMode {
-  const next = currentTheme === 'dark' ? 'light' : 'dark';
-  setTheme(next);
-  return next;
+  setTheme('light');
+  return 'light';
 }
 
 export function initTheme(): ThemeMode {
   if (typeof window === 'undefined') return 'light';
 
+  currentTheme = 'light';
   try {
-    if (!localStorage.getItem('vanta_redesign_v2')) {
-      localStorage.setItem(THEME_STORAGE_KEY, 'light');
-      localStorage.setItem('vanta_redesign_v2', 'true');
-      currentTheme = 'light';
-    } else {
-      const saved = localStorage.getItem(THEME_STORAGE_KEY) as ThemeMode | null;
-      if (saved === 'light' || saved === 'dark') {
-        currentTheme = saved;
-      } else {
-        currentTheme = 'light';
-      }
-    }
+    localStorage.setItem(THEME_STORAGE_KEY, 'light');
+    localStorage.setItem('vanta_redesign_v2', 'true');
   } catch {
-    currentTheme = 'light';
+    // The page still renders in light mode when storage is unavailable.
   }
 
-  applyThemeToDOM(currentTheme);
-  return currentTheme;
+  applyThemeToDOM('light');
+  return 'light';
 }
 
 export function subscribeTheme(fn: ThemeListener): () => void {

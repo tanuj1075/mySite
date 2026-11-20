@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { Search, Heart, ShoppingBag, User, Menu, X, Scale, Sun, Moon, Globe, ChevronDown, Package, Truck, LogOut } from 'lucide-react';
+import { Search, Heart, ShoppingBag, User, Menu, X, Scale, Globe, ChevronDown, Package, Truck, LogOut } from 'lucide-react';
 import { CURRENCY_CONFIGS, SupportedCurrency, getActiveCurrency, setActiveCurrency, subscribeCurrency } from '../lib/currency';
-import { getTheme, setTheme, toggleTheme, subscribeTheme, ThemeMode } from '../lib/theme';
 
 interface HeaderProps {
   cartCount: number;
@@ -35,16 +34,13 @@ export const Header: React.FC<HeaderProps> = ({
   onSelectCategoryFilter,
 }) => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const [theme, setCurrentTheme] = useState<ThemeMode>(getTheme());
   const [currency, setCurrentCurrency] = useState<SupportedCurrency>(getActiveCurrency());
   const [isCurrencyMenuOpen, setIsCurrencyMenuOpen] = useState(false);
   const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
 
   useEffect(() => {
-    const unsubTheme = subscribeTheme((t) => setCurrentTheme(t));
     const unsubCurr = subscribeCurrency((c) => setCurrentCurrency(c));
     return () => {
-      unsubTheme();
       unsubCurr();
     };
   }, []);
@@ -103,25 +99,6 @@ export const Header: React.FC<HeaderProps> = ({
           >
             <Globe className="w-3.5 h-3.5 text-[#B4532A]" />
             <span>{activeCurrencyConfig.flag} {activeCurrencyConfig.code} ({activeCurrencyConfig.symbol})</span>
-          </button>
-
-          {/* Quick Theme Toggle */}
-          <button
-            onClick={() => toggleTheme()}
-            className="flex items-center gap-1.5 text-[#242321] dark:text-[#8e8e98] hover:text-[#B4532A] transition-colors cursor-pointer font-medium"
-            title={`Toggle Theme (${theme === 'dark' ? 'Switch to Light' : 'Switch to Dark'})`}
-          >
-            {theme === 'dark' ? (
-              <>
-                <Sun className="w-3.5 h-3.5 text-[#c9a96e]" />
-                <span>LIGHT</span>
-              </>
-            ) : (
-              <>
-                <Moon className="w-3.5 h-3.5 text-[#242321]" />
-                <span>DARK</span>
-              </>
-            )}
           </button>
 
           {currentUser ? (
@@ -399,14 +376,7 @@ export const Header: React.FC<HeaderProps> = ({
             About VANTA
           </button>
 
-          <div className="pt-2 border-t border-[#E9D9CA] dark:border-[#242429] flex items-center justify-between">
-            <button
-              onClick={() => toggleTheme()}
-              className="py-2 px-3 rounded-lg bg-[#F7F2EC] dark:bg-[#121215] text-xs font-bold flex items-center gap-2 text-[#242321] dark:text-[#f4f4f6]"
-            >
-              {theme === 'dark' ? <Sun className="w-4 h-4 text-[#B4532A]" /> : <Moon className="w-4 h-4 text-[#242321]" />}
-              <span>{theme === 'dark' ? 'LIGHT MODE' : 'DARK MODE'}</span>
-            </button>
+          <div className="pt-2 border-t border-[#E9D9CA] dark:border-[#242429] flex items-center justify-end">
             <button
               onClick={() => setIsCurrencyMenuOpen((prev) => !prev)}
               className="py-2 px-3 rounded-lg bg-[#F7F2EC] dark:bg-[#121215] text-xs font-bold text-[#B4532A]"

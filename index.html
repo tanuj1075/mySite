@@ -15,16 +15,12 @@
     <script>
       (function() {
         try {
-          if (!localStorage.getItem('vanta_redesign_v2')) {
-            localStorage.setItem('vanta_theme_mode', 'light');
-            localStorage.setItem('vanta_redesign_v2', 'true');
-          }
-          var saved = localStorage.getItem('vanta_theme_mode');
-          var theme = saved === 'dark' ? 'dark' : 'light';
           document.documentElement.classList.remove('dark', 'light');
-          document.documentElement.classList.add(theme);
-          document.documentElement.setAttribute('data-theme', theme);
-          document.documentElement.style.colorScheme = theme;
+          document.documentElement.classList.add('light');
+          document.documentElement.setAttribute('data-theme', 'light');
+          document.documentElement.style.colorScheme = 'light';
+          localStorage.setItem('vanta_theme_mode', 'light');
+          localStorage.setItem('vanta_redesign_v2', 'true');
         } catch (e) {}
       })();
     </script>

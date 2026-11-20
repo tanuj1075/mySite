@@ -1,6 +1,5 @@
-import React, { useState, useEffect } from 'react';
-import { Sun, Moon, Instagram, Youtube, Twitter } from 'lucide-react';
-import { getTheme, setTheme, subscribeTheme, ThemeMode } from '../lib/theme';
+import React, { useState } from 'react';
+import { Instagram, Youtube, Twitter } from 'lucide-react';
 
 interface FooterProps {
   onSelectNav?: (nav: string) => void;
@@ -16,12 +15,6 @@ export const Footer: React.FC<FooterProps> = ({
   const [email, setEmail] = useState('');
   const [subscribeMessage, setSubscribeMessage] = useState('');
   const [secretClickCount, setSecretClickCount] = useState(0);
-  const [theme, setCurrentTheme] = useState<ThemeMode>(getTheme());
-
-  useEffect(() => {
-    return subscribeTheme((t) => setCurrentTheme(t));
-  }, []);
-
   const handleSecretAdminTrigger = (e: React.MouseEvent) => {
     if (e.altKey || e.metaKey || e.ctrlKey) {
       onOpenAdminLogin?.();
@@ -220,41 +213,10 @@ export const Footer: React.FC<FooterProps> = ({
               APPEARANCE:
             </span>
             <span className="text-white font-bold text-[11px]">
-              {theme === 'dark' ? 'OBSIDIAN DARK LUXURY' : 'WARM IVORY & TERRACOTTA'}
+              WARM IVORY &amp; TERRACOTTA
             </span>
           </div>
 
-          <div
-            id="footer-theme-switcher"
-            className="flex items-center border border-[#3e3c39] bg-[#1E1E24] p-1 rounded-lg gap-1"
-          >
-            <button
-              id="footer-theme-light-btn"
-              onClick={() => setTheme('light')}
-              className={`flex items-center gap-1.5 px-3 py-1.5 rounded text-xs font-semibold transition-all cursor-pointer ${
-                theme === 'light'
-                  ? 'bg-[#B4532A] text-white shadow-sm'
-                  : 'text-[#A8A49E] hover:text-white'
-              }`}
-              title="Switch to Warm Ivory & Terracotta Mode"
-            >
-              <Sun className="w-3.5 h-3.5" />
-              <span>LIGHT MODE</span>
-            </button>
-            <button
-              id="footer-theme-dark-btn"
-              onClick={() => setTheme('dark')}
-              className={`flex items-center gap-1.5 px-3 py-1.5 rounded text-xs font-semibold transition-all cursor-pointer ${
-                theme === 'dark'
-                  ? 'bg-[#B4532A] text-white shadow-sm'
-                  : 'text-[#A8A49E] hover:text-white'
-              }`}
-              title="Switch to Obsidian Dark Mode"
-            >
-              <Moon className="w-3.5 h-3.5" />
-              <span>DARK MODE</span>
-            </button>
-          </div>
         </div>
 
         {/* Bottom Bar: Copyright & System Coordinates */}
