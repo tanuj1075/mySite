@@ -1,5 +1,9 @@
 @import "tailwindcss";
 
+/* Force Tailwind v4 dark: variant to respond ONLY to html.dark class, NOT system prefers-color-scheme */
+@variant dark (&:where(.dark, .dark *));
+@variant dark (html.dark &);
+
 @theme {
   --font-headline: "Syne", "Plus Jakarta Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
   --font-sans: "Inter", "Plus Jakarta Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
