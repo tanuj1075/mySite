@@ -140,15 +140,15 @@ export const OrderSuccessView: React.FC<OrderSuccessViewProps> = ({
               <span className="text-[10px] text-[#B4532A] uppercase font-bold block">
                 Shipping Destination:
               </span>
-              <div className="font-bold text-[#242321] dark:text-white">{order.shippingAddress.name}</div>
-              <div className="text-[#77716B] dark:text-[#8e8e98]">{order.shippingAddress.line1}</div>
-              {order.shippingAddress.line2 && (
+              <div className="font-bold text-[#242321] dark:text-white">{order.shippingAddress?.name || 'Client Delivery Address'}</div>
+              <div className="text-[#77716B] dark:text-[#8e8e98]">{order.shippingAddress?.line1 || 'Address on file'}</div>
+              {order.shippingAddress?.line2 && (
                 <div className="text-[#77716B] dark:text-[#8e8e98]">{order.shippingAddress.line2}</div>
               )}
               <div className="text-[#77716B] dark:text-[#8e8e98]">
-                {order.shippingAddress.city}{order.shippingAddress.state ? `, ${order.shippingAddress.state}` : ''} {order.shippingAddress.postalCode}
+                {order.shippingAddress?.city || ''}{order.shippingAddress?.state ? `, ${order.shippingAddress.state}` : ''} {order.shippingAddress?.postalCode || ''}
               </div>
-              <div className="text-[#77716B] dark:text-[#8e8e98]">{order.shippingAddress.country}</div>
+              <div className="text-[#77716B] dark:text-[#8e8e98]">{order.shippingAddress?.country || ''}</div>
             </div>
             <div className="space-y-1">
               <span className="text-[10px] text-[#B4532A] uppercase font-bold block">

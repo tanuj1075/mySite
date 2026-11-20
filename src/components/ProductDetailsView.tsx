@@ -138,30 +138,38 @@ export const ProductDetailsView: React.FC<ProductDetailsViewProps> = ({
   // Inventory for current active color
   const sizeStockList = product.sizeInventory[activeColor.name] || [];
 
+  // Auto-select first in-stock size so customer can Buy Now or Add to Cart immediately
+  useEffect(() => {
+    if (!selectedSize && sizeStockList.length > 0) {
+      const firstInStock = sizeStockList.find((s) => s.stock > 0);
+      if (firstInStock) {
+        setSelectedSize(firstInStock.size);
+      } else if (sizeStockList[0]) {
+        setSelectedSize(sizeStockList[0].size);
+      }
+    }
+  }, [activeColor, sizeStockList, selectedSize]);
+
   const handleSizeSelect = (size: string) => {
     setSelectedSize(size);
     setSizeError(false);
   };
 
   // Check out of stock condition
-  const selectedSizeInfo = sizeStockList.find((s) => s.size === selectedSize);
+  const effectiveSize = selectedSize || sizeStockList.find((s) => s.stock > 0)?.size || sizeStockList[0]?.size || '9';
+  const selectedSizeInfo = sizeStockList.find((s) => s.size === effectiveSize);
   const isSelectedSizeOutOfStock = selectedSizeInfo ? selectedSizeInfo.stock <= 0 : false;
 
   // Add to Bag validation
   const handleAddToCartClick = async () => {
-    if (!selectedSize) {
-      setSizeError(true);
-      onShowToast('MANDATORY ATTRIBUTE: SELECT SIZE SPECIFICATION');
-      return;
-    }
-
+    const sizeToUse = effectiveSize;
     if (isSelectedSizeOutOfStock) {
-      onShowToast(`SPECIFICATION SIZE ${selectedSize} IS DEPLETED // VAULT RESERVATION REQUIRED`);
+      onShowToast(`SPECIFICATION SIZE ${sizeToUse} IS DEPLETED // VAULT RESERVATION REQUIRED`);
       return;
     }
 
     const cartItem: CartItem = {
-      id: `${product.id}-${activeColor.name}-${selectedSize}`,
+      id: `${product.id}-${activeColor.name}-${sizeToUse}`,
       productId: product.id,
       code: product.code,
       name: product.name,
@@ -169,12 +177,12 @@ export const ProductDetailsView: React.FC<ProductDetailsViewProps> = ({
       price: product.price,
       image: activeColor.images.front,
       colorway: activeColor.name,
-      specification: `${sizeLabel} ${selectedSize}`,
+      specification: `${sizeLabel} ${sizeToUse}`,
       availableSizes: sizeStockList.map((s) => `${sizeLabel} ${s.size}`),
       allocationStatus: 'Vault Allocation Secured',
       quantity: 1,
       selectedColor: activeColor.name,
-      selectedSize: selectedSize,
+      selectedSize: sizeToUse,
     };
 
     await onAddToCart(cartItem);
@@ -182,19 +190,14 @@ export const ProductDetailsView: React.FC<ProductDetailsViewProps> = ({
 
   // Buy Now validation
   const handleBuyNowClick = async () => {
-    if (!selectedSize) {
-      setSizeError(true);
-      onShowToast('MANDATORY ATTRIBUTE: SELECT SIZE SPECIFICATION');
-      return;
-    }
-
+    const sizeToUse = effectiveSize;
     if (isSelectedSizeOutOfStock) {
-      onShowToast(`SPECIFICATION SIZE ${selectedSize} IS DEPLETED // VAULT RESERVATION REQUIRED`);
+      onShowToast(`SPECIFICATION SIZE ${sizeToUse} IS DEPLETED // VAULT RESERVATION REQUIRED`);
       return;
     }
 
     const cartItem: CartItem = {
-      id: `${product.id}-${activeColor.name}-${selectedSize}`,
+      id: `${product.id}-${activeColor.name}-${sizeToUse}`,
       productId: product.id,
       code: product.code,
       name: product.name,
@@ -202,12 +205,12 @@ export const ProductDetailsView: React.FC<ProductDetailsViewProps> = ({
       price: product.price,
       image: activeColor.images.front,
       colorway: activeColor.name,
-      specification: `${sizeLabel} ${selectedSize}`,
+      specification: `${sizeLabel} ${sizeToUse}`,
       availableSizes: sizeStockList.map((s) => `${sizeLabel} ${s.size}`),
       allocationStatus: 'Immediate Protocol Checkout',
       quantity: 1,
       selectedColor: activeColor.name,
-      selectedSize: selectedSize,
+      selectedSize: sizeToUse,
     };
 
     await onBuyNow(cartItem);

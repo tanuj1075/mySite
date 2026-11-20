@@ -610,21 +610,21 @@ export const ProductListingView: React.FC<ProductListingViewProps> = ({
                             <span className="text-[10px] text-[#8e8e98] uppercase">
                               {shoe.category} • {shoe.gender}
                             </span>
-                            <div className="flex items-center gap-1 text-[10px] font-bold text-[#f4f4f6]">
+                            <div className="flex items-center gap-1 text-[10px] font-bold text-[#242321] dark:text-[#f4f4f6]">
                               {shoe.reviewsCount > 0 ? (
                                 <>
-                                  <Star className="w-3 h-3 fill-[#c9a96e] text-[#c9a96e]" />
+                                  <Star className="w-3 h-3 fill-[#B4532A] text-[#B4532A]" />
                                   <span>{shoe.rating}</span>
                                 </>
                               ) : (
-                                <span className="text-[#8e8e98]">Not rated</span>
+                                <span className="text-[#77716B] dark:text-[#8e8e98]">Not rated</span>
                               )}
                             </div>
                           </div>
 
                           <h3
                             onClick={() => onSelectProduct(shoe)}
-                            className="font-headline text-lg font-bold uppercase text-[#f4f4f6] tracking-tight hover:text-[#c9a96e] cursor-pointer leading-snug transition-colors"
+                            className="font-headline text-lg font-bold uppercase text-[#242321] dark:text-[#f4f4f6] tracking-tight hover:text-[#B4532A] cursor-pointer leading-snug transition-colors"
                           >
                             {shoe.name}
                           </h3>
@@ -632,10 +632,10 @@ export const ProductListingView: React.FC<ProductListingViewProps> = ({
 
                         {/* Price & MRP */}
                         <div className="flex items-baseline gap-2 mb-3">
-                          <span className="text-base font-bold text-[#f4f4f6]">
+                          <span className="text-base font-bold text-[#242321] dark:text-white">
                             {formatCurrency(shoe.price)}
                           </span>
-                          <span className="text-xs text-[#52525b] line-through">
+                          <span className="text-xs text-[#77716B] dark:text-[#8e8e98] line-through">
                             {formatCurrency(shoe.mrp)}
                           </span>
                         </div>
@@ -643,14 +643,14 @@ export const ProductListingView: React.FC<ProductListingViewProps> = ({
                         {/* Colorway Swatches Preview */}
                         {shoe.colors && shoe.colors.length > 1 && (
                           <div className="flex items-center gap-1.5 mb-3">
-                            <span className="text-[8px] uppercase tracking-wider text-[#c9a96e] font-bold mr-1">
+                            <span className="text-[8px] uppercase tracking-wider text-[#B4532A] font-bold mr-1">
                               {shoe.colors.length} TONES:
                             </span>
                             {shoe.colors.map((c) => (
                               <span
                                 key={c.name}
                                 title={c.name}
-                                className="w-2.5 h-2.5 rounded-full border border-[#3a3a42]"
+                                className="w-2.5 h-2.5 rounded-full border border-[#E9D9CA] dark:border-[#3a3a42]"
                                 style={{ backgroundColor: c.hex }}
                               />
                             ))}
@@ -658,15 +658,15 @@ export const ProductListingView: React.FC<ProductListingViewProps> = ({
                         )}
 
                         {/* Available Sizes List */}
-                        <div className="space-y-1 pt-2 border-t border-[#242429]">
-                          <span className="text-[9px] font-bold text-[#c9a96e] uppercase block">
+                        <div className="space-y-1 pt-2 border-t border-[#E9D9CA] dark:border-[#242429]">
+                          <span className="text-[9px] font-bold text-[#B4532A] uppercase block">
                             AVAILABLE SIZES:
                           </span>
                           <div className="flex flex-wrap gap-1">
                             {allSizesInStock.map((sz) => (
                               <span
                                 key={sz}
-                                className="px-1.5 py-0.5 bg-[#18181c] border border-[#242429] text-[9px] text-[#8e8e98] font-bold"
+                                className="px-1.5 py-0.5 bg-[#F7F2EC] dark:bg-[#18181c] border border-[#E9D9CA] dark:border-[#242429] text-[9px] text-[#242321] dark:text-[#8e8e98] font-bold rounded"
                               >
                                 {sz}
                               </span>

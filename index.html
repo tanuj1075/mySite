@@ -19,9 +19,12 @@
           document.documentElement.classList.add('light');
           document.documentElement.setAttribute('data-theme', 'light');
           document.documentElement.style.colorScheme = 'light';
+          document.documentElement.style.backgroundColor = '#F7F2EC';
           localStorage.setItem('vanta_theme_mode', 'light');
           localStorage.setItem('vanta_redesign_v2', 'true');
-        } catch (e) {}
+        } catch (e) {
+          document.documentElement.classList.add('light');
+        }
       })();
     </script>
   </head>

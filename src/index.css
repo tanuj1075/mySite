@@ -466,6 +466,61 @@ html.light .storefront-surface .museum-corners::after {
   border-color: #B4532A !important;
 }
 
+/* ============================================
+   DARK MODE OVERRIDES — ensure dark backgrounds work
+   ============================================ */
+html.dark, html.dark body {
+  background-color: #09090b !important;
+  color: #f4f4f6 !important;
+}
+
+html.dark input,
+html.dark select,
+html.dark textarea {
+  background-color: #18181c !important;
+  color: #f4f4f6 !important;
+  border-color: #242429 !important;
+}
+html.dark input::placeholder,
+html.dark textarea::placeholder {
+  color: #52525b !important;
+}
+html.dark input:focus,
+html.dark select:focus,
+html.dark textarea:focus {
+  border-color: #B4532A !important;
+  outline: 2px solid rgba(180, 83, 42, 0.2);
+}
+
+/* ============================================
+   ADMIN LOGIN PAGE — light mode override
+   These are the hardcoded dark classes in AdminLoginView.tsx
+   ============================================ */
+html.light #admin-login-root {
+  background-color: #F7F2EC !important;
+  color: #242321 !important;
+}
+
+/* Force admin login specific panels to be light when in light mode */
+html.light .admin-login-panel {
+  background-color: #FFFFFF !important;
+  border-color: #E9D9CA !important;
+  color: #242321 !important;
+}
+
+/* Additional background dark class light overrides */
+html.light .bg-\[\#09090b\]\/80,
+html.light .bg-\[\#09090b\]\/90,
+html.light .bg-\[\#09090b\]\/95 {
+  background-color: rgba(247, 242, 236, 0.95) !important;
+}
+
+/* Toast / notification overlays should stay dark for visibility */
+html.light #vanta-toast {
+  background-color: #242321 !important;
+  color: #f4f4f6 !important;
+}
+
 @media print {
   body {
     background: white !important;

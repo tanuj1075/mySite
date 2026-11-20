@@ -63,12 +63,12 @@ export const OrderInvoiceModal: React.FC<OrderInvoiceModalProps> = ({
       `Payment Method:     ${order.paymentMethod} (PRE-APPROVED ATELIER CLEARANCE)`,
       '-----------------------------------------------------------------',
       'PATRON & DISPATCH SPECIFICATIONS:',
-      `Patron Name:        ${patronName || order.shippingAddress.name}`,
+      `Patron Name:        ${patronName || order.shippingAddress?.name || 'Verified Patron'}`,
       `Patron Email:       ${patronEmail || 'archive.patron@vanta-atelier.internal'}`,
       `Patron Dossier ID:  ${patronId || 'VN-CLIENT-SPEC-01'}`,
-      `Destination:        ${order.shippingAddress.line1}${order.shippingAddress.line2 ? `, ${order.shippingAddress.line2}` : ''}`,
-      `                    ${order.shippingAddress.city}, ${order.shippingAddress.state || ''} ${order.shippingAddress.postalCode}`,
-      `                    ${order.shippingAddress.country}`,
+      `Destination:        ${order.shippingAddress?.line1 || 'Address on file'}${order.shippingAddress?.line2 ? `, ${order.shippingAddress.line2}` : ''}`,
+      `                    ${order.shippingAddress?.city || ''}, ${order.shippingAddress?.state || ''} ${order.shippingAddress?.postalCode || ''}`,
+      `                    ${order.shippingAddress?.country || ''}`,
       `Courier Carrier:    ${order.carrier || 'VANTA ARMORED COURIER'}`,
       `Tracking Reference: ${order.trackingNumber || 'ARMORED-TRK-VERIFIED'}`,
       '-----------------------------------------------------------------',
@@ -186,7 +186,7 @@ export const OrderInvoiceModal: React.FC<OrderInvoiceModalProps> = ({
                 ISSUED TO (PATRON):
               </span>
               <div className="font-bold text-[#F4F4F6] print:text-black text-sm">
-                {patronName || order.shippingAddress.name}
+                {patronName || order.shippingAddress?.name || 'Verified Patron'}
               </div>
               {patronEmail && (
                 <div className="text-[11px] text-[#8E8E98] print:text-gray-600">{patronEmail}</div>
@@ -205,16 +205,16 @@ export const OrderInvoiceModal: React.FC<OrderInvoiceModalProps> = ({
               <span className="text-[10px] text-[#C9A96E] print:text-black uppercase font-bold tracking-wider block">
                 DISPATCH DESTINATION & TRANSIT:
               </span>
-              <div className="text-[#F4F4F6] print:text-black font-medium">{order.shippingAddress.line1}</div>
-              {order.shippingAddress.line2 && (
+              <div className="text-[#F4F4F6] print:text-black font-medium">{order.shippingAddress?.line1 || 'Address on file'}</div>
+              {order.shippingAddress?.line2 && (
                 <div className="text-[#8E8E98] print:text-gray-600">{order.shippingAddress.line2}</div>
               )}
               <div className="text-[#8E8E98] print:text-gray-600">
-                {order.shippingAddress.city}
-                {order.shippingAddress.state ? `, ${order.shippingAddress.state}` : ''} {order.shippingAddress.postalCode}
+                {order.shippingAddress?.city || ''}
+                {order.shippingAddress?.state ? `, ${order.shippingAddress.state}` : ''} {order.shippingAddress?.postalCode || ''}
               </div>
-              <div className="text-[#8E8E98] print:text-gray-600">{order.shippingAddress.country}</div>
-              {order.shippingAddress.phone && (
+              <div className="text-[#8E8E98] print:text-gray-600">{order.shippingAddress?.country || ''}</div>
+              {order.shippingAddress?.phone && (
                 <div className="text-[10px] text-[#C9A96E] print:text-gray-600">📞 {order.shippingAddress.phone}</div>
               )}
               <div className="text-[10px] text-[#8E8E98] print:text-gray-600 pt-1">
