@@ -57,8 +57,8 @@ export const AdminPanelView: React.FC<AdminPanelViewProps> = ({
   customers = [],
   onShowToast,
 }) => {
-  // Default to PRODUCTS tab as showcased in Image 2
-  const [activeSection, setActiveSection] = useState<AdminSection>('PRODUCTS');
+  // Open on the dashboard overview shown in the admin reference.
+  const [activeSection, setActiveSection] = useState<AdminSection>('OVERVIEW');
   const [isSidebarOpenMobile, setIsSidebarOpenMobile] = useState<boolean>(true);
 
   if (!isOpen) return null;

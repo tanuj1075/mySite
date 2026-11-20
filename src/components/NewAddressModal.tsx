@@ -26,6 +26,7 @@ export const NewAddressModal: React.FC<NewAddressModalProps> = ({
   const [city, setCity] = useState('');
   const [state, setState] = useState('');
   const [postalCode, setPostalCode] = useState('');
+  const [postalCodeError, setPostalCodeError] = useState<string | null>(null);
   const [country, setCountry] = useState('United States');
   const [phone, setPhone] = useState('');
   const [suggestions, setSuggestions] = useState<GlobalLocationPreset[]>([]);
@@ -91,6 +92,7 @@ export const NewAddressModal: React.FC<NewAddressModalProps> = ({
   const handleCountryChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const selectedCountry = e.target.value;
     setCountry(selectedCountry);
+    setPostalCodeError(null);
     const cObj = WORLDWIDE_COUNTRIES.find((c) => c.name === selectedCountry);
     if (cObj) {
       setCity(cObj.defaultCity);
@@ -102,6 +104,21 @@ export const NewAddressModal: React.FC<NewAddressModalProps> = ({
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!line1.trim() || !city.trim()) return;
+    const normalizedCountry = country.trim();
+    const normalizedPostalCode = postalCode.trim();
+    if (/^(india|in|ind)$/i.test(normalizedCountry)) {
+      if (!/^[1-9][0-9]{5}$/.test(normalizedPostalCode.replace(/\s+/g, ''))) {
+        setPostalCodeError('Enter a valid 6-digit Indian PIN code.');
+        return;
+      }
+    } else {
+      const compactPostalCode = normalizedPostalCode.replace(/[\s-]+/g, '');
+      if (compactPostalCode.length < 3 || compactPostalCode.length > 10) {
+        setPostalCodeError('Enter a valid postal code (3–10 letters or digits).');
+        return;
+      }
+    }
+    setPostalCodeError(null);
 
     const newAddr: Address = {
       id: `addr-${Date.now()}`,
@@ -110,8 +127,8 @@ export const NewAddressModal: React.FC<NewAddressModalProps> = ({
       line2: line2.trim() || undefined,
       city: city.trim(),
       state: state.trim() || undefined,
-      postalCode: postalCode.trim() || '10001',
-      country: country.trim(),
+      postalCode: normalizedPostalCode,
+      country: normalizedCountry,
       phone: phone.trim() || undefined,
     };
 
@@ -307,10 +324,16 @@ export const NewAddressModal: React.FC<NewAddressModalProps> = ({
                 type="text"
                 required
                 value={postalCode}
-                onChange={(e) => setPostalCode(e.target.value)}
-                placeholder="10003"
+                onChange={(e) => {
+                  setPostalCode(e.target.value);
+                  setPostalCodeError(null);
+                }}
+                placeholder={/^(india|in|ind)$/i.test(country.trim()) ? '6-digit PIN' : 'Postal code'}
+                aria-invalid={Boolean(postalCodeError)}
+                aria-describedby={postalCodeError ? 'postal-code-error' : undefined}
                 className="w-full bg-[#18181C] border border-[#242429] px-3 py-2 text-[#F4F4F6] placeholder:text-[#52525B] focus:outline-none focus:border-[#C9A96E] transition-colors"
               />
+              {postalCodeError && <p id="postal-code-error" className="mt-1 text-[10px] text-red-400" role="alert">{postalCodeError}</p>}
             </div>
           </div>
 

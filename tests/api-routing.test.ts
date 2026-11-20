@@ -24,6 +24,8 @@ test('Vercel SPA fallback leaves API paths for the serverless function', () => {
     rewrites: Array<{ source: string; destination: string }>;
   };
   assert.equal(existsSync(resolve('api/[...path].ts')), true);
+  assert.equal(existsSync(resolve('api/delivery/estimate.ts')), true, 'delivery estimate has an explicit function route');
+  assert.equal(existsSync(resolve('api/payments/quote.ts')), true, 'payment quote has an explicit function route');
   const spaFallback = vercel.rewrites.find(({ destination }) => destination === '/index.html');
   assert.ok(spaFallback, 'SPA deep links should resolve to index.html');
   const spaPattern = new RegExp('^' + spaFallback.source + '$');
@@ -66,4 +68,21 @@ test('CORS rejects unconfigured Vercel preview origins', async () => {
     },
   });
   assert.equal(response.headers.has('access-control-allow-origin'), false);
+});
+
+test('delivery estimate route is registered and validates Indian PIN codes', async () => {
+  const valid = await fetch(`${baseUrl}/api/delivery/estimate`, {
+    method: 'POST',
+    headers: { 'content-type': 'application/json' },
+    body: JSON.stringify({ city: 'Pune', state: 'Maharashtra', postalCode: '411001', country: 'India' }),
+  });
+  assert.equal(valid.status, 200);
+  assert.equal((await valid.json()).zone, 'INDIA_METRO');
+
+  const invalid = await fetch(`${baseUrl}/api/delivery/estimate`, {
+    method: 'POST',
+    headers: { 'content-type': 'application/json' },
+    body: JSON.stringify({ city: 'Pune', state: 'Maharashtra', postalCode: '10040', country: 'India' }),
+  });
+  assert.equal(invalid.status, 400, 'five-digit Indian PIN should be rejected as invalid address data, not missing route');
 });
