@@ -25,12 +25,12 @@ export const CartItemList: React.FC<CartItemListProps> = ({
   return (
     <section className="flex flex-col gap-6" id="cart-allocation-section">
       {/* Header (Exact Match to Reference Panel 4) */}
-      <div className="flex items-center justify-between pb-4 border-b border-[#E9D9CA] dark:border-[#242429]">
+      <div className="flex items-center justify-between pb-4 border-b border-[#E9D9CA] border-[#E9D9CA]">
         <div>
           <h1 className="text-3xl sm:text-4xl font-extrabold text-[#242321] dark:text-white tracking-tight">
             Your Cart
           </h1>
-          <p className="text-xs text-[#77716B] dark:text-[#8e8e98] mt-1">
+          <p className="text-xs text-[#77716B] text-[#77716B] mt-1">
             {items.length === 0 ? 'Your shopping bag is currently empty.' : `${totalItemCount} item${totalItemCount > 1 ? 's' : ''} in your cart`}
           </p>
         </div>
@@ -46,14 +46,14 @@ export const CartItemList: React.FC<CartItemListProps> = ({
       {/* Cart Items List */}
       <div className="flex flex-col gap-4" id="cart-items-container">
         {items.length === 0 ? (
-          <div className="bg-white dark:bg-[#18181c] border border-[#E9D9CA] dark:border-[#242429] rounded-3xl p-12 text-center flex flex-col items-center justify-center gap-4 shadow-sm">
+          <div className="bg-white bg-white border border-[#E9D9CA] border-[#E9D9CA] rounded-3xl p-12 text-center flex flex-col items-center justify-center gap-4 shadow-sm">
             <div className="w-14 h-14 rounded-full bg-[#E9D9CA]/40 dark:bg-[#242429] flex items-center justify-center text-[#B4532A]">
               <ShoppingBag className="w-6 h-6" />
             </div>
             <h2 className="text-xl font-bold text-[#242321] dark:text-white">
               Your Cart is Empty
             </h2>
-            <p className="text-xs text-[#77716B] dark:text-[#8e8e98] max-w-sm">
+            <p className="text-xs text-[#77716B] text-[#77716B] max-w-sm">
               Discover our handpicked archival collection and performance runners to add specimens to your cart.
             </p>
             <button
@@ -69,11 +69,11 @@ export const CartItemList: React.FC<CartItemListProps> = ({
             <article
               key={item.id}
               id={`cart-item-${item.id}`}
-              className="bg-white dark:bg-[#18181c] border border-[#E9D9CA] dark:border-[#2A2A32] rounded-2xl p-4 sm:p-5 flex flex-col sm:flex-row gap-5 items-center justify-between shadow-sm hover:shadow-md transition-all group"
+              className="bg-white bg-white border border-[#E9D9CA] dark:border-[#2A2A32] rounded-2xl p-4 sm:p-5 flex flex-col sm:flex-row gap-5 items-center justify-between shadow-sm hover:shadow-md transition-all group"
             >
               {/* Product Visual Asset */}
               <div className="flex items-center gap-4 w-full sm:w-auto">
-                <div className="w-20 h-20 sm:w-24 sm:h-24 bg-[#F7F2EC] dark:bg-[#121215] rounded-xl shrink-0 overflow-hidden flex items-center justify-center p-2 border border-[#E9D9CA]/60">
+                <div className="w-20 h-20 sm:w-24 sm:h-24 bg-[#F7F2EC] bg-[#FDFAF6] rounded-xl shrink-0 overflow-hidden flex items-center justify-center p-2 border border-[#E9D9CA]/60">
                   <img
                     src={item.image}
                     alt={item.name}
@@ -89,7 +89,7 @@ export const CartItemList: React.FC<CartItemListProps> = ({
                   <h3 className="text-base font-bold text-[#242321] dark:text-white leading-snug">
                     {item.name}
                   </h3>
-                  <p className="text-xs text-[#77716B] dark:text-[#8e8e98]">
+                  <p className="text-xs text-[#77716B] text-[#77716B]">
                     {[item.selectedSize, item.colorway].filter(Boolean).join(' • ') || 'Variant unavailable'}
                   </p>
                   <p className="text-sm font-extrabold text-[#242321] dark:text-white sm:hidden">
@@ -106,24 +106,24 @@ export const CartItemList: React.FC<CartItemListProps> = ({
                 </span>
 
                 {/* Quantity Stepper */}
-                <div className="flex items-center bg-[#F7F2EC] dark:bg-[#121215] border border-[#E9D9CA] dark:border-[#2A2A32] rounded-xl overflow-hidden">
+                <div className="flex items-center bg-[#F7F2EC] bg-[#FDFAF6] border border-[#E9D9CA] dark:border-[#2A2A32] rounded-xl overflow-hidden">
                   <button
                     type="button"
                     aria-label="Decrease quantity"
                     onClick={() => onUpdateQuantity(item.id, -1)}
-                    className="w-8 h-8 flex items-center justify-center text-[#242321] dark:text-[#f4f4f6] hover:bg-[#E9D9CA]/50 transition-colors text-sm cursor-pointer disabled:opacity-30"
+                    className="w-8 h-8 flex items-center justify-center text-[#242321] text-[#242321] hover:bg-[#E9D9CA]/50 transition-colors text-sm cursor-pointer disabled:opacity-30"
                     disabled={item.quantity <= 1}
                   >
                     <Minus className="w-3.5 h-3.5" />
                   </button>
-                  <span className="w-8 text-center text-xs font-bold text-[#242321] dark:text-[#f4f4f6]">
+                  <span className="w-8 text-center text-xs font-bold text-[#242321] text-[#242321]">
                     {item.quantity}
                   </span>
                   <button
                     type="button"
                     aria-label="Increase quantity"
                     onClick={() => onUpdateQuantity(item.id, 1)}
-                    className="w-8 h-8 flex items-center justify-center text-[#242321] dark:text-[#f4f4f6] hover:bg-[#E9D9CA]/50 transition-colors text-sm cursor-pointer"
+                    className="w-8 h-8 flex items-center justify-center text-[#242321] text-[#242321] hover:bg-[#E9D9CA]/50 transition-colors text-sm cursor-pointer"
                     disabled={item.quantity >= 20}
                   >
                     <Plus className="w-3.5 h-3.5" />
@@ -146,9 +146,9 @@ export const CartItemList: React.FC<CartItemListProps> = ({
       </div>
 
       {/* Trust Notice */}
-      <div className="bg-white dark:bg-[#18181c] border border-[#E9D9CA] dark:border-[#242429] rounded-2xl p-4 flex items-center gap-3 shadow-sm">
+      <div className="bg-white bg-white border border-[#E9D9CA] border-[#E9D9CA] rounded-2xl p-4 flex items-center gap-3 shadow-sm">
         <ShieldCheck className="w-5 h-5 text-[#B4532A] shrink-0" />
-        <span className="text-xs text-[#77716B] dark:text-[#8e8e98]">
+        <span className="text-xs text-[#77716B] text-[#77716B]">
           Complimentary insured shipping &amp; 30-day hassle-free return protection included.
         </span>
       </div>

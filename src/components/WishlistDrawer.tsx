@@ -36,16 +36,16 @@ export const WishlistDrawer: React.FC<WishlistDrawerProps> = ({
       role="dialog"
       aria-modal="true"
     >
-      <div className="w-full max-w-2xl bg-[#F7F2EC] dark:bg-[#121215] h-full flex flex-col justify-between shadow-2xl p-6 sm:p-8 overflow-y-auto border-l border-[#E9D9CA] dark:border-[#242429]">
+      <div className="w-full max-w-2xl bg-[#F7F2EC] bg-[#FDFAF6] h-full flex flex-col justify-between shadow-2xl p-6 sm:p-8 overflow-y-auto border-l border-[#E9D9CA] border-[#E9D9CA]">
         <div className="flex flex-col gap-6">
           
           {/* Header (Exact Match to Reference Panel 6) */}
-          <div className="flex items-center justify-between border-b border-[#E9D9CA] dark:border-[#242429] pb-4">
+          <div className="flex items-center justify-between border-b border-[#E9D9CA] border-[#E9D9CA] pb-4">
             <div>
               <h1 className="text-2xl sm:text-3xl font-extrabold text-[#242321] dark:text-white">
                 My Wishlist
               </h1>
-              <p className="text-xs text-[#77716B] dark:text-[#8e8e98] mt-1">
+              <p className="text-xs text-[#77716B] text-[#77716B] mt-1">
                 {items.length === 0
                   ? 'Your wishlist is currently empty.'
                   : `You have ${items.length} item${items.length > 1 ? 's' : ''} in your wishlist.`}
@@ -64,7 +64,7 @@ export const WishlistDrawer: React.FC<WishlistDrawerProps> = ({
               <button
                 type="button"
                 onClick={onClose}
-                className="w-9 h-9 rounded-full bg-white dark:bg-[#18181c] border border-[#E9D9CA] dark:border-[#242429] flex items-center justify-center text-[#77716B] hover:text-[#242321] dark:hover:text-white transition-colors cursor-pointer"
+                className="w-9 h-9 rounded-full bg-white bg-white border border-[#E9D9CA] border-[#E9D9CA] flex items-center justify-center text-[#77716B] hover:text-[#242321] dark:hover:text-white transition-colors cursor-pointer"
                 aria-label="Close Wishlist"
               >
                 <X className="w-4 h-4" />
@@ -74,14 +74,14 @@ export const WishlistDrawer: React.FC<WishlistDrawerProps> = ({
 
           {/* List of Wishlist items (Panel 6 2-column or 3-column cards) */}
           {items.length === 0 ? (
-            <div className="py-20 text-center flex flex-col items-center justify-center gap-4 bg-white dark:bg-[#18181c] rounded-2xl border border-[#E9D9CA] dark:border-[#242429] p-8">
+            <div className="py-20 text-center flex flex-col items-center justify-center gap-4 bg-white bg-white rounded-2xl border border-[#E9D9CA] border-[#E9D9CA] p-8">
               <div className="w-14 h-14 rounded-full bg-[#E9D9CA]/40 dark:bg-[#242429] flex items-center justify-center text-[#B4532A]">
                 <Heart className="w-6 h-6" />
               </div>
               <h2 className="text-lg font-bold text-[#242321] dark:text-white">
                 Your Wishlist is Empty
               </h2>
-              <p className="text-xs text-[#77716B] dark:text-[#8e8e98] max-w-xs">
+              <p className="text-xs text-[#77716B] text-[#77716B] max-w-xs">
                 Explore our curated catalog and tap the heart icon on any sneaker to save it here.
               </p>
               <button
@@ -98,20 +98,20 @@ export const WishlistDrawer: React.FC<WishlistDrawerProps> = ({
               {items.map((item) => (
                 <article
                   key={item.id}
-                  className="bg-white dark:bg-[#18181c] border border-[#E9D9CA] dark:border-[#2A2A32] rounded-2xl p-4 flex flex-col justify-between shadow-sm hover:shadow-md transition-all group relative"
+                  className="bg-white bg-white border border-[#E9D9CA] dark:border-[#2A2A32] rounded-2xl p-4 flex flex-col justify-between shadow-sm hover:shadow-md transition-all group relative"
                 >
                   {/* Remove Heart Trigger */}
                   <button
                     type="button"
                     onClick={() => onRemoveFromWishlist(item.id)}
-                    className="absolute top-3 right-3 w-8 h-8 rounded-full bg-[#F7F2EC] dark:bg-[#121215] flex items-center justify-center text-[#B4532A] hover:scale-110 transition-transform cursor-pointer shadow-xs z-10"
+                    className="absolute top-3 right-3 w-8 h-8 rounded-full bg-[#F7F2EC] bg-[#FDFAF6] flex items-center justify-center text-[#B4532A] hover:scale-110 transition-transform cursor-pointer shadow-xs z-10"
                     title="Remove from Wishlist"
                   >
                     <Heart className="w-4 h-4 fill-[#B4532A]" />
                   </button>
 
                   {/* Sneaker Image */}
-                  <div className="w-full h-36 bg-[#F7F2EC] dark:bg-[#121215] rounded-xl overflow-hidden flex items-center justify-center p-3 mb-3">
+                  <div className="w-full h-36 bg-[#F7F2EC] bg-[#FDFAF6] rounded-xl overflow-hidden flex items-center justify-center p-3 mb-3">
                     <img
                       src={item.image}
                       alt={item.name}
@@ -127,7 +127,7 @@ export const WishlistDrawer: React.FC<WishlistDrawerProps> = ({
                     <h3 className="text-sm font-bold text-[#242321] dark:text-white truncate">
                       {item.name}
                     </h3>
-                    <p className="text-xs text-[#77716B] dark:text-[#8e8e98]">
+                    <p className="text-xs text-[#77716B] text-[#77716B]">
                       {item.specification || 'Standard Fit'}
                     </p>
                     <p className="text-sm font-extrabold text-[#242321] dark:text-white pt-1">
@@ -139,7 +139,7 @@ export const WishlistDrawer: React.FC<WishlistDrawerProps> = ({
                   <button
                     type="button"
                     onClick={() => onMoveToBag(item)}
-                    className="w-full py-2.5 px-4 rounded-xl border border-[#E9D9CA] dark:border-[#2A2A32] bg-[#F7F2EC] dark:bg-[#121215] hover:bg-[#B4532A] hover:border-[#B4532A] hover:text-white text-[#242321] dark:text-white text-xs font-bold transition-all flex items-center justify-center gap-2 cursor-pointer shadow-xs"
+                    className="w-full py-2.5 px-4 rounded-xl border border-[#E9D9CA] dark:border-[#2A2A32] bg-[#F7F2EC] bg-[#FDFAF6] hover:bg-[#B4532A] hover:border-[#B4532A] hover:text-white text-[#242321] dark:text-white text-xs font-bold transition-all flex items-center justify-center gap-2 cursor-pointer shadow-xs"
                   >
                     <ShoppingBag className="w-3.5 h-3.5" />
                     <span>Add to Cart</span>
@@ -151,7 +151,7 @@ export const WishlistDrawer: React.FC<WishlistDrawerProps> = ({
         </div>
 
         {/* Footer Close */}
-        <div className="pt-6 border-t border-[#E9D9CA] dark:border-[#242429]">
+        <div className="pt-6 border-t border-[#E9D9CA] border-[#E9D9CA]">
           <button
             type="button"
             onClick={onClose}

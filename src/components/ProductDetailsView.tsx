@@ -257,11 +257,11 @@ export const ProductDetailsView: React.FC<ProductDetailsViewProps> = ({
   };
 
   return (
-    <div className="w-full bg-[#F7F2EC] dark:bg-[#09090b] text-[#242321] dark:text-[#f4f4f6] font-sans pb-24 transition-colors">
+    <div className="w-full bg-[#F7F2EC] bg-[#F7F2EC] text-[#242321] text-[#242321] font-sans pb-24 transition-colors">
       <div className="max-w-[1440px] mx-auto px-4 sm:px-8 lg:px-12 pt-6">
         
         {/* Breadcrumb Path (Exact Match to Reference Panel 3) */}
-        <div className="flex items-center gap-2 text-xs text-[#77716B] dark:text-[#8e8e98] mb-6 pb-3 border-b border-[#E9D9CA] dark:border-[#242429]">
+        <div className="flex items-center gap-2 text-xs text-[#77716B] text-[#77716B] mb-6 pb-3 border-b border-[#E9D9CA] border-[#E9D9CA]">
           <button
             onClick={onBackToCatalog}
             className="hover:text-[#B4532A] cursor-pointer transition-colors"
@@ -275,12 +275,12 @@ export const ProductDetailsView: React.FC<ProductDetailsViewProps> = ({
         </div>
 
         {/* Top Product Layout: Left Gallery (7 cols) + Right Details (5 cols) */}
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-14 items-start pb-16 border-b border-[#E9D9CA] dark:border-[#242429]">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-14 items-start pb-16 border-b border-[#E9D9CA] border-[#E9D9CA]">
           
           {/* LEFT: Multi-Angle Interactive Product Gallery */}
           <div className="lg:col-span-7 space-y-4">
             {/* Main Stage Display */}
-            <div className="relative aspect-[4/3] bg-white dark:bg-[#121215] border border-[#E9D9CA] dark:border-[#2A2A32] rounded-3xl overflow-hidden group shadow-sm flex items-center justify-center p-6">
+            <div className="relative aspect-[4/3] bg-white bg-[#FDFAF6] border border-[#E9D9CA] dark:border-[#2A2A32] rounded-3xl overflow-hidden group shadow-sm flex items-center justify-center p-6">
               <img
                 src={activeColor.images[activeAngle] || activeColor.images.front}
                 alt={`${product.name} - ${activeAngle} view`}
@@ -385,12 +385,12 @@ export const ProductDetailsView: React.FC<ProductDetailsViewProps> = ({
           {/* RIGHT: Product Purchasing Protocol, Color, Size, Specs (Exact Match to Reference Panel 3) */}
           <div className="lg:col-span-5 space-y-6">
             {/* Header / Brand & Rating */}
-            <div className="space-y-2 border-b border-[#E9D9CA] dark:border-[#242429] pb-5">
+            <div className="space-y-2 border-b border-[#E9D9CA] border-[#E9D9CA] pb-5">
               <div className="flex items-center justify-between text-xs">
                 <span className="text-[#B4532A] font-bold tracking-wider uppercase text-[11px]">
                   {product.brand}
                 </span>
-                <div className="flex items-center gap-1 font-bold text-[#242321] dark:text-[#f4f4f6]">
+                <div className="flex items-center gap-1 font-bold text-[#242321] text-[#242321]">
                   <Star className="w-4 h-4 fill-[#B4532A] text-[#B4532A]" />
                   <span>{product.rating}</span>
                   <span className="text-[#77716B] font-normal">
@@ -421,7 +421,7 @@ export const ProductDetailsView: React.FC<ProductDetailsViewProps> = ({
             </div>
 
             {/* COLOR SELECTION */}
-            <div className="space-y-3 border-b border-[#E9D9CA] dark:border-[#242429] pb-5">
+            <div className="space-y-3 border-b border-[#E9D9CA] border-[#E9D9CA] pb-5">
               <div className="flex items-center justify-between text-xs">
                 <span className="font-bold text-[#242321] dark:text-white">
                   Color: <span className="font-normal text-[#77716B]">{activeColor.name}</span>
@@ -439,7 +439,7 @@ export const ProductDetailsView: React.FC<ProductDetailsViewProps> = ({
                     className={`relative w-8 h-8 rounded-full border-2 p-0.5 transition-all cursor-pointer ${
                       selectedColorIndex === idx
                         ? 'border-[#B4532A] scale-110'
-                        : 'border-[#E9D9CA] dark:border-[#242429] hover:border-[#B4532A]'
+                        : 'border-[#E9D9CA] border-[#E9D9CA] hover:border-[#B4532A]'
                     }`}
                     title={c.name}
                   >
@@ -453,7 +453,7 @@ export const ProductDetailsView: React.FC<ProductDetailsViewProps> = ({
             </div>
 
             {/* SIZE SELECTION & SIZE GUIDE */}
-            <div className="space-y-3 border-b border-[#E9D9CA] dark:border-[#242429] pb-5">
+            <div className="space-y-3 border-b border-[#E9D9CA] border-[#E9D9CA] pb-5">
               <div className="flex items-center justify-between text-xs">
                 <div className="flex items-center gap-2">
                   <span className="font-bold text-[#242321] dark:text-white">
@@ -486,8 +486,8 @@ export const ProductDetailsView: React.FC<ProductDetailsViewProps> = ({
                         isChosen
                           ? 'bg-[#B4532A] text-white border-[#B4532A] shadow-md'
                           : isAvailable
-                          ? 'bg-white dark:bg-[#18181c] text-[#242321] dark:text-[#f4f4f6] border-[#E9D9CA] dark:border-[#242429] hover:border-[#B4532A]'
-                          : 'bg-[#F7F2EC] dark:bg-[#121215] text-[#77716B] border-[#E9D9CA]/40 opacity-40 cursor-not-allowed'
+                          ? 'bg-white bg-white text-[#242321] text-[#242321] border-[#E9D9CA] border-[#E9D9CA] hover:border-[#B4532A]'
+                          : 'bg-[#F7F2EC] bg-[#FDFAF6] text-[#77716B] border-[#E9D9CA]/40 opacity-40 cursor-not-allowed'
                       }`}
                     >
                       <span>{s.size}</span>
@@ -506,7 +506,7 @@ export const ProductDetailsView: React.FC<ProductDetailsViewProps> = ({
 
               {/* Out of Stock Alert for selected size with Notify Me */}
               {selectedSize && isSelectedSizeOutOfStock && (
-                <div className="p-3 bg-white dark:bg-[#18181c] border border-[#E9D9CA] rounded-xl text-xs space-y-2">
+                <div className="p-3 bg-white bg-white border border-[#E9D9CA] rounded-xl text-xs space-y-2">
                   <div className="text-red-500 font-bold flex items-center gap-1.5">
                     <AlertCircle className="w-4 h-4" />
                     <span>Size {sizeLabel} {selectedSize} is currently out of stock.</span>
@@ -538,7 +538,7 @@ export const ProductDetailsView: React.FC<ProductDetailsViewProps> = ({
                   className={`w-14 h-14 rounded-xl border flex items-center justify-center transition-all cursor-pointer shadow-sm ${
                     isWishlisted
                       ? 'bg-[#B4532A] text-white border-[#B4532A]'
-                      : 'bg-white dark:bg-[#18181c] text-[#77716B] border-[#E9D9CA] dark:border-[#242429] hover:border-[#B4532A]'
+                      : 'bg-white bg-white text-[#77716B] border-[#E9D9CA] border-[#E9D9CA] hover:border-[#B4532A]'
                   }`}
                   title={isWishlisted ? 'Remove from Wishlist' : 'Add to Wishlist'}
                 >
@@ -549,24 +549,24 @@ export const ProductDetailsView: React.FC<ProductDetailsViewProps> = ({
               <button
                 id="pdp-buy-now-btn"
                 onClick={handleBuyNowClick}
-                className="w-full py-4 bg-white dark:bg-[#18181c] hover:bg-[#B4532A] hover:text-white text-[#B4532A] border-2 border-[#B4532A] rounded-xl text-sm font-bold flex items-center justify-center gap-2 cursor-pointer transition-all shadow-sm"
+                className="w-full py-4 bg-white bg-white hover:bg-[#B4532A] hover:text-white text-[#B4532A] border-2 border-[#B4532A] rounded-xl text-sm font-bold flex items-center justify-center gap-2 cursor-pointer transition-all shadow-sm"
               >
                 <span>Buy Now →</span>
               </button>
 
               {/* Value Proposition Badges */}
               <div className="grid grid-cols-3 gap-3 pt-4 text-center">
-                <div className="p-3 bg-white dark:bg-[#18181c] border border-[#E9D9CA] dark:border-[#242429] rounded-xl flex flex-col items-center gap-1.5 shadow-sm">
+                <div className="p-3 bg-white bg-white border border-[#E9D9CA] border-[#E9D9CA] rounded-xl flex flex-col items-center gap-1.5 shadow-sm">
                   <Truck className="w-4 h-4 text-[#B4532A]" />
                   <span className="font-bold text-xs text-[#242321] dark:text-white">Free Shipping</span>
                   <span className="text-[10px] text-[#77716B]">On all orders</span>
                 </div>
-                <div className="p-3 bg-white dark:bg-[#18181c] border border-[#E9D9CA] dark:border-[#242429] rounded-xl flex flex-col items-center gap-1.5 shadow-sm">
+                <div className="p-3 bg-white bg-white border border-[#E9D9CA] border-[#E9D9CA] rounded-xl flex flex-col items-center gap-1.5 shadow-sm">
                   <RotateCcw className="w-4 h-4 text-[#B4532A]" />
                   <span className="font-bold text-xs text-[#242321] dark:text-white">Easy Returns</span>
                   <span className="text-[10px] text-[#77716B]">30 days exchange</span>
                 </div>
-                <div className="p-3 bg-white dark:bg-[#18181c] border border-[#E9D9CA] dark:border-[#242429] rounded-xl flex flex-col items-center gap-1.5 shadow-sm">
+                <div className="p-3 bg-white bg-white border border-[#E9D9CA] border-[#E9D9CA] rounded-xl flex flex-col items-center gap-1.5 shadow-sm">
                   <Shield className="w-4 h-4 text-[#B4532A]" />
                   <span className="font-bold text-xs text-[#242321] dark:text-white">Secure Payment</span>
                   <span className="text-[10px] text-[#77716B]">100% Protected</span>

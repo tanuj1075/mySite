@@ -27,6 +27,22 @@
         }
       })();
     </script>
+    <style>
+      /* GLOBAL LIGHT MODE FORCE — overrides ALL dark colors before React mounts */
+      *, *::before, *::after {
+        --tw-bg-opacity: 1 !important;
+      }
+      html, body, #root {
+        background-color: #F7F2EC !important;
+        color: #242321 !important;
+      }
+      /* Kill dark backgrounds */
+      [style*="background-color: rgb(9, 9, 11)"],
+      [style*="background:#09090b"],
+      [style*="background: #09090b"] {
+        background-color: #F7F2EC !important;
+      }
+    </style>
   </head>
   <body class="bg-[#F7F2EC] text-[#242321] antialiased selection:bg-[#B4532A33] selection:text-[#B4532A]">
     <div id="root"></div>

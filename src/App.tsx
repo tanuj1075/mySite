@@ -1356,7 +1356,7 @@ export default function App() {
   }
 
   return (
-    <div className="storefront-shell min-h-screen bg-[#F7F2EC] dark:bg-[#09090b] text-[#242321] dark:text-[#f4f4f6] antialiased flex flex-col justify-between selection:bg-[#B4532A33] selection:text-[#B4532A]">
+    <div className="storefront-shell min-h-screen bg-[#F7F2EC] bg-[#F7F2EC] text-[#242321] text-[#242321] antialiased flex flex-col justify-between selection:bg-[#B4532A33] selection:text-[#B4532A]">
       {/* Fixed Luxury Header */}
       <Header
         cartCount={totalItemCount}
@@ -1402,7 +1402,7 @@ export default function App() {
       />
 
       {/* Main Content Area */}
-      <main className="storefront-content w-full pt-16 sm:pt-24 bg-[#F7F2EC] dark:bg-[#09090b] flex-1">
+      <main className="storefront-content w-full pt-16 sm:pt-24 bg-[#F7F2EC] bg-[#F7F2EC] flex-1">
         {/* VIEW 1: COLLECTIONS (Hero & Home Experience) */}
         {activeNav === 'COLLECTIONS' && (
           <CollectionsView
@@ -1587,7 +1587,7 @@ export default function App() {
                 }}
               />
             ) : (
-              <div className="w-full bg-[#F7F2EC] dark:bg-[#09090b] text-[#242321] dark:text-[#f4f4f6] min-h-[60vh] flex flex-col items-center justify-center p-8 text-center">
+              <div className="w-full bg-[#F7F2EC] bg-[#F7F2EC] text-[#242321] text-[#242321] min-h-[60vh] flex flex-col items-center justify-center p-8 text-center">
                 <h2 className="text-2xl font-bold mb-2">No Active Orders Yet</h2>
                 <p className="text-xs text-[#77716B] mb-6">Complete a checkout to track your sneaker shipment in real-time.</p>
                 <button

@@ -256,7 +256,7 @@ export const ProductListingView: React.FC<ProductListingViewProps> = ({
   }, [filteredProducts, sortBy]);
 
   return (
-    <div className="w-full bg-[#F7F2EC] dark:bg-[#09090b] text-[#242321] dark:text-[#f4f4f6] font-sans pb-24 transition-colors">
+    <div className="w-full bg-[#F7F2EC] bg-[#F7F2EC] text-[#242321] text-[#242321] font-sans pb-24 transition-colors">
       <div className="max-w-[1440px] mx-auto px-4 sm:px-8 lg:px-12 pt-6">
         
         {/* Collection Header Banner (Exact Match to Reference Panel 2) */}
@@ -282,12 +282,12 @@ export const ProductListingView: React.FC<ProductListingViewProps> = ({
         </div>
 
         {/* Quick Filter Header & Sort Bar */}
-        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 pb-6 border-b border-[#E9D9CA] dark:border-[#242429] mb-8">
+        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 pb-6 border-b border-[#E9D9CA] border-[#E9D9CA] mb-8">
           <div>
             <span className="text-sm font-bold text-[#242321] dark:text-white">
               {filteredProducts.length} Products Found
             </span>
-            <span className="text-xs text-[#77716B] dark:text-[#8e8e98] ml-2">
+            <span className="text-xs text-[#77716B] text-[#77716B] ml-2">
               (out of {products.length} in active catalog)
             </span>
           </div>
@@ -295,18 +295,18 @@ export const ProductListingView: React.FC<ProductListingViewProps> = ({
           <div className="flex items-center gap-3 w-full sm:w-auto justify-between sm:justify-end">
             <button
               onClick={() => setMobileFiltersOpen(!mobileFiltersOpen)}
-              className="lg:hidden flex items-center gap-2 bg-white dark:bg-[#121215] border border-[#E9D9CA] dark:border-[#242429] px-4 py-2 rounded-xl text-xs font-semibold text-[#242321] dark:text-[#f4f4f6] cursor-pointer"
+              className="lg:hidden flex items-center gap-2 bg-white bg-[#FDFAF6] border border-[#E9D9CA] border-[#E9D9CA] px-4 py-2 rounded-xl text-xs font-semibold text-[#242321] text-[#242321] cursor-pointer"
             >
               <Filter className="w-4 h-4 text-[#B4532A]" />
               <span>Filters ({selectedSizes.length > 0 ? selectedSizes.length : ''})</span>
             </button>
 
             <div className="flex items-center gap-2">
-              <span className="text-xs font-semibold text-[#77716B] dark:text-[#8e8e98]">Sort by:</span>
+              <span className="text-xs font-semibold text-[#77716B] text-[#77716B]">Sort by:</span>
               <select
                 value={sortBy}
                 onChange={(e) => setSortBy(e.target.value as any)}
-                className="bg-white dark:bg-[#121215] border border-[#E9D9CA] dark:border-[#242429] text-[#242321] dark:text-[#f4f4f6] text-xs font-medium px-3.5 py-2 rounded-xl focus:outline-none focus:border-[#B4532A] cursor-pointer shadow-sm"
+                className="bg-white bg-[#FDFAF6] border border-[#E9D9CA] border-[#E9D9CA] text-[#242321] text-[#242321] text-xs font-medium px-3.5 py-2 rounded-xl focus:outline-none focus:border-[#B4532A] cursor-pointer shadow-sm"
               >
                 <option value="POPULAR">Popularity</option>
                 <option value="NEWEST">Newest Drops</option>
@@ -333,11 +333,11 @@ export const ProductListingView: React.FC<ProductListingViewProps> = ({
           
           {/* LEFT SIDEBAR FILTERS (Matching Reference Panel 2) */}
           <div
-            className={`lg:col-span-3 space-y-6 bg-white dark:bg-[#121215] border border-[#E9D9CA] dark:border-[#242429] p-6 rounded-2xl shadow-sm ${
+            className={`lg:col-span-3 space-y-6 bg-white bg-[#FDFAF6] border border-[#E9D9CA] border-[#E9D9CA] p-6 rounded-2xl shadow-sm ${
               mobileFiltersOpen ? 'block' : 'hidden lg:block'
             }`}
           >
-            <div className="flex items-center justify-between border-b border-[#E9D9CA] dark:border-[#242429] pb-3">
+            <div className="flex items-center justify-between border-b border-[#E9D9CA] border-[#E9D9CA] pb-3">
               <span className="text-sm font-bold text-[#242321] dark:text-white uppercase tracking-wider flex items-center gap-2">
                 <Filter className="w-4 h-4 text-[#B4532A]" />
                 Filter By
@@ -352,7 +352,7 @@ export const ProductListingView: React.FC<ProductListingViewProps> = ({
             </div>
 
             {/* Price Range Slider */}
-            <div className="space-y-3 border-b border-[#E9D9CA] dark:border-[#242429] pb-5">
+            <div className="space-y-3 border-b border-[#E9D9CA] border-[#E9D9CA] pb-5">
               <div className="flex items-center justify-between text-xs font-bold">
                 <span className="text-[#242321] dark:text-white">Price Range</span>
                 <span className="text-[#B4532A]">{formatCurrency(maxPrice)}</span>
@@ -376,7 +376,7 @@ export const ProductListingView: React.FC<ProductListingViewProps> = ({
             </div>
 
             {/* Brand Checkboxes */}
-            <div className="space-y-3 border-b border-[#E9D9CA] dark:border-[#242429] pb-5">
+            <div className="space-y-3 border-b border-[#E9D9CA] border-[#E9D9CA] pb-5">
               <span className="text-xs font-bold text-[#242321] dark:text-white uppercase tracking-wider block">
                 Brands
               </span>
@@ -386,7 +386,7 @@ export const ProductListingView: React.FC<ProductListingViewProps> = ({
                   className={`w-full text-left px-2.5 py-1.5 rounded-lg text-xs font-medium flex items-center justify-between transition-colors cursor-pointer ${
                     selectedBrand === 'ALL'
                       ? 'bg-[#B4532A] text-white font-bold'
-                      : 'text-[#77716B] hover:bg-[#F7F2EC] dark:hover:bg-[#18181c] dark:text-[#8e8e98]'
+                      : 'text-[#77716B] hover:bg-[#F7F2EC] hover:bg-[#F0EAE2] text-[#77716B]'
                   }`}
                 >
                   <span>All Brands</span>
@@ -402,7 +402,7 @@ export const ProductListingView: React.FC<ProductListingViewProps> = ({
                       className={`w-full text-left px-2.5 py-1.5 rounded-lg text-xs font-medium flex items-center justify-between transition-colors cursor-pointer ${
                         selectedBrand === brand
                           ? 'bg-[#B4532A] text-white font-bold'
-                          : 'text-[#77716B] hover:bg-[#F7F2EC] dark:hover:bg-[#18181c] dark:text-[#8e8e98]'
+                          : 'text-[#77716B] hover:bg-[#F7F2EC] hover:bg-[#F0EAE2] text-[#77716B]'
                       }`}
                     >
                       <span>{brand}</span>
@@ -414,7 +414,7 @@ export const ProductListingView: React.FC<ProductListingViewProps> = ({
             </div>
 
             {/* Sizes Chips */}
-            <div className="space-y-3 border-b border-[#E9D9CA] dark:border-[#242429] pb-5">
+            <div className="space-y-3 border-b border-[#E9D9CA] border-[#E9D9CA] pb-5">
               <div className="flex items-center justify-between">
                 <span className="text-xs font-bold text-[#242321] dark:text-white uppercase tracking-wider">
                   Size
@@ -435,7 +435,7 @@ export const ProductListingView: React.FC<ProductListingViewProps> = ({
                       className={`py-2 text-center text-xs rounded-xl font-bold transition-all cursor-pointer border ${
                         isSelected
                           ? 'bg-[#B4532A] text-white border-[#B4532A] shadow-sm'
-                          : 'bg-[#F7F2EC] dark:bg-[#18181c] text-[#77716B] dark:text-[#8e8e98] border-[#E9D9CA] dark:border-[#2A2A32] hover:border-[#B4532A]'
+                          : 'bg-[#F7F2EC] bg-white text-[#77716B] text-[#77716B] border-[#E9D9CA] dark:border-[#2A2A32] hover:border-[#B4532A]'
                       }`}
                     >
                       {size}
@@ -461,7 +461,7 @@ export const ProductListingView: React.FC<ProductListingViewProps> = ({
                         className={`px-3 py-1.5 rounded-full text-xs font-medium border transition-all cursor-pointer ${
                           isSelected
                             ? 'bg-[#B4532A] text-white border-[#B4532A]'
-                            : 'bg-[#F7F2EC] dark:bg-[#18181c] text-[#77716B] dark:text-[#8e8e98] border-[#E9D9CA] dark:border-[#2A2A32] hover:border-[#B4532A]'
+                            : 'bg-[#F7F2EC] bg-white text-[#77716B] text-[#77716B] border-[#E9D9CA] dark:border-[#2A2A32] hover:border-[#B4532A]'
                         }`}
                       >
                         {colorName}
@@ -518,7 +518,7 @@ export const ProductListingView: React.FC<ProductListingViewProps> = ({
                   return (
                     <div
                       key={shoe.id}
-                      className="bg-white dark:bg-[#18181c] border border-[#E9D9CA] dark:border-[#2A2A32] rounded-2xl flex flex-col justify-between group hover:border-[#B4532A] transition-all duration-300 hover:-translate-y-1 shadow-sm hover:shadow-xl overflow-hidden"
+                      className="bg-white bg-white border border-[#E9D9CA] dark:border-[#2A2A32] rounded-2xl flex flex-col justify-between group hover:border-[#B4532A] transition-all duration-300 hover:-translate-y-1 shadow-sm hover:shadow-xl overflow-hidden"
                     >
                       <div className="p-5">
                         {/* Card Header: Brand, Code, Wishlist */}
@@ -557,7 +557,7 @@ export const ProductListingView: React.FC<ProductListingViewProps> = ({
                         {/* Image Preview with Dual-Angle Hover Reveal */}
                         <div
                           onClick={() => onSelectProduct(shoe)}
-                          className="relative aspect-[4/3] bg-[#F7F2EC] dark:bg-[#121215] rounded-xl overflow-hidden mb-4 cursor-pointer flex items-center justify-center p-3"
+                          className="relative aspect-[4/3] bg-[#F7F2EC] bg-[#FDFAF6] rounded-xl overflow-hidden mb-4 cursor-pointer flex items-center justify-center p-3"
                         >
                           {/* Primary Front Angle */}
                           <img
@@ -610,21 +610,21 @@ export const ProductListingView: React.FC<ProductListingViewProps> = ({
                             <span className="text-[10px] text-[#8e8e98] uppercase">
                               {shoe.category} • {shoe.gender}
                             </span>
-                            <div className="flex items-center gap-1 text-[10px] font-bold text-[#242321] dark:text-[#f4f4f6]">
+                            <div className="flex items-center gap-1 text-[10px] font-bold text-[#242321] text-[#242321]">
                               {shoe.reviewsCount > 0 ? (
                                 <>
                                   <Star className="w-3 h-3 fill-[#B4532A] text-[#B4532A]" />
                                   <span>{shoe.rating}</span>
                                 </>
                               ) : (
-                                <span className="text-[#77716B] dark:text-[#8e8e98]">Not rated</span>
+                                <span className="text-[#77716B] text-[#77716B]">Not rated</span>
                               )}
                             </div>
                           </div>
 
                           <h3
                             onClick={() => onSelectProduct(shoe)}
-                            className="font-headline text-lg font-bold uppercase text-[#242321] dark:text-[#f4f4f6] tracking-tight hover:text-[#B4532A] cursor-pointer leading-snug transition-colors"
+                            className="font-headline text-lg font-bold uppercase text-[#242321] text-[#242321] tracking-tight hover:text-[#B4532A] cursor-pointer leading-snug transition-colors"
                           >
                             {shoe.name}
                           </h3>
@@ -635,7 +635,7 @@ export const ProductListingView: React.FC<ProductListingViewProps> = ({
                           <span className="text-base font-bold text-[#242321] dark:text-white">
                             {formatCurrency(shoe.price)}
                           </span>
-                          <span className="text-xs text-[#77716B] dark:text-[#8e8e98] line-through">
+                          <span className="text-xs text-[#77716B] text-[#77716B] line-through">
                             {formatCurrency(shoe.mrp)}
                           </span>
                         </div>
@@ -658,7 +658,7 @@ export const ProductListingView: React.FC<ProductListingViewProps> = ({
                         )}
 
                         {/* Available Sizes List */}
-                        <div className="space-y-1 pt-2 border-t border-[#E9D9CA] dark:border-[#242429]">
+                        <div className="space-y-1 pt-2 border-t border-[#E9D9CA] border-[#E9D9CA]">
                           <span className="text-[9px] font-bold text-[#B4532A] uppercase block">
                             AVAILABLE SIZES:
                           </span>
@@ -666,7 +666,7 @@ export const ProductListingView: React.FC<ProductListingViewProps> = ({
                             {allSizesInStock.map((sz) => (
                               <span
                                 key={sz}
-                                className="px-1.5 py-0.5 bg-[#F7F2EC] dark:bg-[#18181c] border border-[#E9D9CA] dark:border-[#242429] text-[9px] text-[#242321] dark:text-[#8e8e98] font-bold rounded"
+                                className="px-1.5 py-0.5 bg-[#F7F2EC] bg-white border border-[#E9D9CA] border-[#E9D9CA] text-[9px] text-[#242321] text-[#77716B] font-bold rounded"
                               >
                                 {sz}
                               </span>
@@ -679,7 +679,7 @@ export const ProductListingView: React.FC<ProductListingViewProps> = ({
                       <div className="grid grid-cols-2 gap-2 p-5 pt-0">
                         <button
                           onClick={() => onSelectProduct(shoe)}
-                          className="py-2.5 bg-[#F7F2EC] dark:bg-[#242429] hover:bg-[#E9D9CA]/60 text-[#242321] dark:text-[#f4f4f6] text-xs font-semibold rounded-xl flex items-center justify-center gap-1.5 cursor-pointer transition-colors"
+                          className="py-2.5 bg-[#F7F2EC] dark:bg-[#242429] hover:bg-[#E9D9CA]/60 text-[#242321] text-[#242321] text-xs font-semibold rounded-xl flex items-center justify-center gap-1.5 cursor-pointer transition-colors"
                         >
                           <Eye className="w-4 h-4" />
                           <span>Details</span>
@@ -700,7 +700,7 @@ export const ProductListingView: React.FC<ProductListingViewProps> = ({
                 {/* Pagination / Load more */}
                 {visibleCount < sortedProducts.length && (
                   <div className="mt-12 flex flex-col items-center justify-center gap-3">
-                    <p className="text-xs text-[#77716B] dark:text-[#8e8e98]">
+                    <p className="text-xs text-[#77716B] text-[#77716B]">
                       Showing {Math.min(visibleCount, sortedProducts.length)} of {sortedProducts.length} products
                     </p>
                     <button

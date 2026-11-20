@@ -46,12 +46,12 @@ export const OrderTrackingView: React.FC<OrderTrackingViewProps> = ({
   };
 
   return (
-    <div className="w-full bg-[#F7F2EC] dark:bg-[#09090b] text-[#242321] dark:text-[#f4f4f6] min-h-[80vh] pb-24">
+    <div className="w-full bg-[#F7F2EC] bg-[#F7F2EC] text-[#242321] text-[#242321] min-h-[80vh] pb-24">
       
       {/* Sub-Hero with Curved Warm Beige Organic Element (Exact Match to Reference Panel 8) */}
-      <section className="relative overflow-hidden bg-white dark:bg-[#121215] border-b border-[#E9D9CA] dark:border-[#242429]">
+      <section className="relative overflow-hidden bg-white bg-[#FDFAF6] border-b border-[#E9D9CA] border-[#E9D9CA]">
         {/* Background decorative curved beige shape */}
-        <div className="absolute right-0 top-0 bottom-0 w-1/2 bg-[#E9D9CA]/40 dark:bg-[#1e1e24] rounded-l-[120px] pointer-events-none hidden md:block" />
+        <div className="absolute right-0 top-0 bottom-0 w-1/2 bg-[#E9D9CA]/40 bg-[#F0EAE2] rounded-l-[120px] pointer-events-none hidden md:block" />
 
         <div className="max-w-[1280px] mx-auto px-5 sm:px-8 py-10 sm:py-14 relative z-10 flex flex-col md:flex-row items-center justify-between gap-8">
           
@@ -68,7 +68,7 @@ export const OrderTrackingView: React.FC<OrderTrackingViewProps> = ({
             <h1 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-[#242321] dark:text-white tracking-tight">
               Track Your Order
             </h1>
-            <p className="text-sm text-[#77716B] dark:text-[#8e8e98]">
+            <p className="text-sm text-[#77716B] text-[#77716B]">
               Enter your order ID to track your shipment in real time
             </p>
 
@@ -80,7 +80,7 @@ export const OrderTrackingView: React.FC<OrderTrackingViewProps> = ({
                   value={inputOrderId}
                   onChange={(e) => setInputOrderId(e.target.value)}
                   placeholder="Order ID (e.g. VA12345)"
-                  className="w-full px-4 py-3.5 rounded-xl border border-[#E9D9CA] dark:border-[#2A2A32] bg-white dark:bg-[#18181c] text-[#242321] dark:text-white text-xs font-semibold focus:outline-none focus:border-[#B4532A] shadow-xs"
+                  className="w-full px-4 py-3.5 rounded-xl border border-[#E9D9CA] dark:border-[#2A2A32] bg-white bg-white text-[#242321] dark:text-white text-xs font-semibold focus:outline-none focus:border-[#B4532A] shadow-xs"
                 />
               </div>
               <button
@@ -110,21 +110,21 @@ export const OrderTrackingView: React.FC<OrderTrackingViewProps> = ({
       <div className="max-w-[1100px] mx-auto px-5 sm:px-8 mt-10 space-y-8">
         
         {/* Milestone Timeline Card (Exact Match to Reference Panel 8) */}
-        <div className="bg-white dark:bg-[#121215] border border-[#E9D9CA] dark:border-[#242429] rounded-2xl p-6 sm:p-10 shadow-sm space-y-8">
+        <div className="bg-white bg-[#FDFAF6] border border-[#E9D9CA] border-[#E9D9CA] rounded-2xl p-6 sm:p-10 shadow-sm space-y-8">
           
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-[#E9D9CA] dark:border-[#242429] pb-6">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-[#E9D9CA] border-[#E9D9CA] pb-6">
             <div>
               <div className="flex items-center gap-2 text-xs font-bold text-[#B4532A] mb-1">
                 <span className="w-2 h-2 rounded-full bg-[#B4532A] animate-pulse"></span>
                 <span>Active Tracking: #{displayId}</span>
               </div>
-              <p className="text-xs text-[#77716B] dark:text-[#8e8e98]">
+              <p className="text-xs text-[#77716B] text-[#77716B]">
                 Carrier: <strong className="text-[#242321] dark:text-white">{order.carrier}</strong> • Tracking #{order.trackingNumber}
               </p>
             </div>
 
             <div className="text-right">
-              <span className="text-xs text-[#77716B] dark:text-[#8e8e98] block">Estimated Delivery</span>
+              <span className="text-xs text-[#77716B] text-[#77716B] block">Estimated Delivery</span>
               <span className="text-sm font-extrabold text-[#242321] dark:text-white">
                 {order.expectedDelivery}
               </span>
@@ -151,7 +151,7 @@ export const OrderTrackingView: React.FC<OrderTrackingViewProps> = ({
                       className={`w-9 h-9 rounded-full flex items-center justify-center font-bold text-xs transition-all ${
                         isPassed
                           ? 'bg-[#B4532A] text-white shadow-sm ring-4 ring-[#B4532A]/20'
-                          : 'bg-white dark:bg-[#18181c] border-2 border-[#E9D9CA] dark:border-[#2A2A32] text-[#77716B]'
+                          : 'bg-white bg-white border-2 border-[#E9D9CA] dark:border-[#2A2A32] text-[#77716B]'
                       }`}
                     >
                       {isPassed ? <Check className="w-4 h-4" /> : idx + 1}
@@ -161,7 +161,7 @@ export const OrderTrackingView: React.FC<OrderTrackingViewProps> = ({
                       {m.label}
                     </span>
 
-                    <span className="text-[10px] text-[#77716B] dark:text-[#8e8e98] mt-0.5">
+                    <span className="text-[10px] text-[#77716B] text-[#77716B] mt-0.5">
                       {order.timeline[idx]?.date || m.defaultDate}
                     </span>
                   </div>
@@ -175,7 +175,7 @@ export const OrderTrackingView: React.FC<OrderTrackingViewProps> = ({
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           
           {/* Destination */}
-          <div className="bg-white dark:bg-[#121215] border border-[#E9D9CA] dark:border-[#242429] rounded-2xl p-6 shadow-sm space-y-3">
+          <div className="bg-white bg-[#FDFAF6] border border-[#E9D9CA] border-[#E9D9CA] rounded-2xl p-6 shadow-sm space-y-3">
             <div className="flex items-center gap-2 text-xs font-bold text-[#B4532A] uppercase tracking-wider">
               <MapPin className="w-4 h-4" />
               <span>Delivery Destination</span>
@@ -183,7 +183,7 @@ export const OrderTrackingView: React.FC<OrderTrackingViewProps> = ({
             <div className="text-sm font-bold text-[#242321] dark:text-white">
               {order.shippingAddress.name}
             </div>
-            <p className="text-xs text-[#77716B] dark:text-[#8e8e98] leading-relaxed">
+            <p className="text-xs text-[#77716B] text-[#77716B] leading-relaxed">
               {order.shippingAddress.line1}
               {order.shippingAddress.line2 && <><br />{order.shippingAddress.line2}</>}
               <br />
@@ -192,14 +192,14 @@ export const OrderTrackingView: React.FC<OrderTrackingViewProps> = ({
               {order.shippingAddress.country}
             </p>
             {order.shippingAddress.phone && (
-              <p className="text-xs text-[#77716B] dark:text-[#8e8e98] pt-1">
+              <p className="text-xs text-[#77716B] text-[#77716B] pt-1">
                 Phone: {order.shippingAddress.phone}
               </p>
             )}
           </div>
 
           {/* Items In Shipment */}
-          <div className="bg-white dark:bg-[#121215] border border-[#E9D9CA] dark:border-[#242429] rounded-2xl p-6 shadow-sm space-y-3">
+          <div className="bg-white bg-[#FDFAF6] border border-[#E9D9CA] border-[#E9D9CA] rounded-2xl p-6 shadow-sm space-y-3">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2 text-xs font-bold text-[#B4532A] uppercase tracking-wider">
                 <Package className="w-4 h-4" />
@@ -219,7 +219,7 @@ export const OrderTrackingView: React.FC<OrderTrackingViewProps> = ({
               {order.items.map((item, idx) => (
                 <div key={idx} className="py-2.5 flex items-center justify-between gap-3">
                   <div className="flex items-center gap-3">
-                    <div className="w-11 h-11 rounded-lg bg-[#F7F2EC] dark:bg-[#18181c] border border-[#E9D9CA]/60 overflow-hidden shrink-0 flex items-center justify-center p-1">
+                    <div className="w-11 h-11 rounded-lg bg-[#F7F2EC] bg-white border border-[#E9D9CA]/60 overflow-hidden shrink-0 flex items-center justify-center p-1">
                       <img src={item.image} alt={item.name} className="w-full h-full object-contain" />
                     </div>
                     <div>

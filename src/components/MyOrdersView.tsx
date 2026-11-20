@@ -63,7 +63,7 @@ export const MyOrdersView: React.FC<MyOrdersViewProps> = ({
   };
 
   return (
-    <div className="w-full bg-[#F7F2EC] dark:bg-[#09090b] text-[#242321] dark:text-[#f4f4f6] min-h-[70vh] py-10 sm:py-16">
+    <div className="w-full bg-[#F7F2EC] bg-[#F7F2EC] text-[#242321] text-[#242321] min-h-[70vh] py-10 sm:py-16">
       <div className="max-w-[1200px] mx-auto px-5 sm:px-8">
         
         {/* Header (Exact Match to Reference Panel 7) */}
@@ -71,7 +71,7 @@ export const MyOrdersView: React.FC<MyOrdersViewProps> = ({
           <h1 className="text-3xl sm:text-4xl font-extrabold text-[#242321] dark:text-white tracking-tight">
             My Orders
           </h1>
-          <p className="text-xs text-[#77716B] dark:text-[#8e8e98] mt-1">
+          <p className="text-xs text-[#77716B] text-[#77716B] mt-1">
             Track, view provenance dossiers, and manage deliveries
           </p>
         </div>
@@ -88,7 +88,7 @@ export const MyOrdersView: React.FC<MyOrdersViewProps> = ({
                 className={`px-5 py-2 rounded-xl text-xs font-bold transition-all cursor-pointer ${
                   isActive
                     ? 'bg-[#B4532A] text-white shadow-sm'
-                    : 'bg-white dark:bg-[#18181c] text-[#77716B] dark:text-[#8e8e98] border border-[#E9D9CA] dark:border-[#242429] hover:border-[#B4532A]'
+                    : 'bg-white bg-white text-[#77716B] text-[#77716B] border border-[#E9D9CA] border-[#E9D9CA] hover:border-[#B4532A]'
                 }`}
               >
                 {tab}
@@ -99,14 +99,14 @@ export const MyOrdersView: React.FC<MyOrdersViewProps> = ({
 
         {/* Orders Listing Grid */}
         {filteredOrders.length === 0 ? (
-          <div className="bg-white dark:bg-[#18181c] border border-[#E9D9CA] dark:border-[#242429] rounded-2xl p-12 text-center flex flex-col items-center justify-center gap-4 shadow-sm">
+          <div className="bg-white bg-white border border-[#E9D9CA] border-[#E9D9CA] rounded-2xl p-12 text-center flex flex-col items-center justify-center gap-4 shadow-sm">
             <div className="w-14 h-14 rounded-full bg-[#E9D9CA]/40 dark:bg-[#242429] flex items-center justify-center text-[#B4532A]">
               <Package className="w-6 h-6" />
             </div>
             <h2 className="text-lg font-bold text-[#242321] dark:text-white">
               No Orders in This Category
             </h2>
-            <p className="text-xs text-[#77716B] dark:text-[#8e8e98] max-w-sm">
+            <p className="text-xs text-[#77716B] text-[#77716B] max-w-sm">
               You do not have any {activeFilter !== 'All' ? activeFilter.toLowerCase() : ''} orders currently recorded.
             </p>
             <button
@@ -125,15 +125,15 @@ export const MyOrdersView: React.FC<MyOrdersViewProps> = ({
               return (
                 <article
                   key={order.id}
-                  className="bg-white dark:bg-[#18181c] border border-[#E9D9CA] dark:border-[#2A2A32] rounded-2xl p-6 shadow-sm hover:shadow-md transition-all flex flex-col gap-5"
+                  className="bg-white bg-white border border-[#E9D9CA] dark:border-[#2A2A32] rounded-2xl p-6 shadow-sm hover:shadow-md transition-all flex flex-col gap-5"
                 >
                   {/* Order Header */}
-                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-[#E9D9CA] dark:border-[#242429] pb-4">
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-[#E9D9CA] border-[#E9D9CA] pb-4">
                     <div className="flex items-center gap-3">
                       <span className="text-base font-extrabold text-[#242321] dark:text-white">
                         Order #{displayId}
                       </span>
-                      <span className="text-xs text-[#77716B] dark:text-[#8e8e98]">
+                      <span className="text-xs text-[#77716B] text-[#77716B]">
                         {order.date}
                       </span>
                     </div>
@@ -153,7 +153,7 @@ export const MyOrdersView: React.FC<MyOrdersViewProps> = ({
                       {order.items.map((item, idx) => (
                         <div
                           key={idx}
-                          className="w-16 h-16 sm:w-20 sm:h-20 bg-[#F7F2EC] dark:bg-[#121215] rounded-xl border border-[#E9D9CA]/60 dark:border-[#2A2A32] overflow-hidden p-1.5 flex items-center justify-center shrink-0"
+                          className="w-16 h-16 sm:w-20 sm:h-20 bg-[#F7F2EC] bg-[#FDFAF6] rounded-xl border border-[#E9D9CA]/60 dark:border-[#2A2A32] overflow-hidden p-1.5 flex items-center justify-center shrink-0"
                           title={`${item.name} (${item.specification || 'Size 9'})`}
                         >
                           <img
@@ -166,7 +166,7 @@ export const MyOrdersView: React.FC<MyOrdersViewProps> = ({
                           />
                         </div>
                       ))}
-                      <div className="text-xs text-[#77716B] dark:text-[#8e8e98] pl-2 font-medium">
+                      <div className="text-xs text-[#77716B] text-[#77716B] pl-2 font-medium">
                         {order.items.length} item{order.items.length > 1 ? 's' : ''} • Carrier: {order.carrier}
                       </div>
                     </div>

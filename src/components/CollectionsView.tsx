@@ -91,7 +91,7 @@ export const CollectionsView: React.FC<CollectionsViewProps> = ({
   };
 
   return (
-    <div className="w-full bg-[#F7F2EC] dark:bg-[#09090b] text-[#242321] dark:text-[#f4f4f6] font-sans transition-colors pb-16">
+    <div className="w-full bg-[#F7F2EC] bg-[#F7F2EC] text-[#242321] text-[#242321] font-sans transition-colors pb-16">
       {/* 1. HERO SECTION (Exact Match to Reference Panel 1) */}
       <section className="relative overflow-hidden pt-4 pb-12 sm:pb-20 max-w-[1440px] mx-auto px-5 md:px-12">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center min-h-[520px]">
@@ -118,7 +118,7 @@ export const CollectionsView: React.FC<CollectionsViewProps> = ({
               </button>
               <button
                 onClick={() => onNavigate('COLLECTIONS')}
-                className="border border-[#E9D9CA] dark:border-[#333230] bg-white/70 dark:bg-[#121215] text-[#242321] dark:text-[#f4f4f6] hover:border-[#B4532A] font-semibold text-sm px-6 py-3.5 rounded-xl transition-all cursor-pointer"
+                className="border border-[#E9D9CA] dark:border-[#333230] bg-white/70 bg-[#FDFAF6] text-[#242321] text-[#242321] hover:border-[#B4532A] font-semibold text-sm px-6 py-3.5 rounded-xl transition-all cursor-pointer"
               >
                 Explore Lookbook
               </button>
@@ -156,10 +156,10 @@ export const CollectionsView: React.FC<CollectionsViewProps> = ({
                 onClick={() => handleCategoryClick(pill.filter, pill.navKey)}
                 className="flex flex-col items-center gap-2 group cursor-pointer focus:outline-none"
               >
-                <div className="w-14 h-14 sm:w-16 sm:h-16 rounded-full bg-white dark:bg-[#18181c] border border-[#E9D9CA] dark:border-[#2A2A32] shadow-sm group-hover:border-[#B4532A] group-hover:shadow-md flex items-center justify-center text-[#242321] dark:text-[#f4f4f6] group-hover:text-[#B4532A] transition-all">
+                <div className="w-14 h-14 sm:w-16 sm:h-16 rounded-full bg-white bg-white border border-[#E9D9CA] dark:border-[#2A2A32] shadow-sm group-hover:border-[#B4532A] group-hover:shadow-md flex items-center justify-center text-[#242321] text-[#242321] group-hover:text-[#B4532A] transition-all">
                   <Icon className="w-5 h-5 sm:w-6 sm:h-6" />
                 </div>
-                <span className="text-xs sm:text-sm font-semibold text-[#242321] dark:text-[#f4f4f6] group-hover:text-[#B4532A] transition-colors">
+                <span className="text-xs sm:text-sm font-semibold text-[#242321] text-[#242321] group-hover:text-[#B4532A] transition-colors">
                   {pill.label}
                 </span>
               </button>
@@ -194,9 +194,9 @@ export const CollectionsView: React.FC<CollectionsViewProps> = ({
             <div
               key={col.id}
               onClick={() => handleCategoryClick(col.category)}
-              className="bg-white dark:bg-[#18181c] border border-[#E9D9CA] dark:border-[#2A2A32] rounded-2xl overflow-hidden shadow-sm hover:shadow-xl transition-all cursor-pointer group"
+              className="bg-white bg-white border border-[#E9D9CA] dark:border-[#2A2A32] rounded-2xl overflow-hidden shadow-sm hover:shadow-xl transition-all cursor-pointer group"
             >
-              <div className="aspect-[4/3] bg-[#F7F2EC] dark:bg-[#121215] overflow-hidden relative">
+              <div className="aspect-[4/3] bg-[#F7F2EC] bg-[#FDFAF6] overflow-hidden relative">
                 <img
                   src={col.image}
                   alt={col.title}
@@ -249,10 +249,10 @@ export const CollectionsView: React.FC<CollectionsViewProps> = ({
               <div
                 key={product.id}
                 onClick={() => handleCardClick(product)}
-                className="bg-white dark:bg-[#18181c] border border-[#E9D9CA] dark:border-[#2A2A32] rounded-2xl overflow-hidden shadow-sm hover:shadow-xl transition-all cursor-pointer group flex flex-col justify-between"
+                className="bg-white bg-white border border-[#E9D9CA] dark:border-[#2A2A32] rounded-2xl overflow-hidden shadow-sm hover:shadow-xl transition-all cursor-pointer group flex flex-col justify-between"
               >
                 {/* Image Stage + Wishlist Heart */}
-                <div className="relative aspect-square bg-[#F7F2EC] dark:bg-[#121215] flex items-center justify-center p-4 overflow-hidden">
+                <div className="relative aspect-square bg-[#F7F2EC] bg-[#FDFAF6] flex items-center justify-center p-4 overflow-hidden">
                   <img
                     src={frontImage}
                     alt={product.name}
@@ -305,7 +305,7 @@ export const CollectionsView: React.FC<CollectionsViewProps> = ({
                     </div>
                     <button
                       onClick={(e) => handleQuickAdd(product, e)}
-                      className="w-8 h-8 rounded-full bg-[#F7F2EC] dark:bg-[#242429] hover:bg-[#B4532A] text-[#242321] dark:text-[#f4f4f6] hover:text-white flex items-center justify-center transition-colors cursor-pointer"
+                      className="w-8 h-8 rounded-full bg-[#F7F2EC] dark:bg-[#242429] hover:bg-[#B4532A] text-[#242321] text-[#242321] hover:text-white flex items-center justify-center transition-colors cursor-pointer"
                       title="Choose size"
                     >
                       <ArrowRight className="w-4 h-4" />
@@ -365,7 +365,7 @@ export const CollectionsView: React.FC<CollectionsViewProps> = ({
       {/* 6. TRUST PILLARS (Why Choose VANTA ARCHIVE) */}
       <section className="max-w-[1440px] mx-auto px-5 md:px-12 py-12">
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-          <div className="p-6 bg-white dark:bg-[#18181c] border border-[#E9D9CA] dark:border-[#2A2A32] rounded-2xl shadow-sm flex items-start gap-4">
+          <div className="p-6 bg-white bg-white border border-[#E9D9CA] dark:border-[#2A2A32] rounded-2xl shadow-sm flex items-start gap-4">
             <div className="w-10 h-10 rounded-full bg-[#E9D9CA]/40 dark:bg-[#242429] flex items-center justify-center text-[#B4532A] shrink-0">
               <ShieldCheck className="w-5 h-5" />
             </div>
@@ -377,7 +377,7 @@ export const CollectionsView: React.FC<CollectionsViewProps> = ({
             </div>
           </div>
 
-          <div className="p-6 bg-white dark:bg-[#18181c] border border-[#E9D9CA] dark:border-[#2A2A32] rounded-2xl shadow-sm flex items-start gap-4">
+          <div className="p-6 bg-white bg-white border border-[#E9D9CA] dark:border-[#2A2A32] rounded-2xl shadow-sm flex items-start gap-4">
             <div className="w-10 h-10 rounded-full bg-[#E9D9CA]/40 dark:bg-[#242429] flex items-center justify-center text-[#B4532A] shrink-0">
               <Truck className="w-5 h-5" />
             </div>
@@ -389,7 +389,7 @@ export const CollectionsView: React.FC<CollectionsViewProps> = ({
             </div>
           </div>
 
-          <div className="p-6 bg-white dark:bg-[#18181c] border border-[#E9D9CA] dark:border-[#2A2A32] rounded-2xl shadow-sm flex items-start gap-4">
+          <div className="p-6 bg-white bg-white border border-[#E9D9CA] dark:border-[#2A2A32] rounded-2xl shadow-sm flex items-start gap-4">
             <div className="w-10 h-10 rounded-full bg-[#E9D9CA]/40 dark:bg-[#242429] flex items-center justify-center text-[#B4532A] shrink-0">
               <RotateCcw className="w-5 h-5" />
             </div>
@@ -401,7 +401,7 @@ export const CollectionsView: React.FC<CollectionsViewProps> = ({
             </div>
           </div>
 
-          <div className="p-6 bg-white dark:bg-[#18181c] border border-[#E9D9CA] dark:border-[#2A2A32] rounded-2xl shadow-sm flex items-start gap-4">
+          <div className="p-6 bg-white bg-white border border-[#E9D9CA] dark:border-[#2A2A32] rounded-2xl shadow-sm flex items-start gap-4">
             <div className="w-10 h-10 rounded-full bg-[#E9D9CA]/40 dark:bg-[#242429] flex items-center justify-center text-[#B4532A] shrink-0">
               <Lock className="w-5 h-5" />
             </div>

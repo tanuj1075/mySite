@@ -124,15 +124,15 @@ export const CheckoutProtocol: React.FC<CheckoutProtocolProps> = ({
   return (
     <section className="flex flex-col gap-6" id="checkout-protocol-section">
       {/* Primary Checkout Card (Exact Match to Reference Panel 5) */}
-      <div className="bg-white dark:bg-[#121215] border border-[#E9D9CA] dark:border-[#242429] rounded-2xl p-6 sm:p-8 flex flex-col gap-6 shadow-sm">
+      <div className="bg-white bg-[#FDFAF6] border border-[#E9D9CA] border-[#E9D9CA] rounded-2xl p-6 sm:p-8 flex flex-col gap-6 shadow-sm">
         
         {/* Shipping Information Header */}
-        <div className="border-b border-[#E9D9CA] dark:border-[#242429] pb-4 flex items-center justify-between">
+        <div className="border-b border-[#E9D9CA] border-[#E9D9CA] pb-4 flex items-center justify-between">
           <div>
             <h2 className="text-xl font-bold text-[#242321] dark:text-white">
               Shipping Information
             </h2>
-            <p className="text-xs text-[#77716B] dark:text-[#8e8e98] mt-0.5">
+            <p className="text-xs text-[#77716B] text-[#77716B] mt-0.5">
               Select or register your verified delivery destination
             </p>
           </div>
@@ -145,7 +145,7 @@ export const CheckoutProtocol: React.FC<CheckoutProtocolProps> = ({
         <div className="flex flex-col gap-3" id="address-selection-block">
           {addresses.length === 0 ? (
             <div className="p-5 border border-dashed border-[#E9D9CA] dark:border-[#2A2A32] rounded-xl text-center">
-              <p className="text-xs text-[#77716B] dark:text-[#8e8e98] mb-3">
+              <p className="text-xs text-[#77716B] text-[#77716B] mb-3">
                 No saved shipping address found for your profile.
               </p>
               <button
@@ -166,8 +166,8 @@ export const CheckoutProtocol: React.FC<CheckoutProtocolProps> = ({
                   onClick={() => onSelectAddress(addr.id)}
                   className={`cursor-pointer p-4 rounded-xl flex items-start gap-3.5 transition-all border ${
                     isSelected
-                      ? 'bg-[#F7F2EC] dark:bg-[#18181c] border-[#B4532A] ring-1 ring-[#B4532A] shadow-sm'
-                      : 'bg-white dark:bg-[#121215] border-[#E9D9CA] dark:border-[#242429] hover:border-[#B4532A]/50'
+                      ? 'bg-[#F7F2EC] bg-white border-[#B4532A] ring-1 ring-[#B4532A] shadow-sm'
+                      : 'bg-white bg-[#FDFAF6] border-[#E9D9CA] border-[#E9D9CA] hover:border-[#B4532A]/50'
                   }`}
                 >
                   <input
@@ -188,12 +188,12 @@ export const CheckoutProtocol: React.FC<CheckoutProtocolProps> = ({
                         </span>
                       )}
                     </div>
-                    <p className="text-[#77716B] dark:text-[#8e8e98] mt-1 leading-relaxed">
+                    <p className="text-[#77716B] text-[#77716B] mt-1 leading-relaxed">
                       {addr.line1}{addr.line2 ? `, ${addr.line2}` : ''}<br />
                       {addr.city}, {addr.state ? `${addr.state} ` : ''}{addr.postalCode}, {addr.country}
                     </p>
                     {addr.phone && (
-                      <div className="flex items-center gap-1.5 mt-2 text-[#77716B] dark:text-[#8e8e98]">
+                      <div className="flex items-center gap-1.5 mt-2 text-[#77716B] text-[#77716B]">
                         <Phone className="w-3.5 h-3.5 text-[#B4532A]" />
                         <span>{addr.phone}</span>
                       </div>
@@ -209,7 +209,7 @@ export const CheckoutProtocol: React.FC<CheckoutProtocolProps> = ({
             <button
               type="button"
               onClick={onOpenNewAddressModal}
-              className="flex items-center justify-center gap-2 py-2.5 px-4 rounded-xl border border-dashed border-[#E9D9CA] dark:border-[#242429] hover:border-[#B4532A] text-[#77716B] hover:text-[#B4532A] dark:text-[#8e8e98] text-xs font-semibold transition-colors cursor-pointer"
+              className="flex items-center justify-center gap-2 py-2.5 px-4 rounded-xl border border-dashed border-[#E9D9CA] border-[#E9D9CA] hover:border-[#B4532A] text-[#77716B] hover:text-[#B4532A] text-[#77716B] text-xs font-semibold transition-colors cursor-pointer"
             >
               <Plus className="w-4 h-4 text-[#B4532A]" />
               <span>Add Another Delivery Address</span>
@@ -218,7 +218,7 @@ export const CheckoutProtocol: React.FC<CheckoutProtocolProps> = ({
 
           {/* Delivery Estimate Banner */}
           {isDeliveryLoading && (
-            <div className="bg-[#F7F2EC] dark:bg-[#18181c] border border-[#E9D9CA] dark:border-[#242429] rounded-xl p-3 flex items-center gap-3 text-xs text-[#77716B]">
+            <div className="bg-[#F7F2EC] bg-white border border-[#E9D9CA] border-[#E9D9CA] rounded-xl p-3 flex items-center gap-3 text-xs text-[#77716B]">
               <Truck className="w-4 h-4 text-[#B4532A] shrink-0 animate-pulse" />
               <span>Calculating estimated transit time...</span>
             </div>
@@ -229,7 +229,7 @@ export const CheckoutProtocol: React.FC<CheckoutProtocolProps> = ({
             </div>
           )}
           {deliveryEstimate && !isDeliveryLoading && (
-            <div className="bg-[#F7F2EC] dark:bg-[#18181c] border border-[#E9D9CA] dark:border-[#2A2A32] rounded-xl p-3.5 flex items-start gap-3">
+            <div className="bg-[#F7F2EC] bg-white border border-[#E9D9CA] dark:border-[#2A2A32] rounded-xl p-3.5 flex items-start gap-3">
               <Truck className="w-4 h-4 text-[#B4532A] shrink-0 mt-0.5" />
               <div className="flex flex-col gap-0.5 text-xs">
                 <span className="text-[10px] font-bold text-[#B4532A] uppercase tracking-wider">
@@ -240,7 +240,7 @@ export const CheckoutProtocol: React.FC<CheckoutProtocolProps> = ({
                   {' – '}
                   {new Date(deliveryEstimate.maxDate).toLocaleDateString('en-GB', { weekday: 'short', day: 'numeric', month: 'short', year: 'numeric' })}
                   {' '}
-                  <span className="font-normal text-[#77716B] dark:text-[#8e8e98]">({deliveryEstimate.minDays}–{deliveryEstimate.maxDays} business days)</span>
+                  <span className="font-normal text-[#77716B] text-[#77716B]">({deliveryEstimate.minDays}–{deliveryEstimate.maxDays} business days)</span>
                 </span>
               </div>
             </div>
@@ -248,7 +248,7 @@ export const CheckoutProtocol: React.FC<CheckoutProtocolProps> = ({
         </div>
 
         {/* Payment Method Selector */}
-        <div className="space-y-3 pt-2 border-t border-[#E9D9CA] dark:border-[#242429]" id="settlement-methods-block">
+        <div className="space-y-3 pt-2 border-t border-[#E9D9CA] border-[#E9D9CA]" id="settlement-methods-block">
           <span className="text-xs font-bold text-[#242321] dark:text-white uppercase tracking-wider block">
             Payment Method
           </span>
@@ -268,8 +268,8 @@ export const CheckoutProtocol: React.FC<CheckoutProtocolProps> = ({
                   onClick={() => setPaymentMethod(method.id)}
                   className={`p-3.5 rounded-xl border flex items-center gap-3 transition-all cursor-pointer text-left ${
                     isActive
-                      ? 'bg-[#F7F2EC] dark:bg-[#18181c] border-[#B4532A] ring-1 ring-[#B4532A]'
-                      : 'bg-white dark:bg-[#121215] border-[#E9D9CA] dark:border-[#242429] hover:border-[#B4532A]/50'
+                      ? 'bg-[#F7F2EC] bg-white border-[#B4532A] ring-1 ring-[#B4532A]'
+                      : 'bg-white bg-[#FDFAF6] border-[#E9D9CA] border-[#E9D9CA] hover:border-[#B4532A]/50'
                   } ${isUnavailable ? 'opacity-40 cursor-not-allowed' : ''}`}
                 >
                   <div className={`p-2 rounded-lg ${isActive ? 'bg-[#B4532A] text-white' : 'bg-[#F7F2EC] dark:bg-[#242429] text-[#77716B]'}`}>
@@ -279,7 +279,7 @@ export const CheckoutProtocol: React.FC<CheckoutProtocolProps> = ({
                     <span className="text-xs font-bold text-[#242321] dark:text-white">
                       {method.label}
                     </span>
-                    <span className="text-[10px] text-[#77716B] dark:text-[#8e8e98]">
+                    <span className="text-[10px] text-[#77716B] text-[#77716B]">
                       {method.detail}
                     </span>
                   </div>
@@ -292,19 +292,19 @@ export const CheckoutProtocol: React.FC<CheckoutProtocolProps> = ({
         {/* Financial Ledger / Cost Breakdown (Exact Match to Reference Panel 5 Order Summary) */}
         <div
           id="financial-ledger-breakdown"
-          className="bg-[#F7F2EC] dark:bg-[#18181c] border border-[#E9D9CA] dark:border-[#2A2A32] rounded-xl p-5 flex flex-col gap-3 text-xs"
+          className="bg-[#F7F2EC] bg-white border border-[#E9D9CA] dark:border-[#2A2A32] rounded-xl p-5 flex flex-col gap-3 text-xs"
         >
-          <div className="flex justify-between text-[#77716B] dark:text-[#8e8e98]">
+          <div className="flex justify-between text-[#77716B] text-[#77716B]">
             <span>Subtotal</span>
             <span className="text-[#242321] dark:text-white font-bold">
               {formatCurrency(displayedSubtotal, currency)}
             </span>
           </div>
-          <div className="flex justify-between text-[#77716B] dark:text-[#8e8e98]">
+          <div className="flex justify-between text-[#77716B] text-[#77716B]">
             <span>Shipping</span>
             <span className="text-[#22C55E] font-bold">Free</span>
           </div>
-          <div className="border-t border-[#E9D9CA] dark:border-[#242429] pt-3 flex justify-between items-center text-sm">
+          <div className="border-t border-[#E9D9CA] border-[#E9D9CA] pt-3 flex justify-between items-center text-sm">
             <span className="font-extrabold text-[#242321] dark:text-white">
               Total
             </span>
@@ -317,7 +317,7 @@ export const CheckoutProtocol: React.FC<CheckoutProtocolProps> = ({
           </div>
 
           {isQuoteLoading && (
-            <p className="text-[10px] text-[#77716B] dark:text-[#8e8e98]" role="status">Loading international currency quote...</p>
+            <p className="text-[10px] text-[#77716B] text-[#77716B]" role="status">Loading international currency quote...</p>
           )}
           {quoteError && (
             <p className="text-[10px] text-red-500" role="alert">{quoteError}</p>
@@ -346,14 +346,14 @@ export const CheckoutProtocol: React.FC<CheckoutProtocolProps> = ({
             )}
           </button>
 
-          <div className="flex items-center justify-center gap-1.5 text-center text-xs text-[#77716B] dark:text-[#8e8e98] pt-1">
+          <div className="flex items-center justify-center gap-1.5 text-center text-xs text-[#77716B] text-[#77716B] pt-1">
             <Lock className="w-3.5 h-3.5 text-[#B4532A]" />
             <span>Secure Checkout • 256-bit SSL Encryption</span>
           </div>
         </div>
 
         {/* Trust Badges */}
-        <div className="grid grid-cols-2 gap-3 pt-2 border-t border-[#E9D9CA] dark:border-[#242429] text-[11px] text-[#77716B]">
+        <div className="grid grid-cols-2 gap-3 pt-2 border-t border-[#E9D9CA] border-[#E9D9CA] text-[11px] text-[#77716B]">
           <div className="flex items-center gap-2">
             <CheckCircle2 className="w-4 h-4 text-[#22C55E]" />
             <span>100% Authentic Guaranteed</span>
