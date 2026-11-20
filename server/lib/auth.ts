@@ -34,6 +34,9 @@ const ARGON2_OPTIONS: Options = {
 const BCRYPT_HASH_PATTERN = /^\$2[aby]\$\d{2}\$/;
 
 export async function hashPassword(password: string): Promise<string> {
+  if (process.env.VERCEL || process.env.FORCE_BCRYPT === 'true') {
+    return bcrypt.hash(password, 10);
+  }
   try {
     return await argon2Hash(password, ARGON2_OPTIONS);
   } catch (err) {
