@@ -35,6 +35,7 @@ import { adminApi, authApi, clearAdminSession, clearSession, customerApi } from 
 import { UpiPaymentModal } from './components/UpiPaymentModal';
 import { initTheme } from './lib/theme';
 import { subscribeCurrency } from './lib/currency';
+import { INITIAL_ADDRESSES } from './data/mockData';
 
 import {
   CartItem,
